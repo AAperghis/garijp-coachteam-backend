@@ -1,10 +1,18 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+import io
 
-from banaan.models import Student, Instructor, BanaanConfig
+from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+import pandas as pd
+
+from banaan.models import Student, Instructor, BanaanConfig, BanaanGroup, BanaanSolution
 from banaan.solver import BanaanSolver
+from banaan.output import generate_output, export_to_xlsx
 
 router = APIRouter(prefix="/banaan")
+
+
+# ── Pydantic models ─────────────────────────────────────────────────────
 
 
 class InstructorInput(BaseModel):
@@ -21,9 +29,7 @@ class StudentInput(BaseModel):
     friend: str | None = None
 
 
-class BanaanRequest(BaseModel):
-    students: list[StudentInput]
-    instructors: list[InstructorInput]
+class ConfigInput(BaseModel):
     boat_capacity: int = 6
     slot_duration_min: int = 15
     prep_time_min: int = 15
@@ -31,6 +37,18 @@ class BanaanRequest(BaseModel):
     start_time: str = "10:30"
     end_time: str = "16:00"
     weights: dict[str, int] = {"instructor_switch": 10, "discipline_switch": 50}
+
+
+class UploadResponse(BaseModel):
+    students: list[StudentInput]
+    instructors: list[InstructorInput]
+    config: ConfigInput
+
+
+class BanaanRequest(BaseModel):
+    students: list[StudentInput]
+    instructors: list[InstructorInput]
+    config: ConfigInput = ConfigInput()
 
 
 class GroupOutput(BaseModel):
@@ -50,8 +68,76 @@ class BanaanResponse(BaseModel):
     total_banana_students: int
 
 
+# ── Endpoints ────────────────────────────────────────────────────────────
+
+
+@router.post("/upload", response_model=UploadResponse)
+async def upload_banaan(file: UploadFile):
+    """Parse an uploaded CSV/XLSX student file.
+
+    Returns the student list, extracted instructor list, and default config
+    so the frontend can display a preview and let the user adjust parameters.
+    """
+    contents = await file.read()
+    filename = file.filename or ""
+
+    try:
+        if filename.endswith(".xlsx"):
+            df = pd.read_excel(io.BytesIO(contents))
+        else:
+            df = pd.read_csv(io.BytesIO(contents))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Could not parse file: {exc}")
+
+    required_cols = {"Name", "Discipline", "Instructor", "Will banana"}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Missing columns: {', '.join(sorted(missing))}",
+        )
+
+    students: list[StudentInput] = []
+    instructor_set: dict[str, str] = {}  # name -> discipline
+    for _, row in df.iterrows():
+        friend_val = row.get("Friend")
+        friend = (
+            str(friend_val).strip()
+            if pd.notna(friend_val) and str(friend_val).strip()
+            else None
+        )
+        name = str(row["Name"]).strip()
+        discipline = str(row["Discipline"]).strip().lower()
+        instructor = str(row["Instructor"]).strip()
+        wants_banana = str(row["Will banana"]).strip().lower() in (
+            "yes", "true", "1", "ja",
+        )
+        students.append(
+            StudentInput(
+                name=name,
+                discipline=discipline,
+                instructor=instructor,
+                wants_banana=wants_banana,
+                friend=friend,
+            )
+        )
+        instructor_set[instructor] = discipline
+
+    instructors = [
+        InstructorInput(name=name, discipline=disc, transport_capacity=6)
+        for name, disc in instructor_set.items()
+    ]
+
+    return UploadResponse(
+        students=students,
+        instructors=instructors,
+        config=ConfigInput(),
+    )
+
+
 @router.post("/solve", response_model=BanaanResponse)
 async def solve_banaan(req: BanaanRequest):
+    """Run the solver on the (possibly edited) student/instructor/config data."""
     students = [
         Student(
             name=s.name,
@@ -70,21 +156,21 @@ async def solve_banaan(req: BanaanRequest):
         )
         for i in req.instructors
     ]
+    cfg = req.config
     config = BanaanConfig(
-        boat_capacity=req.boat_capacity,
-        slot_duration_min=req.slot_duration_min,
-        prep_time_min=req.prep_time_min,
-        transport_time_min=req.transport_time_min,
-        start_time=req.start_time,
-        end_time=req.end_time,
-        weights=req.weights,
+        boat_capacity=cfg.boat_capacity,
+        slot_duration_min=cfg.slot_duration_min,
+        prep_time_min=cfg.prep_time_min,
+        transport_time_min=cfg.transport_time_min,
+        start_time=cfg.start_time,
+        end_time=cfg.end_time,
+        weights=cfg.weights,
     )
 
     solver = BanaanSolver(students, instructors, config)
     solution = solver.solve()
 
     if solution is None:
-        from fastapi import HTTPException
         raise HTTPException(status_code=422, detail="No feasible schedule found")
 
     groups = [
@@ -107,4 +193,58 @@ async def solve_banaan(req: BanaanRequest):
         non_banana_assignments=solution.non_banana_assignments,
         total_groups=len(solution.groups),
         total_banana_students=sum(len(g.students) for g in solution.groups),
+    )
+
+
+@router.post("/download")
+async def download_banaan(req: BanaanRequest):
+    """Solve and return the result as a downloadable XLSX file."""
+    # Re-use the solve logic
+    students = [
+        Student(
+            name=s.name,
+            discipline=s.discipline,
+            instructor=s.instructor,
+            wants_banana=s.wants_banana,
+            friend=s.friend,
+        )
+        for s in req.students
+    ]
+    instructors = [
+        Instructor(
+            name=i.name,
+            discipline=i.discipline,
+            transport_capacity=i.transport_capacity,
+        )
+        for i in req.instructors
+    ]
+    cfg = req.config
+    config = BanaanConfig(
+        boat_capacity=cfg.boat_capacity,
+        slot_duration_min=cfg.slot_duration_min,
+        prep_time_min=cfg.prep_time_min,
+        transport_time_min=cfg.transport_time_min,
+        start_time=cfg.start_time,
+        end_time=cfg.end_time,
+        weights=cfg.weights,
+    )
+
+    solver = BanaanSolver(students, instructors, config)
+    solution = solver.solve()
+
+    if solution is None:
+        raise HTTPException(status_code=422, detail="No feasible schedule found")
+
+    sheets = generate_output(solution)
+
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        for name, df in sheets.items():
+            df.to_excel(writer, sheet_name=name, index=False)
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=banaan_schedule.xlsx"},
     )
