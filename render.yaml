@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: coach-tools
+    runtime: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ROOT_PATH
+        value: ""

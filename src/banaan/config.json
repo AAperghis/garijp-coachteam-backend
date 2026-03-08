@@ -1,0 +1,22 @@
+{
+    "instructors": {
+        "Pieter": {"discipline": "jz", "transport_capacity": 6},
+        "Marie": {"discipline": "jz", "transport_capacity": 6},
+        "Hans": {"discipline": "zb", "transport_capacity": 6},
+        "Anna": {"discipline": "ws", "transport_capacity": 6},
+        "Lisa": {"discipline": "ws", "transport_capacity": 6},
+        "Tom": {"discipline": "cat", "transport_capacity": 6},
+        "Klaas": {"discipline": "kb", "transport_capacity": 6},
+        "Jan": {"discipline": "kb", "transport_capacity": 6}
+    },
+    "boat_capacity": 6,
+    "slot_duration_min": 15,
+    "prep_time_min": 15,
+    "transport_time_min": 15,
+    "start_time": "10:30",
+    "end_time": "16:00",
+    "weights": {
+        "instructor_switch": 10,
+        "discipline_switch": 50
+    }
+}

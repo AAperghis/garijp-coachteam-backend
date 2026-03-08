@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["AAperghis <albert@aperghis.nl>"]
+readme = "README.md"
+package-mode=false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.115.14"}
+ortools = "^9.14.6206"
+pandas = "^2.2"
+openpyxl = "^3.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
