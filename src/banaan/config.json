@@ -1,14 +1,4 @@
 {
-    "instructors": {
-        "Pieter": {"discipline": "jz", "transport_capacity": 6},
-        "Marie": {"discipline": "jz", "transport_capacity": 6},
-        "Hans": {"discipline": "zb", "transport_capacity": 6},
-        "Anna": {"discipline": "ws", "transport_capacity": 6},
-        "Lisa": {"discipline": "ws", "transport_capacity": 6},
-        "Tom": {"discipline": "cat", "transport_capacity": 6},
-        "Klaas": {"discipline": "kb", "transport_capacity": 6},
-        "Jan": {"discipline": "kb", "transport_capacity": 6}
-    },
     "boat_capacity": 6,
     "slot_duration_min": 15,
     "prep_time_min": 15,
@@ -16,7 +6,16 @@
     "start_time": "10:30",
     "end_time": "16:00",
     "weights": {
-        "instructor_switch": 10,
-        "discipline_switch": 50
+        "banana_group": 1000,
+        "instructor_switch": 50,
+        "discipline_switch": 100,
+        "friend_reward": 5,
+        "age_similarity_reward": 1,
+        "cwo_similarity_reward": 1,
+        "instructor_cwo_match_bonus": 1,
+        "cover_over_penalty": 10,
+        "phase_order": 10,
+        "cover_switch_penalty": 3,
+        "stick_with_group_bonus": 10
     }
 }

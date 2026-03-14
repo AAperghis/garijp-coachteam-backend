@@ -3,14 +3,14 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install Poetry
-ENV POETRY_VERSION=1.8.2
-RUN pip install --no-cache-dir "poetry==$POETRY_VERSION"
+# Install uv
+ENV UV_VERSION=0.1.0
+RUN pip install --no-cache-dir "uv==$UV_VERSION"
 
-# Copy dependency files and install
-COPY pyproject.toml poetry.lock ./
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-root --only main
+# Copy dependency file and install
+COPY pyproject.toml ./
+RUN uv config virtualenvs.create false \
+    && uv pip install --group main
 
 # Copy source code
 COPY src/ ./src/

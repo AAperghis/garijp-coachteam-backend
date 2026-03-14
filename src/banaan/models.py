@@ -23,7 +23,9 @@ class Student:
     discipline: str
     instructor: str
     wants_banana: bool
-    friend: str | None = None
+    cwo: int
+    age: int
+    friends: list[str] | None = None
 
     @property
     def phase(self) -> int:
@@ -34,7 +36,9 @@ class Student:
 class Instructor:
     name: str
     discipline: str
+    cwo: int
     transport_capacity: int
+    cover_capacity: int
 
 
 @dataclass
@@ -61,11 +65,16 @@ class BanaanGroup:
     students: list[Student] = field(default_factory=list)
     transport_instructor: Instructor | None = None
 
+@dataclass
+class NonBananaAssignment:
+    student: Student
+    slot: int
+    instructor_name: str
 
 @dataclass
 class BanaanSolution:
     groups: list[BanaanGroup]
-    non_banana_assignments: dict[str, str]  # student_name -> instructor_name
+    non_banana_assignments: list[NonBananaAssignment]
     config: BanaanConfig
     start_time_minutes: int = 630  # 10:30 default
 

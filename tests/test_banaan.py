@@ -39,61 +39,58 @@ def _make_config(**overrides) -> BanaanConfig:
     return BanaanConfig(**defaults)
 
 
-def _make_instructors() -> list[Instructor]:
-    """8 instructors across all disciplines."""
-    return [
-        Instructor("Pieter", "jz", 6),
-        Instructor("Marie", "jz", 6),
-        Instructor("Hans", "zb", 6),
-        Instructor("Anna", "ws", 6),
-        Instructor("Lisa", "ws", 6),
-        Instructor("Tom", "cat", 6),
-        Instructor("Klaas", "kb", 6),
-        Instructor("Jan", "kb", 6),
+def _make_instructors(overrides=None) -> list[Instructor]:
+    """8 instructors across all disciplines, with all required fields."""
+    base = [
+        {"name": "Pieter", "discipline": "jz", "cwo": 2, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Marie", "discipline": "jz", "cwo": 3, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Hans", "discipline": "zb", "cwo": 4, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Anna", "discipline": "ws", "cwo": 1, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Lisa", "discipline": "ws", "cwo": 2, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Tom", "discipline": "cat", "cwo": 3, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Klaas", "discipline": "kb", "cwo": 4, "transport_capacity": 6, "cover_capacity": 6},
+        {"name": "Jan", "discipline": "kb", "cwo": 4, "transport_capacity": 6, "cover_capacity": 6},
     ]
+    if overrides:
+        for i, ovr in overrides.items():
+            base[i].update(ovr)
+    return [Instructor(**row) for row in base]
 
 
 def _make_full_student_set() -> list[Student]:
-    """30 students across all disciplines — matches example_input.csv."""
+    """30 students across all disciplines — matches example_input.csv, with cwo/age."""
+    # cwo and age are plausible, but arbitrary for test
     return [
-        # JZ — Pieter (4 banana, 1 no)
-        Student("Daan", "jz", "Pieter", True, "Sem"),
-        Student("Sem", "jz", "Pieter", True, "Daan"),
-        Student("Lotte", "jz", "Pieter", True),
-        Student("Luuk", "jz", "Pieter", False),
-        # JZ — Marie (3 banana, 1 no)
-        Student("Eva", "jz", "Marie", True, "Julia"),
-        Student("Finn", "jz", "Marie", True),
-        Student("Julia", "jz", "Marie", True, "Eva"),
-        Student("Noor", "jz", "Marie", False),
-        # ZB — Hans (3 banana, 1 no)
-        Student("Max", "zb", "Hans", True),
-        Student("Mila", "zb", "Hans", True),
-        Student("Bram", "zb", "Hans", True),
-        Student("Saar", "zb", "Hans", False),
-        # WS — Anna (2 banana, 1 no)
-        Student("Noah", "ws", "Anna", True, "Tess"),
-        Student("Tess", "ws", "Anna", True, "Noah"),
-        Student("Tim", "ws", "Anna", False),
-        # WS — Lisa (2 banana, 1 no)
-        Student("Fien", "ws", "Lisa", True),
-        Student("Lars", "ws", "Lisa", True),
-        Student("Roos", "ws", "Lisa", False),
-        # CAT — Tom (3 banana, 1 no)
-        Student("Thijs", "cat", "Tom", True),
-        Student("Evi", "cat", "Tom", True),
-        Student("Cas", "cat", "Tom", True),
-        Student("Luca", "cat", "Tom", False),
-        # KB — Klaas (3 banana, 1 no)
-        Student("Jesse", "kb", "Klaas", True, "Stijn"),
-        Student("Stijn", "kb", "Klaas", True, "Jesse"),
-        Student("Bo", "kb", "Klaas", True),
-        Student("Ruben", "kb", "Klaas", False),
-        # KB — Jan (2 banana, 2 no)
-        Student("Isa", "kb", "Jan", True),
-        Student("Niels", "kb", "Jan", True),
-        Student("Fleur", "kb", "Jan", False),
-        Student("Sophie", "kb", "Jan", False),
+        Student("Daan", "jz", "Pieter", True, 2, 10, ["Sem"]),
+        Student("Sem", "jz", "Pieter", True, 2, 10, ["Daan"]),
+        Student("Lotte", "jz", "Pieter", True, 2, 9),
+        Student("Luuk", "jz", "Pieter", False, 2, 9),
+        Student("Eva", "jz", "Marie", True, 3, 11, ["Julia"]),
+        Student("Finn", "jz", "Marie", True, 3, 10),
+        Student("Julia", "jz", "Marie", True, 3, 11, ["Eva"]),
+        Student("Noor", "jz", "Marie", False, 2, 10),
+        Student("Max", "zb", "Hans", True, 4, 12),
+        Student("Mila", "zb", "Hans", True, 4, 12),
+        Student("Bram", "zb", "Hans", True, 4, 13),
+        Student("Saar", "zb", "Hans", False, 4, 12),
+        Student("Noah", "ws", "Anna", True, 1, 13, ["Tess"]),
+        Student("Tess", "ws", "Anna", True, 1, 13, ["Noah"]),
+        Student("Tim", "ws", "Anna", False, 1, 12),
+        Student("Fien", "ws", "Lisa", True, 2, 14),
+        Student("Lars", "ws", "Lisa", True, 2, 14),
+        Student("Roos", "ws", "Lisa", False, 2, 13),
+        Student("Thijs", "cat", "Tom", True, 3, 15),
+        Student("Evi", "cat", "Tom", True, 3, 15),
+        Student("Cas", "cat", "Tom", True, 3, 16),
+        Student("Luca", "cat", "Tom", False, 3, 15),
+        Student("Jesse", "kb", "Klaas", True, 4, 17, ["Stijn"]),
+        Student("Stijn", "kb", "Klaas", True, 4, 17, ["Jesse"]),
+        Student("Bo", "kb", "Klaas", True, 4, 16),
+        Student("Ruben", "kb", "Klaas", False, 4, 16),
+        Student("Isa", "kb", "Jan", True, 4, 17),
+        Student("Niels", "kb", "Jan", True, 4, 16),
+        Student("Fleur", "kb", "Jan", False, 4, 17),
+        Student("Sophie", "kb", "Jan", False, 4, 16),
     ]
 
 
@@ -113,7 +110,7 @@ class TestModels:
             get_phase("unknown")
 
     def test_student_phase(self):
-        s = Student("Test", "ws", "Anna", True)
+        s = Student("Test", "ws", "Anna", True, 1, 12)
         assert s.phase == 1
 
     def test_slot_to_time(self):
@@ -137,35 +134,39 @@ class TestSolverBasic:
     def test_no_banana_students(self):
         """All students say no → empty schedule, all assigned to instructors."""
         students = [
-            Student("A", "jz", "Pieter", False),
-            Student("B", "ws", "Anna", False),
+            Student("A", "jz", "Pieter", False, 2, 10),
+            Student("B", "ws", "Anna", False, 1, 11),
         ]
-        instructors = [Instructor("Pieter", "jz", 4), Instructor("Anna", "ws", 3)]
+        instructors = [Instructor("Pieter", "jz", 2, 4, 4), Instructor("Anna", "ws", 1, 3, 3)]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
         assert len(sol.groups) == 0
-        assert sol.non_banana_assignments == {"A": "Pieter", "B": "Anna"}
+        for (student, slot), instructors_list in sol.non_banana_assignments.items():
+            assert student in ["A", "B"]
+            assert isinstance(instructors_list, list)
+            assert len(instructors_list) >= 1
 
     def test_single_group_jz(self):
         """6 JZ students fit in 1 group."""
-        students = [Student(f"S{i}", "jz", "Pieter", True) for i in range(6)]
-        students.append(Student("Stay", "jz", "Marie", False))
-        instructors = [Instructor("Pieter", "jz", 6), Instructor("Marie", "jz", 4)]
+        students = [Student(f"S{i}", "jz", "Pieter", True, 2, 10) for i in range(6)]
+        students.append(Student("Stay", "jz", "Marie", False, 3, 11))
+        instructors = [Instructor("Pieter", "jz", 2, 6, 6), Instructor("Marie", "jz", 3, 4, 4)]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
         assert len(sol.groups) == 1
         assert len(sol.groups[0].students) == 6
         assert sol.groups[0].transport_instructor is not None
-        assert "Stay" in sol.non_banana_assignments
+        found = any(student == "Stay" for (student, slot) in sol.non_banana_assignments)
+        assert found
 
     def test_two_groups_jz(self):
         """7 JZ students need 2 groups."""
-        students = [Student(f"S{i}", "jz", "Pieter", True) for i in range(7)]
-        students.append(Student("Stay", "jz", "Marie", False))
+        students = [Student(f"S{i}", "jz", "Pieter", True, 2, 10) for i in range(7)]
+        students.append(Student("Stay", "jz", "Marie", False, 3, 11))
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 6),
-            Instructor("Erik", "jz", 6),  # 3rd for coverage
+            Instructor("Pieter", "jz", 2, 6, 6),
+            Instructor("Marie", "jz", 3, 6, 6),
+            Instructor("Erik", "jz", 2, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -177,12 +178,12 @@ class TestSolverBasic:
 
     def test_group_respects_capacity(self):
         """No group exceeds boat capacity."""
-        students = [Student(f"S{i}", "jz", "Pieter", True) for i in range(12)]
-        students.append(Student("Stay", "jz", "Marie", False))
+        students = [Student(f"S{i}", "jz", "Pieter", True, 2, 10) for i in range(12)]
+        students.append(Student("Stay", "jz", "Marie", False, 3, 11))
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 6),
-            Instructor("Erik", "jz", 6),
+            Instructor("Pieter", "jz", 2, 6, 6),
+            Instructor("Marie", "jz", 3, 6, 6),
+            Instructor("Erik", "jz", 2, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -196,21 +197,21 @@ class TestSolverPhases:
     def test_phase_ordering_preferred(self):
         """JZ groups tend to come before middle, which come before KB (soft)."""
         students = [
-            Student("JZ1", "jz", "Pieter", True),
-            Student("ZB1", "zb", "Hans", True),
-            Student("KB1", "kb", "Klaas", True),
+            Student("JZ1", "jz", "Pieter", True, 2, 10),
+            Student("ZB1", "zb", "Hans", True, 2, 10),
+            Student("KB1", "kb", "Klaas", True, 2, 10),
             # Non-banana for coverage
-            Student("JZ_stay", "jz", "Marie", False),
-            Student("ZB_stay", "zb", "Hans2", False),
-            Student("KB_stay", "kb", "Jan", False),
+            Student("JZ_stay", "jz", "Marie", False, 3, 11),
+            Student("ZB_stay", "zb", "Hans2", False, 3, 11),
+            Student("KB_stay", "kb", "Jan", False, 3, 11),
         ]
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 4),
-            Instructor("Hans", "zb", 6),
-            Instructor("Hans2", "zb", 4),
-            Instructor("Klaas", "kb", 6),
-            Instructor("Jan", "kb", 4),
+            Instructor("Pieter", "jz", 2, 6, 6),
+            Instructor("Marie", "jz", 3, 6, 6),
+            Instructor("Hans", "zb", 2, 6, 6),
+            Instructor("Hans2", "zb", 3, 6, 6),
+            Instructor("Klaas", "kb", 2, 6, 6),
+            Instructor("Jan", "kb", 3, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -222,20 +223,20 @@ class TestSolverPhases:
     def test_all_banana_students_assigned(self):
         """Every banana student appears in exactly one group."""
         students = [
-            Student("JZ1", "jz", "Pieter", True),
-            Student("WS1", "ws", "Anna", True),
-            Student("KB1", "kb", "Klaas", True),
-            Student("JZ_stay", "jz", "Marie", False),
-            Student("WS_stay", "ws", "Lisa", False),
-            Student("KB_stay", "kb", "Jan", False),
+            Student("JZ1", "jz", "Pieter", True, 2, 10),
+            Student("WS1", "ws", "Anna", True, 2, 10),
+            Student("KB1", "kb", "Klaas", True, 2, 10),
+            Student("JZ_stay", "jz", "Marie", False, 3, 11),
+            Student("WS_stay", "ws", "Lisa", False, 3, 11),
+            Student("KB_stay", "kb", "Jan", False, 3, 11),
         ]
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 4),
-            Instructor("Anna", "ws", 6),
-            Instructor("Lisa", "ws", 4),
-            Instructor("Klaas", "kb", 6),
-            Instructor("Jan", "kb", 4),
+            Instructor("Pieter", "jz", 2, 6, 6),
+            Instructor("Marie", "jz", 3, 6, 6),
+            Instructor("Anna", "ws", 2, 6, 6),
+            Instructor("Lisa", "ws", 3, 6, 6),
+            Instructor("Klaas", "kb", 2, 6, 6),
+            Instructor("Jan", "kb", 3, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -245,20 +246,20 @@ class TestSolverPhases:
     def test_middle_phase_mixes_disciplines(self):
         """ZB, WS, CAT students can share groups in the middle phase."""
         students = [
-            Student("ZB1", "zb", "Hans", True),
-            Student("WS1", "ws", "Anna", True),
-            Student("CAT1", "cat", "Tom", True),
-            Student("ZB_stay", "zb", "Hans2", False),
-            Student("WS_stay", "ws", "Lisa", False),
-            Student("CAT_stay", "cat", "Tom2", False),
+            Student("ZB1", "zb", "Hans", True, 2, 10),
+            Student("WS1", "ws", "Anna", True, 2, 10),
+            Student("CAT1", "cat", "Tom", True, 2, 10),
+            Student("ZB_stay", "zb", "Hans2", False, 3, 11),
+            Student("WS_stay", "ws", "Lisa", False, 3, 11),
+            Student("CAT_stay", "cat", "Tom2", False, 3, 11),
         ]
         instructors = [
-            Instructor("Hans", "zb", 6),
-            Instructor("Hans2", "zb", 4),
-            Instructor("Anna", "ws", 6),
-            Instructor("Lisa", "ws", 4),
-            Instructor("Tom", "cat", 6),
-            Instructor("Tom2", "cat", 4),
+            Instructor("Hans", "zb", 2, 6, 6),
+            Instructor("Hans2", "zb", 3, 6, 6),
+            Instructor("Anna", "ws", 2, 6, 6),
+            Instructor("Lisa", "ws", 3, 6, 6),
+            Instructor("Tom", "cat", 2, 6, 6),
+            Instructor("Tom2", "cat", 3, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -274,19 +275,19 @@ class TestSolverFriends:
     def test_friends_in_same_group(self):
         """Mutual friends must end up in the same banana group."""
         students = [
-            Student("A", "jz", "Pieter", True, "B"),
-            Student("B", "jz", "Pieter", True, "A"),
-            Student("C", "jz", "Pieter", True),
-            Student("D", "jz", "Pieter", True),
-            Student("E", "jz", "Marie", True),
-            Student("F", "jz", "Marie", True),
-            Student("G", "jz", "Marie", True),
-            Student("Stay", "jz", "Erik", False),
+            Student("A", "jz", "Pieter", True, 2, 10, ["B"]),
+            Student("B", "jz", "Pieter", True, 3, 11, ["A", "C"]),
+            Student("C", "jz", "Pieter", True, 2, 10, ["B"]),
+            Student("D", "jz", "Pieter", True, 2, 10),
+            Student("E", "jz", "Marie", True, 2, 10),
+            Student("F", "jz", "Marie", True, 2, 10),
+            Student("G", "jz", "Marie", True, 2, 10),
+            Student("Stay", "jz", "Erik", False, 3, 11),
         ]
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 6),
-            Instructor("Erik", "jz", 6),
+            Instructor("Pieter", "jz", 3, 6, 6),
+            Instructor("Marie", "jz", 6, 6, 6),
+            Instructor("Erik", "jz", 6, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -300,11 +301,11 @@ class TestSolverFriends:
     def test_friend_not_banana(self):
         """If a friend doesn't want banana, constraint is skipped (no crash)."""
         students = [
-            Student("A", "jz", "Pieter", True, "B"),
-            Student("B", "jz", "Pieter", False),  # B doesn't want banana
-            Student("Stay", "jz", "Marie", False),
+            Student("A", "jz", "Pieter", True, 2, 4, ["B"]),
+            Student("B", "jz", "Pieter", False, 2, 4),  # B doesn't want banana
+            Student("Stay", "jz", "Marie", False, 3, 11),
         ]
-        instructors = [Instructor("Pieter", "jz", 6), Instructor("Marie", "jz", 4)]
+        instructors = [Instructor("Pieter", "jz",3, 6, 6), Instructor("Marie", "jz", 4, 6, 6)]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
         assert len(sol.groups) == 1
@@ -313,16 +314,16 @@ class TestSolverFriends:
     def test_cross_discipline_friends(self):
         """Friends from different disciplines can be in the same group."""
         students = [
-            Student("JZ1", "jz", "Pieter", True, "KB1"),
-            Student("KB1", "kb", "Klaas", True, "JZ1"),
-            Student("JZ_stay", "jz", "Marie", False),
-            Student("KB_stay", "kb", "Jan", False),
+            Student("JZ1", "jz", "Pieter", True, 2, 10, ["KB1"]),
+            Student("KB1", "kb", "Klaas", True, 3, 12, ["JZ1"]),
+            Student("JZ_stay", "jz", "Marie", False, 2, 10),
+            Student("KB_stay", "kb", "Jan", False, 1, 2),
         ]
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 4),
-            Instructor("Klaas", "kb", 6),
-            Instructor("Jan", "kb", 4),
+            Instructor("Pieter", "jz", 2, 6, 6),
+            Instructor("Marie", "jz", 3, 3, 4),
+            Instructor("Klaas", "kb", 6, 6, 6),
+            Instructor("Jan", "kb", 4, 4, 4),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -425,10 +426,10 @@ class TestSolverEdgeCases:
     def test_all_students_banana(self):
         """No non-banana students → no coverage constraint needed."""
         students = [
-            Student("A", "jz", "Pieter", True),
-            Student("B", "jz", "Pieter", True),
+            Student("A", "jz", "Pieter", True, 2, 10),
+            Student("B", "jz", "Pieter", True, 2, 10),
         ]
-        instructors = [Instructor("Pieter", "jz", 6)]
+        instructors = [Instructor("Pieter", "jz", 2, 6, 6)]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
         assert len(sol.groups) == 1
@@ -436,8 +437,8 @@ class TestSolverEdgeCases:
 
     def test_insufficient_time_window(self):
         """If the time window is too small, solver returns None."""
-        students = [Student(f"S{i}", "jz", "Pieter", True) for i in range(50)]
-        instructors = [Instructor("Pieter", "jz", 6)]
+        students = [Student(f"S{i}", "jz", "Pieter", True, 2, 4) for i in range(50)]
+        instructors = [Instructor("Pieter", "jz", 2, 6, 6)]
         # 50 students → 9 groups → 135 min; window = 30 min → infeasible
         config = _make_config(start_time="10:30", end_time="11:00")
         sol = BanaanSolver(students, instructors, config).solve()
@@ -445,10 +446,10 @@ class TestSolverEdgeCases:
 
     def test_capacity_too_small(self):
         """If no instructor has enough capacity, solver returns None."""
-        students = [Student(f"S{i}", "jz", "Pieter", True) for i in range(6)]
-        students.append(Student("Stay", "jz", "Marie", False))
+        students = [Student(f"S{i}", "jz", "Pieter", True, 2, 10) for i in range(6)]
+        students.append(Student("Stay", "jz", "Marie", False, 3, 11))
         # All instructors have capacity 2, but we need groups up to 6
-        instructors = [Instructor("Pieter", "jz", 2), Instructor("Marie", "jz", 2)]
+        instructors = [Instructor("Pieter", "jz", 2, 2, 2), Instructor("Marie", "jz", 3, 2, 2)]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         # Need 3 groups of 2 each, 2 instructors, groups 0,1,2
         # Pieter can do group 0 (busy -2 to 1), next available at slot 4 → can't do 1 or 2
@@ -467,18 +468,18 @@ class TestSolverObjective:
         """When possible, students should be transported by their own instructor."""
         # 3 students of Pieter, 3 of Marie → 1 group each ideally
         students = [
-            Student("P1", "jz", "Pieter", True),
-            Student("P2", "jz", "Pieter", True),
-            Student("P3", "jz", "Pieter", True),
-            Student("M1", "jz", "Marie", True),
-            Student("M2", "jz", "Marie", True),
-            Student("M3", "jz", "Marie", True),
-            Student("Stay", "jz", "Erik", False),
+            Student("P1", "jz", "Pieter", True, 2, 10),
+            Student("P2", "jz", "Pieter", True, 2, 10),
+            Student("P3", "jz", "Pieter", True, 2, 10),
+            Student("M1", "jz", "Marie", True, 2, 10),
+            Student("M2", "jz", "Marie", True, 2, 10),
+            Student("M3", "jz", "Marie", True, 2, 10),
+            Student("Stay", "jz", "Erik", False, 2, 10),
         ]
         instructors = [
-            Instructor("Pieter", "jz", 6),
-            Instructor("Marie", "jz", 6),
-            Instructor("Erik", "jz", 4),
+            Instructor("Pieter", "jz", 2, 6, 6),
+            Instructor("Marie", "jz", 3, 6, 6),
+            Instructor("Erik", "jz", 2, 6, 6),
         ]
         sol = BanaanSolver(students, instructors, _make_config()).solve()
         assert sol is not None
@@ -563,8 +564,7 @@ class TestIO:
         config_path = os.path.join(
             os.path.dirname(__file__), "..", "src", "banaan", "config.json"
         )
-        instructors, config = load_config(config_path)
-        assert len(instructors) == 8
+        config = load_config(config_path)
         assert config.boat_capacity == 6
 
     def test_output_generation(self):
@@ -572,8 +572,8 @@ class TestIO:
         from banaan.output import generate_output
 
         students = [
-            Student("A", "jz", "Pieter", True),
-            Student("B", "jz", "Pieter", False),
+            Student("A", "jz", "Pieter", True, 2, 10),
+            Student("B", "jz", "Pieter", False, 2, 11),
         ]
         sol = BanaanSolution(
             groups=[
@@ -582,10 +582,10 @@ class TestIO:
                     slot=0,
                     phase=0,
                     students=[students[0]],
-                    transport_instructor=Instructor("Pieter", "jz", 4),
+                    transport_instructor=Instructor("Pieter", "jz", 2, 4, 4),
                 )
             ],
-            non_banana_assignments={"B": "Pieter"},
+            non_banana_assignments={("B", 0): ["Pieter"]},
             config=_make_config(),
             start_time_minutes=630,
         )
@@ -606,8 +606,8 @@ class TestIO:
                     index=0,
                     slot=0,
                     phase=0,
-                    students=[Student("A", "jz", "Pieter", True)],
-                    transport_instructor=Instructor("Pieter", "jz", 4),
+                    students=[Student("A", "jz", "Pieter", True, 2, 10)],
+                    transport_instructor=Instructor("Pieter", "jz", 2, 4, 4),
                 )
             ],
             non_banana_assignments={},

@@ -39,6 +39,60 @@ class ConfigInput(BaseModel):
     weights: dict[str, int] = {"instructor_switch": 10, "discipline_switch": 50}
 
 
+# ── Update endpoints ───────────────────────────────────────────────────
+
+from fastapi import Body
+from typing import Optional
+
+class UpdateStudentRequest(BaseModel):
+    students: list[StudentInput]
+    index: Optional[int] = None
+    name: Optional[str] = None
+    new_values: dict
+
+class UpdateInstructorRequest(BaseModel):
+    instructors: list[InstructorInput]
+    index: Optional[int] = None
+    name: Optional[str] = None
+    new_values: dict
+
+class UpdateConfigRequest(BaseModel):
+    config: ConfigInput
+    new_values: dict
+
+@router.post("/student/update", response_model=list[StudentInput])
+async def update_student(req: UpdateStudentRequest):
+    """Update a student by index or name."""
+    students = req.students.copy()
+    idx = req.index
+    if idx is None and req.name is not None:
+        idx = next((i for i, s in enumerate(students) if s.name == req.name), None)
+    if idx is None or idx < 0 or idx >= len(students):
+        raise HTTPException(status_code=404, detail="Student not found")
+    updated = students[idx].copy(update=req.new_values)
+    students[idx] = updated
+    return students
+
+@router.post("/instructor/update", response_model=list[InstructorInput])
+async def update_instructor(req: UpdateInstructorRequest):
+    """Update an instructor by index or name."""
+    instructors = req.instructors.copy()
+    idx = req.index
+    if idx is None and req.name is not None:
+        idx = next((i for i, s in enumerate(instructors) if s.name == req.name), None)
+    if idx is None or idx < 0 or idx >= len(instructors):
+        raise HTTPException(status_code=404, detail="Instructor not found")
+    updated = instructors[idx].copy(update=req.new_values)
+    instructors[idx] = updated
+    return instructors
+
+@router.post("/config/update", response_model=ConfigInput)
+async def update_config(req: UpdateConfigRequest):
+    """Update config values."""
+    config = req.config.copy(update=req.new_values)
+    return config
+
+
 class UploadResponse(BaseModel):
     students: list[StudentInput]
     instructors: list[InstructorInput]

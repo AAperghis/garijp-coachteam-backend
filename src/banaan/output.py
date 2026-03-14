@@ -56,14 +56,15 @@ def generate_output(
                     ),
                 }
             )
-    for s_name, i_name in sorted(solution.non_banana_assignments.items()):
+    # Handle new structure: (student_name, slot) -> [instructor_name, ...]
+    for assignment in sorted(solution.non_banana_assignments, key=lambda x: (x.student.name, x.slot)):
         assignment_rows.append(
             {
-                "Name": s_name,
-                "Discipline": "",
-                "Original Instructor": i_name,
-                "Assignment": f"Stay with {i_name}",
-                "Time": "",
+                "Name": assignment.student.name,
+                "Discipline": assignment.student.discipline,
+                "Original Instructor": assignment.student.instructor,
+                "Assignment": f"Covered by {assignment.instructor_name}",
+                "Time": solution.slot_to_time(assignment.slot),
                 "Transport Instructor": "",
             }
         )
