@@ -136,7 +136,7 @@ def main() -> None:
     parser.add_argument("--instructors", required=True, help="Path to instructor CSV/XLSX")
     parser.add_argument("--config", default=None, help="Path to config JSON")
     parser.add_argument("--output", default="schedule", help="Output base name")
-    parser.add_argument("--timeout", type=int, default=60, help="Solver timeout in seconds")
+    parser.add_argument("--timeout", type=int, default=300, help="Solver timeout in seconds")
     args = parser.parse_args()
 
     students = load_students(args.students)

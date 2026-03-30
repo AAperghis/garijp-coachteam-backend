@@ -1,13 +1,13 @@
 Name,Time,State,Instructor
-Alexander op ten Noort,10:00,on_banana,
-Alexander op ten Noort,10:15,on_island,
-Alexander op ten Noort,10:30,transit_from,
-Alexander op ten Noort,10:45,sailing,Esther
-Alexander op ten Noort,11:00,sailing,Wouter
-Alexander op ten Noort,11:15,sailing,Wouter
-Alexander op ten Noort,11:30,sailing,Wouter
-Alexander op ten Noort,11:45,sailing,Esther
-Alexander op ten Noort,12:00,sailing,Esther
+Alexander op ten Noort,10:00,sailing,Esther
+Alexander op ten Noort,10:15,sailing,Esther
+Alexander op ten Noort,10:30,transit_to,
+Alexander op ten Noort,10:45,prep,
+Alexander op ten Noort,11:00,on_banana,
+Alexander op ten Noort,11:15,sailing,Koen
+Alexander op ten Noort,11:30,sailing,Koen
+Alexander op ten Noort,11:45,sailing,Koen
+Alexander op ten Noort,12:00,sailing,Koen
 Alexander op ten Noort,12:15,sailing,Esther
 Alexander op ten Noort,12:30,sailing,Esther
 Alexander op ten Noort,12:45,sailing,Esther
@@ -25,20 +25,20 @@ Alexander op ten Noort,15:30,sailing,Esther
 Alexander op ten Noort,15:45,sailing,Esther
 Anna Derks,10:00,sailing,Laure
 Anna Derks,10:15,sailing,Laure
-Anna Derks,10:30,on_banana,
-Anna Derks,10:45,on_island,
-Anna Derks,11:00,on_island,
-Anna Derks,11:15,on_island,
-Anna Derks,11:30,transit_from,
+Anna Derks,10:30,sailing,Laure
+Anna Derks,10:45,sailing,Laure
+Anna Derks,11:00,sailing,Laure
+Anna Derks,11:15,sailing,Laure
+Anna Derks,11:30,sailing,Laure
 Anna Derks,11:45,sailing,Laure
 Anna Derks,12:00,sailing,Laure
 Anna Derks,12:15,sailing,Laure
 Anna Derks,12:30,sailing,Laure
 Anna Derks,12:45,sailing,Laure
-Anna Derks,13:00,sailing,Laure
-Anna Derks,13:15,sailing,Laure
-Anna Derks,13:30,sailing,Laure
-Anna Derks,13:45,sailing,Laure
+Anna Derks,13:00,transit_to,
+Anna Derks,13:15,prep,
+Anna Derks,13:30,on_banana,
+Anna Derks,13:45,transit_from,
 Anna Derks,14:00,sailing,Laure
 Anna Derks,14:15,sailing,Laure
 Anna Derks,14:30,sailing,Laure
@@ -49,14 +49,14 @@ Anna Derks,15:30,sailing,Laure
 Anna Derks,15:45,sailing,Laure
 Annemijn van der Laan,10:00,sailing,Lieke
 Annemijn van der Laan,10:15,sailing,Lieke
-Annemijn van der Laan,10:30,sailing,Lieke
-Annemijn van der Laan,10:45,sailing,Esther
-Annemijn van der Laan,11:00,sailing,Wouter
-Annemijn van der Laan,11:15,sailing,Wouter
-Annemijn van der Laan,11:30,sailing,Lieke
-Annemijn van der Laan,11:45,transit_to,
-Annemijn van der Laan,12:00,on_island,
-Annemijn van der Laan,12:15,on_banana,
+Annemijn van der Laan,10:30,sailing,Anouk
+Annemijn van der Laan,10:45,transit_to,
+Annemijn van der Laan,11:00,prep,
+Annemijn van der Laan,11:15,on_banana,
+Annemijn van der Laan,11:30,transit_from,
+Annemijn van der Laan,11:45,sailing,Lieke
+Annemijn van der Laan,12:00,sailing,Lieke
+Annemijn van der Laan,12:15,sailing,Lieke
 Annemijn van der Laan,12:30,sailing,Lieke
 Annemijn van der Laan,12:45,sailing,Lieke
 Annemijn van der Laan,13:00,sailing,Lieke
@@ -71,15 +71,15 @@ Annemijn van der Laan,15:00,sailing,Lieke
 Annemijn van der Laan,15:15,sailing,Lieke
 Annemijn van der Laan,15:30,sailing,Lieke
 Annemijn van der Laan,15:45,sailing,Lieke
-Aron Hulscher,10:00,on_banana,
-Aron Hulscher,10:15,on_island,
-Aron Hulscher,10:30,transit_from,
+Aron Hulscher,10:00,transit_to,
+Aron Hulscher,10:15,prep,
+Aron Hulscher,10:30,on_banana,
 Aron Hulscher,10:45,sailing,Esther
-Aron Hulscher,11:00,sailing,Wouter
-Aron Hulscher,11:15,sailing,Wouter
-Aron Hulscher,11:30,sailing,Wouter
-Aron Hulscher,11:45,sailing,Esther
-Aron Hulscher,12:00,sailing,Esther
+Aron Hulscher,11:00,sailing,Esther
+Aron Hulscher,11:15,sailing,Koen
+Aron Hulscher,11:30,sailing,Koen
+Aron Hulscher,11:45,sailing,Koen
+Aron Hulscher,12:00,sailing,Koen
 Aron Hulscher,12:15,sailing,Esther
 Aron Hulscher,12:30,sailing,Esther
 Aron Hulscher,12:45,sailing,Esther
@@ -98,17 +98,17 @@ Aron Hulscher,15:45,sailing,Esther
 Ava Zaanen,10:00,sailing,Sieds
 Ava Zaanen,10:15,sailing,Sieds
 Ava Zaanen,10:30,sailing,Sieds
-Ava Zaanen,10:45,sailing,Sieds
-Ava Zaanen,11:00,sailing,Sieds
-Ava Zaanen,11:15,sailing,Sieds
-Ava Zaanen,11:30,sailing,Sieds
+Ava Zaanen,10:45,transit_to,
+Ava Zaanen,11:00,prep,
+Ava Zaanen,11:15,on_banana,
+Ava Zaanen,11:30,transit_from,
 Ava Zaanen,11:45,sailing,Sieds
 Ava Zaanen,12:00,sailing,Sieds
-Ava Zaanen,12:15,transit_to,
-Ava Zaanen,12:30,on_island,
-Ava Zaanen,12:45,on_banana,
-Ava Zaanen,13:00,sailing,Huib
-Ava Zaanen,13:15,sailing,Huib
+Ava Zaanen,12:15,sailing,Sieds
+Ava Zaanen,12:30,sailing,Sieds
+Ava Zaanen,12:45,sailing,Sieds
+Ava Zaanen,13:00,sailing,Sieds
+Ava Zaanen,13:15,sailing,Sieds
 Ava Zaanen,13:30,sailing,Sieds
 Ava Zaanen,13:45,sailing,Sieds
 Ava Zaanen,14:00,sailing,Sieds
@@ -121,17 +121,17 @@ Ava Zaanen,15:30,sailing,Sieds
 Ava Zaanen,15:45,sailing,Sieds
 Bas de Haan,10:00,sailing,Anouk
 Bas de Haan,10:15,sailing,Anouk
-Bas de Haan,10:30,on_banana,
-Bas de Haan,10:45,on_island,
-Bas de Haan,11:00,on_island,
-Bas de Haan,11:15,on_island,
+Bas de Haan,10:30,sailing,Anouk
+Bas de Haan,10:45,transit_to,
+Bas de Haan,11:00,prep,
+Bas de Haan,11:15,on_banana,
 Bas de Haan,11:30,transit_from,
 Bas de Haan,11:45,sailing,Anouk
 Bas de Haan,12:00,sailing,Anouk
-Bas de Haan,12:15,sailing,Anouk
-Bas de Haan,12:30,sailing,Anouk
-Bas de Haan,12:45,sailing,Anouk
-Bas de Haan,13:00,sailing,Anouk
+Bas de Haan,12:15,sailing,Koen
+Bas de Haan,12:30,sailing,Koen
+Bas de Haan,12:45,sailing,Koen
+Bas de Haan,13:00,sailing,Koen
 Bas de Haan,13:15,sailing,Anouk
 Bas de Haan,13:30,sailing,Anouk
 Bas de Haan,13:45,sailing,Anouk
@@ -146,17 +146,17 @@ Bas de Haan,15:45,sailing,Anouk
 Bente van Rees,10:00,sailing,Sieds
 Bente van Rees,10:15,sailing,Sieds
 Bente van Rees,10:30,sailing,Sieds
-Bente van Rees,10:45,sailing,Sieds
-Bente van Rees,11:00,sailing,Sieds
-Bente van Rees,11:15,sailing,Sieds
-Bente van Rees,11:30,sailing,Sieds
+Bente van Rees,10:45,transit_to,
+Bente van Rees,11:00,on_island,
+Bente van Rees,11:15,prep,
+Bente van Rees,11:30,on_banana,
 Bente van Rees,11:45,sailing,Sieds
 Bente van Rees,12:00,sailing,Sieds
 Bente van Rees,12:15,sailing,Sieds
 Bente van Rees,12:30,sailing,Sieds
-Bente van Rees,12:45,transit_to,
-Bente van Rees,13:00,on_island,
-Bente van Rees,13:15,on_banana,
+Bente van Rees,12:45,sailing,Sieds
+Bente van Rees,13:00,sailing,Sieds
+Bente van Rees,13:15,sailing,Sieds
 Bente van Rees,13:30,sailing,Sieds
 Bente van Rees,13:45,sailing,Sieds
 Bente van Rees,14:00,sailing,Sieds
@@ -172,11 +172,11 @@ Benthe de Heer,10:15,sailing,Koen
 Benthe de Heer,10:30,sailing,Koen
 Benthe de Heer,10:45,sailing,Koen
 Benthe de Heer,11:00,sailing,Koen
-Benthe de Heer,11:15,sailing,Willy
-Benthe de Heer,11:30,sailing,Willy
-Benthe de Heer,11:45,on_banana,
-Benthe de Heer,12:00,on_island,
-Benthe de Heer,12:15,transit_from,
+Benthe de Heer,11:15,transit_to,
+Benthe de Heer,11:30,on_island,
+Benthe de Heer,11:45,prep,
+Benthe de Heer,12:00,on_banana,
+Benthe de Heer,12:15,sailing,Koen
 Benthe de Heer,12:30,sailing,Koen
 Benthe de Heer,12:45,sailing,Koen
 Benthe de Heer,13:00,sailing,Koen
@@ -193,13 +193,13 @@ Benthe de Heer,15:30,sailing,Koen
 Benthe de Heer,15:45,sailing,Koen
 Bo van Berkel,10:00,sailing,Esther
 Bo van Berkel,10:15,sailing,Esther
-Bo van Berkel,10:30,on_banana,
-Bo van Berkel,10:45,on_island,
-Bo van Berkel,11:00,on_island,
-Bo van Berkel,11:15,on_island,
-Bo van Berkel,11:30,transit_from,
-Bo van Berkel,11:45,sailing,Esther
-Bo van Berkel,12:00,sailing,Esther
+Bo van Berkel,10:30,transit_to,
+Bo van Berkel,10:45,prep,
+Bo van Berkel,11:00,on_banana,
+Bo van Berkel,11:15,sailing,Lieke
+Bo van Berkel,11:30,sailing,Lieke
+Bo van Berkel,11:45,sailing,Lieke
+Bo van Berkel,12:00,sailing,Lieke
 Bo van Berkel,12:15,sailing,Esther
 Bo van Berkel,12:30,sailing,Esther
 Bo van Berkel,12:45,sailing,Esther
@@ -215,16 +215,16 @@ Bo van Berkel,15:00,sailing,Esther
 Bo van Berkel,15:15,sailing,Esther
 Bo van Berkel,15:30,sailing,Esther
 Bo van Berkel,15:45,sailing,Esther
-Bram Kok,10:00,sailing,Wouter
-Bram Kok,10:15,sailing,Wouter
-Bram Kok,10:30,sailing,Wouter
-Bram Kok,10:45,sailing,Wouter
+Bram Kok,10:00,sailing,Lieke
+Bram Kok,10:15,transit_to,
+Bram Kok,10:30,prep,
+Bram Kok,10:45,on_banana,
 Bram Kok,11:00,sailing,Wouter
 Bram Kok,11:15,sailing,Wouter
 Bram Kok,11:30,sailing,Wouter
-Bram Kok,11:45,transit_to,
-Bram Kok,12:00,on_banana,
-Bram Kok,12:15,transit_from,
+Bram Kok,11:45,sailing,Wouter
+Bram Kok,12:00,sailing,Wouter
+Bram Kok,12:15,sailing,Wouter
 Bram Kok,12:30,sailing,Wouter
 Bram Kok,12:45,sailing,Wouter
 Bram Kok,13:00,sailing,Wouter
@@ -246,15 +246,15 @@ Cas Straatman,10:45,sailing,Annegreet
 Cas Straatman,11:00,sailing,Annegreet
 Cas Straatman,11:15,sailing,Annegreet
 Cas Straatman,11:30,sailing,Annegreet
-Cas Straatman,11:45,sailing,Annegreet
-Cas Straatman,12:00,sailing,Annegreet
-Cas Straatman,12:15,sailing,Annegreet
-Cas Straatman,12:30,transit_to,
-Cas Straatman,12:45,on_island,
-Cas Straatman,13:00,on_banana,
-Cas Straatman,13:15,sailing,Annegreet
-Cas Straatman,13:30,sailing,Annegreet
-Cas Straatman,13:45,sailing,Annegreet
+Cas Straatman,11:45,sailing,Guus
+Cas Straatman,12:00,sailing,Guus
+Cas Straatman,12:15,sailing,Guus
+Cas Straatman,12:30,sailing,Guus
+Cas Straatman,12:45,sailing,Annegreet
+Cas Straatman,13:00,transit_to,
+Cas Straatman,13:15,on_island,
+Cas Straatman,13:30,prep,
+Cas Straatman,13:45,on_banana,
 Cas Straatman,14:00,sailing,Annegreet
 Cas Straatman,14:15,sailing,Annegreet
 Cas Straatman,14:30,sailing,Annegreet
@@ -263,16 +263,16 @@ Cas Straatman,15:00,sailing,Annegreet
 Cas Straatman,15:15,sailing,Annegreet
 Cas Straatman,15:30,sailing,Annegreet
 Cas Straatman,15:45,sailing,Annegreet
-Casper van Deursen,10:00,sailing,Lieke
-Casper van Deursen,10:15,sailing,Lieke
-Casper van Deursen,10:30,sailing,Lieke
-Casper van Deursen,10:45,on_banana,
-Casper van Deursen,11:00,on_island,
-Casper van Deursen,11:15,transit_from,
-Casper van Deursen,11:30,sailing,Willy
-Casper van Deursen,11:45,sailing,Willy
-Casper van Deursen,12:00,sailing,Willy
-Casper van Deursen,12:15,sailing,Willy
+Casper van Deursen,10:00,sailing,Willy
+Casper van Deursen,10:15,sailing,Willy
+Casper van Deursen,10:30,sailing,Willy
+Casper van Deursen,10:45,sailing,Anouk
+Casper van Deursen,11:00,sailing,Anouk
+Casper van Deursen,11:15,sailing,Anouk
+Casper van Deursen,11:30,transit_to,
+Casper van Deursen,11:45,on_island,
+Casper van Deursen,12:00,prep,
+Casper van Deursen,12:15,on_banana,
 Casper van Deursen,12:30,sailing,Willy
 Casper van Deursen,12:45,sailing,Willy
 Casper van Deursen,13:00,sailing,Willy
@@ -289,16 +289,16 @@ Casper van Deursen,15:30,sailing,Willy
 Casper van Deursen,15:45,sailing,Willy
 Charlie van Asch,10:00,sailing,Lieke
 Charlie van Asch,10:15,sailing,Lieke
-Charlie van Asch,10:30,sailing,Lieke
-Charlie van Asch,10:45,sailing,Wouter
-Charlie van Asch,11:00,sailing,Wouter
-Charlie van Asch,11:15,sailing,Wouter
-Charlie van Asch,11:30,sailing,Lieke
+Charlie van Asch,10:30,sailing,Esther
+Charlie van Asch,10:45,transit_to,
+Charlie van Asch,11:00,prep,
+Charlie van Asch,11:15,on_banana,
+Charlie van Asch,11:30,transit_from,
 Charlie van Asch,11:45,sailing,Lieke
 Charlie van Asch,12:00,sailing,Lieke
-Charlie van Asch,12:15,transit_to,
-Charlie van Asch,12:30,on_banana,
-Charlie van Asch,12:45,transit_from,
+Charlie van Asch,12:15,sailing,Lieke
+Charlie van Asch,12:30,sailing,Lieke
+Charlie van Asch,12:45,sailing,Lieke
 Charlie van Asch,13:00,sailing,Lieke
 Charlie van Asch,13:15,sailing,Lieke
 Charlie van Asch,13:30,sailing,Lieke
@@ -320,12 +320,12 @@ Charlotte Meerburg,11:15,sailing,Huib
 Charlotte Meerburg,11:30,sailing,Huib
 Charlotte Meerburg,11:45,sailing,Huib
 Charlotte Meerburg,12:00,sailing,Huib
-Charlotte Meerburg,12:15,sailing,Sieds
-Charlotte Meerburg,12:30,sailing,Sieds
+Charlotte Meerburg,12:15,sailing,Huib
+Charlotte Meerburg,12:30,sailing,Huib
 Charlotte Meerburg,12:45,transit_to,
-Charlotte Meerburg,13:00,on_island,
+Charlotte Meerburg,13:00,prep,
 Charlotte Meerburg,13:15,on_banana,
-Charlotte Meerburg,13:30,sailing,Huib
+Charlotte Meerburg,13:30,transit_from,
 Charlotte Meerburg,13:45,sailing,Huib
 Charlotte Meerburg,14:00,sailing,Huib
 Charlotte Meerburg,14:15,sailing,Huib
@@ -335,19 +335,19 @@ Charlotte Meerburg,15:00,sailing,Huib
 Charlotte Meerburg,15:15,sailing,Huib
 Charlotte Meerburg,15:30,sailing,Huib
 Charlotte Meerburg,15:45,sailing,Huib
-David de Boer,10:00,sailing,Anouk
-David de Boer,10:15,on_banana,
-David de Boer,10:30,on_island,
-David de Boer,10:45,transit_from,
-David de Boer,11:00,sailing,Stijn
-David de Boer,11:15,sailing,Stijn
-David de Boer,11:30,sailing,Stijn
+David de Boer,10:00,transit_to,
+David de Boer,10:15,prep,
+David de Boer,10:30,on_banana,
+David de Boer,10:45,sailing,Anouk
+David de Boer,11:00,sailing,Anouk
+David de Boer,11:15,sailing,Anouk
+David de Boer,11:30,sailing,Anouk
 David de Boer,11:45,sailing,Anouk
 David de Boer,12:00,sailing,Anouk
-David de Boer,12:15,sailing,Anouk
-David de Boer,12:30,sailing,Anouk
-David de Boer,12:45,sailing,Anouk
-David de Boer,13:00,sailing,Anouk
+David de Boer,12:15,sailing,Koen
+David de Boer,12:30,sailing,Koen
+David de Boer,12:45,sailing,Koen
+David de Boer,13:00,sailing,Koen
 David de Boer,13:15,sailing,Anouk
 David de Boer,13:30,sailing,Anouk
 David de Boer,13:45,sailing,Anouk
@@ -359,18 +359,18 @@ David de Boer,15:00,sailing,Anouk
 David de Boer,15:15,sailing,Anouk
 David de Boer,15:30,sailing,Anouk
 David de Boer,15:45,sailing,Anouk
-Dominic van den Hevel,10:00,transit_to,
-Dominic van den Hevel,10:15,on_banana,
-Dominic van den Hevel,10:30,transit_from,
+Dominic van den Hevel,10:00,sailing,Tim
+Dominic van den Hevel,10:15,sailing,Tim
+Dominic van den Hevel,10:30,sailing,Tim
 Dominic van den Hevel,10:45,sailing,Tim
 Dominic van den Hevel,11:00,sailing,Tim
 Dominic van den Hevel,11:15,sailing,Tim
 Dominic van den Hevel,11:30,sailing,Tim
 Dominic van den Hevel,11:45,sailing,Tim
-Dominic van den Hevel,12:00,sailing,Willy
-Dominic van den Hevel,12:15,sailing,Willy
-Dominic van den Hevel,12:30,sailing,Laure
-Dominic van den Hevel,12:45,sailing,Tim
+Dominic van den Hevel,12:00,transit_to,
+Dominic van den Hevel,12:15,on_island,
+Dominic van den Hevel,12:30,prep,
+Dominic van den Hevel,12:45,on_banana,
 Dominic van den Hevel,13:00,sailing,Tim
 Dominic van den Hevel,13:15,sailing,Tim
 Dominic van den Hevel,13:30,sailing,Tim
@@ -385,17 +385,17 @@ Dominic van den Hevel,15:30,sailing,Tim
 Dominic van den Hevel,15:45,sailing,Tim
 Douwe Sjoerd,10:00,sailing,Anouk
 Douwe Sjoerd,10:15,sailing,Anouk
-Douwe Sjoerd,10:30,on_banana,
-Douwe Sjoerd,10:45,on_island,
-Douwe Sjoerd,11:00,on_island,
-Douwe Sjoerd,11:15,on_island,
-Douwe Sjoerd,11:30,transit_from,
+Douwe Sjoerd,10:30,transit_to,
+Douwe Sjoerd,10:45,prep,
+Douwe Sjoerd,11:00,on_banana,
+Douwe Sjoerd,11:15,sailing,Anouk
+Douwe Sjoerd,11:30,sailing,Anouk
 Douwe Sjoerd,11:45,sailing,Anouk
 Douwe Sjoerd,12:00,sailing,Anouk
-Douwe Sjoerd,12:15,sailing,Anouk
-Douwe Sjoerd,12:30,sailing,Anouk
-Douwe Sjoerd,12:45,sailing,Anouk
-Douwe Sjoerd,13:00,sailing,Anouk
+Douwe Sjoerd,12:15,sailing,Lieke
+Douwe Sjoerd,12:30,sailing,Lieke
+Douwe Sjoerd,12:45,sailing,Lieke
+Douwe Sjoerd,13:00,sailing,Lieke
 Douwe Sjoerd,13:15,sailing,Anouk
 Douwe Sjoerd,13:30,sailing,Anouk
 Douwe Sjoerd,13:45,sailing,Anouk
@@ -407,17 +407,17 @@ Douwe Sjoerd,15:00,sailing,Anouk
 Douwe Sjoerd,15:15,sailing,Anouk
 Douwe Sjoerd,15:30,sailing,Anouk
 Douwe Sjoerd,15:45,sailing,Anouk
-Dries Zaanen,10:00,sailing,Nienke
-Dries Zaanen,10:15,sailing,Nienke
-Dries Zaanen,10:30,sailing,Nienke
-Dries Zaanen,10:45,transit_to,
-Dries Zaanen,11:00,on_island,
-Dries Zaanen,11:15,on_island,
-Dries Zaanen,11:30,on_banana,
-Dries Zaanen,11:45,sailing,Willy
-Dries Zaanen,12:00,sailing,Willy
-Dries Zaanen,12:15,sailing,Willy
-Dries Zaanen,12:30,sailing,Willy
+Dries Zaanen,10:00,sailing,Willy
+Dries Zaanen,10:15,sailing,Willy
+Dries Zaanen,10:30,sailing,Willy
+Dries Zaanen,10:45,sailing,Koen
+Dries Zaanen,11:00,sailing,Koen
+Dries Zaanen,11:15,sailing,Koen
+Dries Zaanen,11:30,sailing,Koen
+Dries Zaanen,11:45,transit_to,
+Dries Zaanen,12:00,on_island,
+Dries Zaanen,12:15,prep,
+Dries Zaanen,12:30,on_banana,
 Dries Zaanen,12:45,sailing,Willy
 Dries Zaanen,13:00,sailing,Willy
 Dries Zaanen,13:15,sailing,Willy
@@ -438,14 +438,14 @@ Duco van Deursen,10:45,sailing,Annegreet
 Duco van Deursen,11:00,sailing,Annegreet
 Duco van Deursen,11:15,sailing,Annegreet
 Duco van Deursen,11:30,sailing,Annegreet
-Duco van Deursen,11:45,sailing,Annegreet
-Duco van Deursen,12:00,sailing,Annegreet
-Duco van Deursen,12:15,sailing,Annegreet
-Duco van Deursen,12:30,sailing,Annegreet
-Duco van Deursen,12:45,sailing,Annegreet
-Duco van Deursen,13:00,transit_to,
-Duco van Deursen,13:15,on_banana,
-Duco van Deursen,13:30,transit_from,
+Duco van Deursen,11:45,sailing,Guus
+Duco van Deursen,12:00,sailing,Guus
+Duco van Deursen,12:15,sailing,Guus
+Duco van Deursen,12:30,sailing,Guus
+Duco van Deursen,12:45,transit_to,
+Duco van Deursen,13:00,on_island,
+Duco van Deursen,13:15,prep,
+Duco van Deursen,13:30,on_banana,
 Duco van Deursen,13:45,sailing,Annegreet
 Duco van Deursen,14:00,sailing,Annegreet
 Duco van Deursen,14:15,sailing,Annegreet
@@ -488,12 +488,12 @@ Elise Houtekamer,11:15,sailing,Huib
 Elise Houtekamer,11:30,sailing,Huib
 Elise Houtekamer,11:45,sailing,Huib
 Elise Houtekamer,12:00,sailing,Huib
-Elise Houtekamer,12:15,sailing,Sieds
-Elise Houtekamer,12:30,sailing,Sieds
+Elise Houtekamer,12:15,sailing,Huib
+Elise Houtekamer,12:30,sailing,Huib
 Elise Houtekamer,12:45,transit_to,
-Elise Houtekamer,13:00,on_banana,
-Elise Houtekamer,13:15,transit_from,
-Elise Houtekamer,13:30,sailing,Huib
+Elise Houtekamer,13:00,on_island,
+Elise Houtekamer,13:15,prep,
+Elise Houtekamer,13:30,on_banana,
 Elise Houtekamer,13:45,sailing,Huib
 Elise Houtekamer,14:00,sailing,Huib
 Elise Houtekamer,14:15,sailing,Huib
@@ -506,18 +506,18 @@ Elise Houtekamer,15:45,sailing,Huib
 Emilie Heerkens Thijssen,10:00,sailing,Nienke
 Emilie Heerkens Thijssen,10:15,sailing,Nienke
 Emilie Heerkens Thijssen,10:30,sailing,Nienke
-Emilie Heerkens Thijssen,10:45,sailing,Nienke
-Emilie Heerkens Thijssen,11:00,sailing,Nienke
-Emilie Heerkens Thijssen,11:15,sailing,Nienke
-Emilie Heerkens Thijssen,11:30,sailing,Nienke
+Emilie Heerkens Thijssen,10:45,transit_to,
+Emilie Heerkens Thijssen,11:00,on_island,
+Emilie Heerkens Thijssen,11:15,on_island,
+Emilie Heerkens Thijssen,11:30,prep,
 Emilie Heerkens Thijssen,11:45,on_banana,
-Emilie Heerkens Thijssen,12:00,on_island,
-Emilie Heerkens Thijssen,12:15,transit_from,
+Emilie Heerkens Thijssen,12:00,sailing,Nienke
+Emilie Heerkens Thijssen,12:15,sailing,Nienke
 Emilie Heerkens Thijssen,12:30,sailing,Nienke
 Emilie Heerkens Thijssen,12:45,sailing,Nienke
-Emilie Heerkens Thijssen,13:00,sailing,Esther
-Emilie Heerkens Thijssen,13:15,sailing,Esther
-Emilie Heerkens Thijssen,13:30,sailing,Esther
+Emilie Heerkens Thijssen,13:00,sailing,Nienke
+Emilie Heerkens Thijssen,13:15,sailing,Nienke
+Emilie Heerkens Thijssen,13:30,sailing,Nienke
 Emilie Heerkens Thijssen,13:45,sailing,Nienke
 Emilie Heerkens Thijssen,14:00,sailing,Nienke
 Emilie Heerkens Thijssen,14:15,sailing,Nienke
@@ -528,21 +528,21 @@ Emilie Heerkens Thijssen,15:15,sailing,Nienke
 Emilie Heerkens Thijssen,15:30,sailing,Nienke
 Emilie Heerkens Thijssen,15:45,sailing,Nienke
 Emma Hulscher,10:00,sailing,Laure
-Emma Hulscher,10:15,on_banana,
-Emma Hulscher,10:30,on_island,
-Emma Hulscher,10:45,transit_from,
-Emma Hulscher,11:00,sailing,Nienke
-Emma Hulscher,11:15,sailing,Nienke
-Emma Hulscher,11:30,sailing,Nienke
+Emma Hulscher,10:15,sailing,Laure
+Emma Hulscher,10:30,sailing,Laure
+Emma Hulscher,10:45,sailing,Laure
+Emma Hulscher,11:00,sailing,Laure
+Emma Hulscher,11:15,sailing,Laure
+Emma Hulscher,11:30,sailing,Laure
 Emma Hulscher,11:45,sailing,Laure
 Emma Hulscher,12:00,sailing,Laure
 Emma Hulscher,12:15,sailing,Laure
 Emma Hulscher,12:30,sailing,Laure
 Emma Hulscher,12:45,sailing,Laure
-Emma Hulscher,13:00,sailing,Laure
-Emma Hulscher,13:15,sailing,Laure
-Emma Hulscher,13:30,sailing,Laure
-Emma Hulscher,13:45,sailing,Laure
+Emma Hulscher,13:00,transit_to,
+Emma Hulscher,13:15,prep,
+Emma Hulscher,13:30,on_banana,
+Emma Hulscher,13:45,transit_from,
 Emma Hulscher,14:00,sailing,Laure
 Emma Hulscher,14:15,sailing,Laure
 Emma Hulscher,14:30,sailing,Laure
@@ -556,11 +556,11 @@ Emma Wurzer,10:15,sailing,Koen
 Emma Wurzer,10:30,sailing,Koen
 Emma Wurzer,10:45,sailing,Koen
 Emma Wurzer,11:00,sailing,Koen
-Emma Wurzer,11:15,sailing,Nienke
-Emma Wurzer,11:30,sailing,Nienke
-Emma Wurzer,11:45,on_banana,
-Emma Wurzer,12:00,on_island,
-Emma Wurzer,12:15,transit_from,
+Emma Wurzer,11:15,transit_to,
+Emma Wurzer,11:30,on_island,
+Emma Wurzer,11:45,prep,
+Emma Wurzer,12:00,on_banana,
+Emma Wurzer,12:15,sailing,Koen
 Emma Wurzer,12:30,sailing,Koen
 Emma Wurzer,12:45,sailing,Koen
 Emma Wurzer,13:00,sailing,Koen
@@ -575,20 +575,20 @@ Emma Wurzer,15:00,sailing,Koen
 Emma Wurzer,15:15,sailing,Koen
 Emma Wurzer,15:30,sailing,Koen
 Emma Wurzer,15:45,sailing,Koen
-Fedde Jobsen,10:00,sailing,Nienke
-Fedde Jobsen,10:15,sailing,Nienke
-Fedde Jobsen,10:30,sailing,Nienke
-Fedde Jobsen,10:45,sailing,Willy
-Fedde Jobsen,11:00,sailing,Willy
-Fedde Jobsen,11:15,transit_to,
-Fedde Jobsen,11:30,on_banana,
-Fedde Jobsen,11:45,transit_from,
+Fedde Jobsen,10:00,sailing,Willy
+Fedde Jobsen,10:15,sailing,Willy
+Fedde Jobsen,10:30,sailing,Willy
+Fedde Jobsen,10:45,sailing,Koen
+Fedde Jobsen,11:00,sailing,Koen
+Fedde Jobsen,11:15,sailing,Koen
+Fedde Jobsen,11:30,sailing,Koen
+Fedde Jobsen,11:45,sailing,Willy
 Fedde Jobsen,12:00,sailing,Willy
 Fedde Jobsen,12:15,sailing,Willy
-Fedde Jobsen,12:30,sailing,Willy
-Fedde Jobsen,12:45,sailing,Willy
-Fedde Jobsen,13:00,sailing,Willy
-Fedde Jobsen,13:15,sailing,Willy
+Fedde Jobsen,12:30,transit_to,
+Fedde Jobsen,12:45,prep,
+Fedde Jobsen,13:00,on_banana,
+Fedde Jobsen,13:15,transit_from,
 Fedde Jobsen,13:30,sailing,Willy
 Fedde Jobsen,13:45,sailing,Willy
 Fedde Jobsen,14:00,sailing,Willy
@@ -608,12 +608,12 @@ Feike Dopheide,11:15,sailing,Huib
 Feike Dopheide,11:30,sailing,Huib
 Feike Dopheide,11:45,sailing,Huib
 Feike Dopheide,12:00,sailing,Huib
-Feike Dopheide,12:15,transit_to,
-Feike Dopheide,12:30,on_banana,
-Feike Dopheide,12:45,transit_from,
-Feike Dopheide,13:00,sailing,Huib
-Feike Dopheide,13:15,sailing,Huib
-Feike Dopheide,13:30,sailing,Huib
+Feike Dopheide,12:15,sailing,Huib
+Feike Dopheide,12:30,sailing,Huib
+Feike Dopheide,12:45,transit_to,
+Feike Dopheide,13:00,prep,
+Feike Dopheide,13:15,on_banana,
+Feike Dopheide,13:30,transit_from,
 Feike Dopheide,13:45,sailing,Huib
 Feike Dopheide,14:00,sailing,Huib
 Feike Dopheide,14:15,sailing,Huib
@@ -626,18 +626,18 @@ Feike Dopheide,15:45,sailing,Huib
 Florine van Dijk,10:00,sailing,Nienke
 Florine van Dijk,10:15,sailing,Nienke
 Florine van Dijk,10:30,sailing,Nienke
-Florine van Dijk,10:45,sailing,Nienke
-Florine van Dijk,11:00,on_banana,
-Florine van Dijk,11:15,on_island,
-Florine van Dijk,11:30,transit_from,
-Florine van Dijk,11:45,sailing,Nienke
-Florine van Dijk,12:00,sailing,Nienke
-Florine van Dijk,12:15,sailing,Nienke
-Florine van Dijk,12:30,sailing,Nienke
+Florine van Dijk,10:45,sailing,Anouk
+Florine van Dijk,11:00,sailing,Anouk
+Florine van Dijk,11:15,sailing,Anouk
+Florine van Dijk,11:30,sailing,Anouk
+Florine van Dijk,11:45,transit_to,
+Florine van Dijk,12:00,prep,
+Florine van Dijk,12:15,on_banana,
+Florine van Dijk,12:30,transit_from,
 Florine van Dijk,12:45,sailing,Nienke
-Florine van Dijk,13:00,sailing,Koen
-Florine van Dijk,13:15,sailing,Koen
-Florine van Dijk,13:30,sailing,Koen
+Florine van Dijk,13:00,sailing,Nienke
+Florine van Dijk,13:15,sailing,Nienke
+Florine van Dijk,13:30,sailing,Nienke
 Florine van Dijk,13:45,sailing,Nienke
 Florine van Dijk,14:00,sailing,Nienke
 Florine van Dijk,14:15,sailing,Nienke
@@ -647,16 +647,16 @@ Florine van Dijk,15:00,sailing,Nienke
 Florine van Dijk,15:15,sailing,Nienke
 Florine van Dijk,15:30,sailing,Nienke
 Florine van Dijk,15:45,sailing,Nienke
-Floris Koopmanschap,10:00,sailing,Wouter
-Floris Koopmanschap,10:15,sailing,Wouter
-Floris Koopmanschap,10:30,sailing,Wouter
-Floris Koopmanschap,10:45,transit_to,
-Floris Koopmanschap,11:00,on_island,
-Floris Koopmanschap,11:15,on_island,
-Floris Koopmanschap,11:30,on_banana,
-Floris Koopmanschap,11:45,sailing,Anouk
-Floris Koopmanschap,12:00,sailing,Anouk
-Floris Koopmanschap,12:15,sailing,Anouk
+Floris Koopmanschap,10:00,sailing,Anouk
+Floris Koopmanschap,10:15,sailing,Anouk
+Floris Koopmanschap,10:30,transit_to,
+Floris Koopmanschap,10:45,prep,
+Floris Koopmanschap,11:00,on_banana,
+Floris Koopmanschap,11:15,sailing,Wouter
+Floris Koopmanschap,11:30,sailing,Wouter
+Floris Koopmanschap,11:45,sailing,Wouter
+Floris Koopmanschap,12:00,sailing,Wouter
+Floris Koopmanschap,12:15,sailing,Wouter
 Floris Koopmanschap,12:30,sailing,Wouter
 Floris Koopmanschap,12:45,sailing,Wouter
 Floris Koopmanschap,13:00,sailing,Wouter
@@ -671,22 +671,22 @@ Floris Koopmanschap,15:00,sailing,Wouter
 Floris Koopmanschap,15:15,sailing,Wouter
 Floris Koopmanschap,15:30,sailing,Wouter
 Floris Koopmanschap,15:45,sailing,Wouter
-Floris Schiebaan,10:00,on_banana,
-Floris Schiebaan,10:15,on_island,
-Floris Schiebaan,10:30,transit_from,
-Floris Schiebaan,10:45,sailing,Nienke
-Floris Schiebaan,11:00,sailing,Nienke
-Floris Schiebaan,11:15,sailing,Nienke
-Floris Schiebaan,11:30,sailing,Lieke
+Floris Schiebaan,10:00,sailing,Laure
+Floris Schiebaan,10:15,sailing,Laure
+Floris Schiebaan,10:30,sailing,Laure
+Floris Schiebaan,10:45,sailing,Laure
+Floris Schiebaan,11:00,sailing,Laure
+Floris Schiebaan,11:15,sailing,Laure
+Floris Schiebaan,11:30,sailing,Laure
 Floris Schiebaan,11:45,sailing,Laure
 Floris Schiebaan,12:00,sailing,Laure
-Floris Schiebaan,12:15,sailing,Laure
-Floris Schiebaan,12:30,sailing,Laure
-Floris Schiebaan,12:45,sailing,Laure
-Floris Schiebaan,13:00,sailing,Laure
-Floris Schiebaan,13:15,sailing,Laure
-Floris Schiebaan,13:30,sailing,Laure
-Floris Schiebaan,13:45,sailing,Laure
+Floris Schiebaan,12:15,transit_to,
+Floris Schiebaan,12:30,on_island,
+Floris Schiebaan,12:45,prep,
+Floris Schiebaan,13:00,on_banana,
+Floris Schiebaan,13:15,sailing,Esther
+Floris Schiebaan,13:30,sailing,Esther
+Floris Schiebaan,13:45,sailing,Esther
 Floris Schiebaan,14:00,sailing,Laure
 Floris Schiebaan,14:15,sailing,Laure
 Floris Schiebaan,14:30,sailing,Laure
@@ -701,10 +701,10 @@ Gijs Derks,10:30,sailing,Stijn
 Gijs Derks,10:45,sailing,Stijn
 Gijs Derks,11:00,sailing,Stijn
 Gijs Derks,11:15,sailing,Stijn
-Gijs Derks,11:30,sailing,Stijn
-Gijs Derks,11:45,transit_to,
-Gijs Derks,12:00,on_island,
-Gijs Derks,12:15,on_banana,
+Gijs Derks,11:30,transit_to,
+Gijs Derks,11:45,prep,
+Gijs Derks,12:00,on_banana,
+Gijs Derks,12:15,transit_from,
 Gijs Derks,12:30,sailing,Stijn
 Gijs Derks,12:45,sailing,Stijn
 Gijs Derks,13:00,sailing,Stijn
@@ -719,15 +719,15 @@ Gijs Derks,15:00,sailing,Stijn
 Gijs Derks,15:15,sailing,Stijn
 Gijs Derks,15:30,sailing,Stijn
 Gijs Derks,15:45,sailing,Stijn
-Gijs Tiesinga,10:00,on_banana,
-Gijs Tiesinga,10:15,on_island,
-Gijs Tiesinga,10:30,transit_from,
+Gijs Tiesinga,10:00,transit_to,
+Gijs Tiesinga,10:15,prep,
+Gijs Tiesinga,10:30,on_banana,
 Gijs Tiesinga,10:45,sailing,Esther
-Gijs Tiesinga,11:00,sailing,Willy
-Gijs Tiesinga,11:15,sailing,Willy
-Gijs Tiesinga,11:30,sailing,Willy
-Gijs Tiesinga,11:45,sailing,Esther
-Gijs Tiesinga,12:00,sailing,Esther
+Gijs Tiesinga,11:00,sailing,Esther
+Gijs Tiesinga,11:15,sailing,Lieke
+Gijs Tiesinga,11:30,sailing,Lieke
+Gijs Tiesinga,11:45,sailing,Lieke
+Gijs Tiesinga,12:00,sailing,Lieke
 Gijs Tiesinga,12:15,sailing,Esther
 Gijs Tiesinga,12:30,sailing,Esther
 Gijs Tiesinga,12:45,sailing,Esther
@@ -746,18 +746,18 @@ Gijs Tiesinga,15:45,sailing,Esther
 Hugo van Oosten,10:00,sailing,Nienke
 Hugo van Oosten,10:15,sailing,Nienke
 Hugo van Oosten,10:30,sailing,Nienke
-Hugo van Oosten,10:45,sailing,Nienke
-Hugo van Oosten,11:00,sailing,Nienke
-Hugo van Oosten,11:15,sailing,Nienke
-Hugo van Oosten,11:30,sailing,Nienke
-Hugo van Oosten,11:45,sailing,Nienke
-Hugo van Oosten,12:00,on_banana,
-Hugo van Oosten,12:15,on_island,
-Hugo van Oosten,12:30,transit_from,
+Hugo van Oosten,10:45,sailing,Esther
+Hugo van Oosten,11:00,sailing,Esther
+Hugo van Oosten,11:15,transit_to,
+Hugo van Oosten,11:30,prep,
+Hugo van Oosten,11:45,on_banana,
+Hugo van Oosten,12:00,transit_from,
+Hugo van Oosten,12:15,sailing,Nienke
+Hugo van Oosten,12:30,sailing,Nienke
 Hugo van Oosten,12:45,sailing,Nienke
-Hugo van Oosten,13:00,sailing,Lieke
-Hugo van Oosten,13:15,sailing,Lieke
-Hugo van Oosten,13:30,sailing,Lieke
+Hugo van Oosten,13:00,sailing,Nienke
+Hugo van Oosten,13:15,sailing,Nienke
+Hugo van Oosten,13:30,sailing,Nienke
 Hugo van Oosten,13:45,sailing,Nienke
 Hugo van Oosten,14:00,sailing,Nienke
 Hugo van Oosten,14:15,sailing,Nienke
@@ -767,19 +767,19 @@ Hugo van Oosten,15:00,sailing,Nienke
 Hugo van Oosten,15:15,sailing,Nienke
 Hugo van Oosten,15:30,sailing,Nienke
 Hugo van Oosten,15:45,sailing,Nienke
-Imke van Berkel,10:00,sailing,Koen
-Imke van Berkel,10:15,sailing,Koen
-Imke van Berkel,10:30,sailing,Koen
-Imke van Berkel,10:45,sailing,Willy
-Imke van Berkel,11:00,sailing,Willy
-Imke van Berkel,11:15,sailing,Willy
-Imke van Berkel,11:30,sailing,Willy
-Imke van Berkel,11:45,on_banana,
-Imke van Berkel,12:00,on_island,
-Imke van Berkel,12:15,transit_from,
-Imke van Berkel,12:30,sailing,Willy
-Imke van Berkel,12:45,sailing,Willy
-Imke van Berkel,13:00,sailing,Willy
+Imke van Berkel,10:00,sailing,Willy
+Imke van Berkel,10:15,sailing,Willy
+Imke van Berkel,10:30,sailing,Willy
+Imke van Berkel,10:45,sailing,Koen
+Imke van Berkel,11:00,sailing,Koen
+Imke van Berkel,11:15,sailing,Koen
+Imke van Berkel,11:30,sailing,Koen
+Imke van Berkel,11:45,sailing,Willy
+Imke van Berkel,12:00,sailing,Willy
+Imke van Berkel,12:15,transit_to,
+Imke van Berkel,12:30,on_island,
+Imke van Berkel,12:45,prep,
+Imke van Berkel,13:00,on_banana,
 Imke van Berkel,13:15,sailing,Willy
 Imke van Berkel,13:30,sailing,Willy
 Imke van Berkel,13:45,sailing,Willy
@@ -794,18 +794,18 @@ Imke van Berkel,15:45,sailing,Willy
 Indi Martens,10:00,sailing,Nienke
 Indi Martens,10:15,sailing,Nienke
 Indi Martens,10:30,sailing,Nienke
-Indi Martens,10:45,sailing,Nienke
-Indi Martens,11:00,sailing,Nienke
-Indi Martens,11:15,sailing,Nienke
-Indi Martens,11:30,sailing,Nienke
-Indi Martens,11:45,sailing,Nienke
-Indi Martens,12:00,on_banana,
-Indi Martens,12:15,on_island,
-Indi Martens,12:30,transit_from,
+Indi Martens,10:45,transit_to,
+Indi Martens,11:00,on_island,
+Indi Martens,11:15,prep,
+Indi Martens,11:30,on_banana,
+Indi Martens,11:45,transit_from,
+Indi Martens,12:00,sailing,Nienke
+Indi Martens,12:15,sailing,Nienke
+Indi Martens,12:30,sailing,Nienke
 Indi Martens,12:45,sailing,Nienke
-Indi Martens,13:00,sailing,Lieke
-Indi Martens,13:15,sailing,Lieke
-Indi Martens,13:30,sailing,Lieke
+Indi Martens,13:00,sailing,Nienke
+Indi Martens,13:15,sailing,Nienke
+Indi Martens,13:30,sailing,Nienke
 Indi Martens,13:45,sailing,Nienke
 Indi Martens,14:00,sailing,Nienke
 Indi Martens,14:15,sailing,Nienke
@@ -816,17 +816,17 @@ Indi Martens,15:15,sailing,Nienke
 Indi Martens,15:30,sailing,Nienke
 Indi Martens,15:45,sailing,Nienke
 Isolde Bouman,10:00,sailing,Pien
-Isolde Bouman,10:15,sailing,Huib
-Isolde Bouman,10:30,sailing,Huib
-Isolde Bouman,10:45,sailing,Huib
-Isolde Bouman,11:00,sailing,Pien
-Isolde Bouman,11:15,sailing,Pien
-Isolde Bouman,11:30,sailing,Pien
-Isolde Bouman,11:45,sailing,Pien
+Isolde Bouman,10:15,sailing,Sieds
+Isolde Bouman,10:30,sailing,Sieds
+Isolde Bouman,10:45,transit_to,
+Isolde Bouman,11:00,on_island,
+Isolde Bouman,11:15,prep,
+Isolde Bouman,11:30,on_banana,
+Isolde Bouman,11:45,transit_from,
 Isolde Bouman,12:00,sailing,Pien
-Isolde Bouman,12:15,transit_to,
-Isolde Bouman,12:30,on_island,
-Isolde Bouman,12:45,on_banana,
+Isolde Bouman,12:15,sailing,Pien
+Isolde Bouman,12:30,sailing,Pien
+Isolde Bouman,12:45,sailing,Pien
 Isolde Bouman,13:00,sailing,Pien
 Isolde Bouman,13:15,sailing,Pien
 Isolde Bouman,13:30,sailing,Pien
@@ -845,12 +845,12 @@ Iza Berger,10:30,sailing,Stijn
 Iza Berger,10:45,sailing,Stijn
 Iza Berger,11:00,sailing,Stijn
 Iza Berger,11:15,sailing,Stijn
-Iza Berger,11:30,sailing,Stijn
-Iza Berger,11:45,sailing,Nienke
-Iza Berger,12:00,sailing,Nienke
-Iza Berger,12:15,transit_to,
-Iza Berger,12:30,on_banana,
-Iza Berger,12:45,transit_from,
+Iza Berger,11:30,transit_to,
+Iza Berger,11:45,on_island,
+Iza Berger,12:00,prep,
+Iza Berger,12:15,on_banana,
+Iza Berger,12:30,sailing,Stijn
+Iza Berger,12:45,sailing,Stijn
 Iza Berger,13:00,sailing,Stijn
 Iza Berger,13:15,sailing,Stijn
 Iza Berger,13:30,sailing,Stijn
@@ -869,13 +869,13 @@ Jade Martens,10:30,sailing,Stijn
 Jade Martens,10:45,sailing,Stijn
 Jade Martens,11:00,sailing,Stijn
 Jade Martens,11:15,sailing,Stijn
-Jade Martens,11:30,sailing,Stijn
-Jade Martens,11:45,sailing,Lieke
-Jade Martens,12:00,sailing,Lieke
-Jade Martens,12:15,sailing,Lieke
-Jade Martens,12:30,transit_to,
-Jade Martens,12:45,on_banana,
-Jade Martens,13:00,transit_from,
+Jade Martens,11:30,sailing,Lieke
+Jade Martens,11:45,transit_to,
+Jade Martens,12:00,on_island,
+Jade Martens,12:15,prep,
+Jade Martens,12:30,on_banana,
+Jade Martens,12:45,sailing,Stijn
+Jade Martens,13:00,sailing,Stijn
 Jade Martens,13:15,sailing,Stijn
 Jade Martens,13:30,sailing,Stijn
 Jade Martens,13:45,sailing,Stijn
@@ -890,18 +890,18 @@ Jade Martens,15:45,sailing,Stijn
 Jasmijn Steenhoven,10:00,sailing,Nienke
 Jasmijn Steenhoven,10:15,sailing,Nienke
 Jasmijn Steenhoven,10:30,sailing,Nienke
-Jasmijn Steenhoven,10:45,sailing,Nienke
-Jasmijn Steenhoven,11:00,on_banana,
+Jasmijn Steenhoven,10:45,transit_to,
+Jasmijn Steenhoven,11:00,on_island,
 Jasmijn Steenhoven,11:15,on_island,
-Jasmijn Steenhoven,11:30,transit_from,
-Jasmijn Steenhoven,11:45,sailing,Nienke
+Jasmijn Steenhoven,11:30,prep,
+Jasmijn Steenhoven,11:45,on_banana,
 Jasmijn Steenhoven,12:00,sailing,Nienke
 Jasmijn Steenhoven,12:15,sailing,Nienke
 Jasmijn Steenhoven,12:30,sailing,Nienke
 Jasmijn Steenhoven,12:45,sailing,Nienke
-Jasmijn Steenhoven,13:00,sailing,Lieke
-Jasmijn Steenhoven,13:15,sailing,Lieke
-Jasmijn Steenhoven,13:30,sailing,Lieke
+Jasmijn Steenhoven,13:00,sailing,Nienke
+Jasmijn Steenhoven,13:15,sailing,Nienke
+Jasmijn Steenhoven,13:30,sailing,Nienke
 Jasmijn Steenhoven,13:45,sailing,Nienke
 Jasmijn Steenhoven,14:00,sailing,Nienke
 Jasmijn Steenhoven,14:15,sailing,Nienke
@@ -914,15 +914,15 @@ Jasmijn Steenhoven,15:45,sailing,Nienke
 Jelt Holswilder,10:00,sailing,Tim
 Jelt Holswilder,10:15,sailing,Tim
 Jelt Holswilder,10:30,sailing,Tim
-Jelt Holswilder,10:45,on_banana,
-Jelt Holswilder,11:00,on_island,
-Jelt Holswilder,11:15,transit_from,
+Jelt Holswilder,10:45,sailing,Tim
+Jelt Holswilder,11:00,sailing,Tim
+Jelt Holswilder,11:15,sailing,Tim
 Jelt Holswilder,11:30,sailing,Tim
 Jelt Holswilder,11:45,sailing,Tim
-Jelt Holswilder,12:00,sailing,Willy
-Jelt Holswilder,12:15,sailing,Willy
-Jelt Holswilder,12:30,sailing,Willy
-Jelt Holswilder,12:45,sailing,Tim
+Jelt Holswilder,12:00,transit_to,
+Jelt Holswilder,12:15,on_island,
+Jelt Holswilder,12:30,prep,
+Jelt Holswilder,12:45,on_banana,
 Jelt Holswilder,13:00,sailing,Tim
 Jelt Holswilder,13:15,sailing,Tim
 Jelt Holswilder,13:30,sailing,Tim
@@ -936,17 +936,17 @@ Jelt Holswilder,15:15,sailing,Tim
 Jelt Holswilder,15:30,sailing,Tim
 Jelt Holswilder,15:45,sailing,Tim
 Jolette Derks,10:00,sailing,Pien
-Jolette Derks,10:15,sailing,Sieds
-Jolette Derks,10:30,sailing,Sieds
-Jolette Derks,10:45,sailing,Sieds
+Jolette Derks,10:15,transit_to,
+Jolette Derks,10:30,prep,
+Jolette Derks,10:45,on_banana,
 Jolette Derks,11:00,sailing,Pien
 Jolette Derks,11:15,sailing,Pien
 Jolette Derks,11:30,sailing,Pien
 Jolette Derks,11:45,sailing,Pien
 Jolette Derks,12:00,sailing,Pien
-Jolette Derks,12:15,transit_to,
-Jolette Derks,12:30,on_island,
-Jolette Derks,12:45,on_banana,
+Jolette Derks,12:15,sailing,Pien
+Jolette Derks,12:30,sailing,Pien
+Jolette Derks,12:45,sailing,Pien
 Jolette Derks,13:00,sailing,Pien
 Jolette Derks,13:15,sailing,Pien
 Jolette Derks,13:30,sailing,Pien
@@ -960,20 +960,20 @@ Jolette Derks,15:15,sailing,Pien
 Jolette Derks,15:30,sailing,Pien
 Jolette Derks,15:45,sailing,Pien
 Juliet van Donk,10:00,sailing,Lieke
-Juliet van Donk,10:15,sailing,Lieke
-Juliet van Donk,10:30,sailing,Lieke
-Juliet van Donk,10:45,sailing,Nienke
-Juliet van Donk,11:00,sailing,Nienke
-Juliet van Donk,11:15,sailing,Nienke
+Juliet van Donk,10:15,transit_to,
+Juliet van Donk,10:30,prep,
+Juliet van Donk,10:45,on_banana,
+Juliet van Donk,11:00,sailing,Esther
+Juliet van Donk,11:15,sailing,Lieke
 Juliet van Donk,11:30,sailing,Lieke
 Juliet van Donk,11:45,sailing,Lieke
 Juliet van Donk,12:00,sailing,Lieke
 Juliet van Donk,12:15,sailing,Lieke
 Juliet van Donk,12:30,sailing,Lieke
 Juliet van Donk,12:45,sailing,Lieke
-Juliet van Donk,13:00,on_banana,
-Juliet van Donk,13:15,on_island,
-Juliet van Donk,13:30,transit_from,
+Juliet van Donk,13:00,sailing,Lieke
+Juliet van Donk,13:15,sailing,Lieke
+Juliet van Donk,13:30,sailing,Lieke
 Juliet van Donk,13:45,sailing,Lieke
 Juliet van Donk,14:00,sailing,Lieke
 Juliet van Donk,14:15,sailing,Lieke
@@ -986,18 +986,18 @@ Juliet van Donk,15:45,sailing,Lieke
 Juliette Beerman,10:00,sailing,Nienke
 Juliette Beerman,10:15,sailing,Nienke
 Juliette Beerman,10:30,sailing,Nienke
-Juliette Beerman,10:45,sailing,Nienke
-Juliette Beerman,11:00,sailing,Nienke
-Juliette Beerman,11:15,sailing,Nienke
-Juliette Beerman,11:30,sailing,Nienke
+Juliette Beerman,10:45,transit_to,
+Juliette Beerman,11:00,on_island,
+Juliette Beerman,11:15,on_island,
+Juliette Beerman,11:30,prep,
 Juliette Beerman,11:45,on_banana,
-Juliette Beerman,12:00,on_island,
-Juliette Beerman,12:15,transit_from,
+Juliette Beerman,12:00,sailing,Nienke
+Juliette Beerman,12:15,sailing,Nienke
 Juliette Beerman,12:30,sailing,Nienke
 Juliette Beerman,12:45,sailing,Nienke
-Juliette Beerman,13:00,sailing,Koen
-Juliette Beerman,13:15,sailing,Koen
-Juliette Beerman,13:30,sailing,Koen
+Juliette Beerman,13:00,sailing,Nienke
+Juliette Beerman,13:15,sailing,Nienke
+Juliette Beerman,13:30,sailing,Nienke
 Juliette Beerman,13:45,sailing,Nienke
 Juliette Beerman,14:00,sailing,Nienke
 Juliette Beerman,14:15,sailing,Nienke
@@ -1013,9 +1013,9 @@ Juliette Buijn,10:30,sailing,Stijn
 Juliette Buijn,10:45,sailing,Stijn
 Juliette Buijn,11:00,sailing,Stijn
 Juliette Buijn,11:15,sailing,Stijn
-Juliette Buijn,11:30,sailing,Stijn
-Juliette Buijn,11:45,transit_to,
-Juliette Buijn,12:00,on_island,
+Juliette Buijn,11:30,transit_to,
+Juliette Buijn,11:45,on_island,
+Juliette Buijn,12:00,prep,
 Juliette Buijn,12:15,on_banana,
 Juliette Buijn,12:30,sailing,Stijn
 Juliette Buijn,12:45,sailing,Stijn
@@ -1040,12 +1040,12 @@ Juul Bastiaan,11:15,sailing,Huib
 Juul Bastiaan,11:30,sailing,Huib
 Juul Bastiaan,11:45,sailing,Huib
 Juul Bastiaan,12:00,sailing,Huib
-Juul Bastiaan,12:15,transit_to,
-Juul Bastiaan,12:30,on_island,
-Juul Bastiaan,12:45,on_banana,
-Juul Bastiaan,13:00,sailing,Huib
-Juul Bastiaan,13:15,sailing,Huib
-Juul Bastiaan,13:30,sailing,Huib
+Juul Bastiaan,12:15,sailing,Huib
+Juul Bastiaan,12:30,transit_to,
+Juul Bastiaan,12:45,prep,
+Juul Bastiaan,13:00,on_banana,
+Juul Bastiaan,13:15,transit_from,
+Juul Bastiaan,13:30,sailing,Sieds
 Juul Bastiaan,13:45,sailing,Huib
 Juul Bastiaan,14:00,sailing,Huib
 Juul Bastiaan,14:15,sailing,Huib
@@ -1056,21 +1056,21 @@ Juul Bastiaan,15:15,sailing,Huib
 Juul Bastiaan,15:30,sailing,Huib
 Juul Bastiaan,15:45,sailing,Huib
 Lars van de Kerk,10:00,sailing,Laure
-Lars van de Kerk,10:15,transit_to,
-Lars van de Kerk,10:30,on_banana,
-Lars van de Kerk,10:45,transit_from,
-Lars van de Kerk,11:00,sailing,Tim
-Lars van de Kerk,11:15,sailing,Tim
-Lars van de Kerk,11:30,sailing,Nienke
+Lars van de Kerk,10:15,sailing,Laure
+Lars van de Kerk,10:30,sailing,Laure
+Lars van de Kerk,10:45,sailing,Laure
+Lars van de Kerk,11:00,sailing,Laure
+Lars van de Kerk,11:15,sailing,Laure
+Lars van de Kerk,11:30,sailing,Laure
 Lars van de Kerk,11:45,sailing,Laure
 Lars van de Kerk,12:00,sailing,Laure
-Lars van de Kerk,12:15,sailing,Laure
-Lars van de Kerk,12:30,sailing,Laure
-Lars van de Kerk,12:45,sailing,Laure
-Lars van de Kerk,13:00,sailing,Laure
-Lars van de Kerk,13:15,sailing,Laure
-Lars van de Kerk,13:30,sailing,Laure
-Lars van de Kerk,13:45,sailing,Laure
+Lars van de Kerk,12:15,transit_to,
+Lars van de Kerk,12:30,prep,
+Lars van de Kerk,12:45,on_banana,
+Lars van de Kerk,13:00,transit_from,
+Lars van de Kerk,13:15,sailing,Koen
+Lars van de Kerk,13:30,sailing,Koen
+Lars van de Kerk,13:45,sailing,Koen
 Lars van de Kerk,14:00,sailing,Laure
 Lars van de Kerk,14:15,sailing,Laure
 Lars van de Kerk,14:30,sailing,Laure
@@ -1081,17 +1081,17 @@ Lars van de Kerk,15:30,sailing,Laure
 Lars van de Kerk,15:45,sailing,Laure
 Laurens van der Werff,10:00,sailing,Anouk
 Laurens van der Werff,10:15,sailing,Anouk
-Laurens van der Werff,10:30,sailing,Wouter
-Laurens van der Werff,10:45,sailing,Esther
-Laurens van der Werff,11:00,sailing,Stijn
-Laurens van der Werff,11:15,sailing,Stijn
-Laurens van der Werff,11:30,sailing,Stijn
+Laurens van der Werff,10:30,sailing,Anouk
+Laurens van der Werff,10:45,sailing,Anouk
+Laurens van der Werff,11:00,sailing,Anouk
+Laurens van der Werff,11:15,sailing,Anouk
+Laurens van der Werff,11:30,sailing,Anouk
 Laurens van der Werff,11:45,sailing,Anouk
 Laurens van der Werff,12:00,sailing,Anouk
-Laurens van der Werff,12:15,sailing,Anouk
-Laurens van der Werff,12:30,sailing,Anouk
-Laurens van der Werff,12:45,sailing,Anouk
-Laurens van der Werff,13:00,sailing,Anouk
+Laurens van der Werff,12:15,sailing,Esther
+Laurens van der Werff,12:30,sailing,Esther
+Laurens van der Werff,12:45,sailing,Esther
+Laurens van der Werff,13:00,sailing,Esther
 Laurens van der Werff,13:15,sailing,Anouk
 Laurens van der Werff,13:30,sailing,Anouk
 Laurens van der Werff,13:45,sailing,Anouk
@@ -1103,17 +1103,17 @@ Laurens van der Werff,15:00,sailing,Anouk
 Laurens van der Werff,15:15,sailing,Anouk
 Laurens van der Werff,15:30,sailing,Anouk
 Laurens van der Werff,15:45,sailing,Anouk
-Lente Muilwijk,10:00,sailing,Esther
-Lente Muilwijk,10:15,sailing,Esther
-Lente Muilwijk,10:30,sailing,Esther
-Lente Muilwijk,10:45,on_banana,
-Lente Muilwijk,11:00,on_island,
-Lente Muilwijk,11:15,transit_from,
-Lente Muilwijk,11:30,sailing,Willy
-Lente Muilwijk,11:45,sailing,Willy
-Lente Muilwijk,12:00,sailing,Willy
-Lente Muilwijk,12:15,sailing,Willy
-Lente Muilwijk,12:30,sailing,Willy
+Lente Muilwijk,10:00,sailing,Willy
+Lente Muilwijk,10:15,sailing,Willy
+Lente Muilwijk,10:30,sailing,Willy
+Lente Muilwijk,10:45,sailing,Anouk
+Lente Muilwijk,11:00,sailing,Anouk
+Lente Muilwijk,11:15,sailing,Anouk
+Lente Muilwijk,11:30,sailing,Anouk
+Lente Muilwijk,11:45,transit_to,
+Lente Muilwijk,12:00,on_island,
+Lente Muilwijk,12:15,prep,
+Lente Muilwijk,12:30,on_banana,
 Lente Muilwijk,12:45,sailing,Willy
 Lente Muilwijk,13:00,sailing,Willy
 Lente Muilwijk,13:15,sailing,Willy
@@ -1128,9 +1128,9 @@ Lente Muilwijk,15:15,sailing,Willy
 Lente Muilwijk,15:30,sailing,Willy
 Lente Muilwijk,15:45,sailing,Willy
 Leonore van Dijk,10:00,sailing,Sieds
-Leonore van Dijk,10:15,sailing,Sieds
-Leonore van Dijk,10:30,sailing,Sieds
-Leonore van Dijk,10:45,sailing,Sieds
+Leonore van Dijk,10:15,transit_to,
+Leonore van Dijk,10:30,prep,
+Leonore van Dijk,10:45,on_banana,
 Leonore van Dijk,11:00,sailing,Sieds
 Leonore van Dijk,11:15,sailing,Sieds
 Leonore van Dijk,11:30,sailing,Sieds
@@ -1138,9 +1138,9 @@ Leonore van Dijk,11:45,sailing,Sieds
 Leonore van Dijk,12:00,sailing,Sieds
 Leonore van Dijk,12:15,sailing,Sieds
 Leonore van Dijk,12:30,sailing,Sieds
-Leonore van Dijk,12:45,transit_to,
-Leonore van Dijk,13:00,on_banana,
-Leonore van Dijk,13:15,transit_from,
+Leonore van Dijk,12:45,sailing,Sieds
+Leonore van Dijk,13:00,sailing,Sieds
+Leonore van Dijk,13:15,sailing,Sieds
 Leonore van Dijk,13:30,sailing,Sieds
 Leonore van Dijk,13:45,sailing,Sieds
 Leonore van Dijk,14:00,sailing,Sieds
@@ -1178,17 +1178,17 @@ Lot de Waard,15:45,sailing,Guus
 Lotte Schouten,10:00,sailing,Sieds
 Lotte Schouten,10:15,sailing,Sieds
 Lotte Schouten,10:30,sailing,Sieds
-Lotte Schouten,10:45,sailing,Sieds
-Lotte Schouten,11:00,sailing,Sieds
-Lotte Schouten,11:15,sailing,Sieds
-Lotte Schouten,11:30,sailing,Sieds
-Lotte Schouten,11:45,sailing,Sieds
+Lotte Schouten,10:45,transit_to,
+Lotte Schouten,11:00,on_island,
+Lotte Schouten,11:15,prep,
+Lotte Schouten,11:30,on_banana,
+Lotte Schouten,11:45,transit_from,
 Lotte Schouten,12:00,sailing,Sieds
 Lotte Schouten,12:15,sailing,Sieds
 Lotte Schouten,12:30,sailing,Sieds
-Lotte Schouten,12:45,transit_to,
-Lotte Schouten,13:00,on_island,
-Lotte Schouten,13:15,on_banana,
+Lotte Schouten,12:45,sailing,Sieds
+Lotte Schouten,13:00,sailing,Sieds
+Lotte Schouten,13:15,sailing,Sieds
 Lotte Schouten,13:30,sailing,Sieds
 Lotte Schouten,13:45,sailing,Sieds
 Lotte Schouten,14:00,sailing,Sieds
@@ -1203,17 +1203,17 @@ Louis Heyning,10:00,sailing,Nienke
 Louis Heyning,10:15,sailing,Nienke
 Louis Heyning,10:30,sailing,Nienke
 Louis Heyning,10:45,transit_to,
-Louis Heyning,11:00,on_banana,
-Louis Heyning,11:15,transit_from,
-Louis Heyning,11:30,sailing,Nienke
-Louis Heyning,11:45,sailing,Nienke
+Louis Heyning,11:00,on_island,
+Louis Heyning,11:15,prep,
+Louis Heyning,11:30,on_banana,
+Louis Heyning,11:45,transit_from,
 Louis Heyning,12:00,sailing,Nienke
 Louis Heyning,12:15,sailing,Nienke
 Louis Heyning,12:30,sailing,Nienke
 Louis Heyning,12:45,sailing,Nienke
-Louis Heyning,13:00,sailing,Lieke
-Louis Heyning,13:15,sailing,Lieke
-Louis Heyning,13:30,sailing,Lieke
+Louis Heyning,13:00,sailing,Nienke
+Louis Heyning,13:15,sailing,Nienke
+Louis Heyning,13:30,sailing,Nienke
 Louis Heyning,13:45,sailing,Nienke
 Louis Heyning,14:00,sailing,Nienke
 Louis Heyning,14:15,sailing,Nienke
@@ -1228,15 +1228,15 @@ Luc Sturm,10:15,sailing,Boersma
 Luc Sturm,10:30,sailing,Boersma
 Luc Sturm,10:45,sailing,Boersma
 Luc Sturm,11:00,sailing,Boersma
-Luc Sturm,11:15,transit_to,
-Luc Sturm,11:30,on_banana,
-Luc Sturm,11:45,transit_from,
+Luc Sturm,11:15,sailing,Boersma
+Luc Sturm,11:30,sailing,Boersma
+Luc Sturm,11:45,sailing,Boersma
 Luc Sturm,12:00,sailing,Boersma
 Luc Sturm,12:15,sailing,Boersma
-Luc Sturm,12:30,sailing,Guus
-Luc Sturm,12:45,sailing,Annegreet
-Luc Sturm,13:00,sailing,Annegreet
-Luc Sturm,13:15,sailing,Boersma
+Luc Sturm,12:30,transit_to,
+Luc Sturm,12:45,on_island,
+Luc Sturm,13:00,prep,
+Luc Sturm,13:15,on_banana,
 Luc Sturm,13:30,sailing,Boersma
 Luc Sturm,13:45,sailing,Boersma
 Luc Sturm,14:00,sailing,Boersma
@@ -1249,19 +1249,19 @@ Luc Sturm,15:30,sailing,Boersma
 Luc Sturm,15:45,sailing,Boersma
 Marilou Verhoeven,10:00,sailing,Lieke
 Marilou Verhoeven,10:15,sailing,Lieke
-Marilou Verhoeven,10:30,sailing,Lieke
-Marilou Verhoeven,10:45,sailing,Nienke
-Marilou Verhoeven,11:00,sailing,Nienke
-Marilou Verhoeven,11:15,sailing,Willy
+Marilou Verhoeven,10:30,transit_to,
+Marilou Verhoeven,10:45,prep,
+Marilou Verhoeven,11:00,on_banana,
+Marilou Verhoeven,11:15,sailing,Lieke
 Marilou Verhoeven,11:30,sailing,Lieke
 Marilou Verhoeven,11:45,sailing,Lieke
 Marilou Verhoeven,12:00,sailing,Lieke
 Marilou Verhoeven,12:15,sailing,Lieke
 Marilou Verhoeven,12:30,sailing,Lieke
 Marilou Verhoeven,12:45,sailing,Lieke
-Marilou Verhoeven,13:00,on_banana,
-Marilou Verhoeven,13:15,on_island,
-Marilou Verhoeven,13:30,transit_from,
+Marilou Verhoeven,13:00,sailing,Lieke
+Marilou Verhoeven,13:15,sailing,Lieke
+Marilou Verhoeven,13:30,sailing,Lieke
 Marilou Verhoeven,13:45,sailing,Lieke
 Marilou Verhoeven,14:00,sailing,Lieke
 Marilou Verhoeven,14:15,sailing,Lieke
@@ -1274,15 +1274,15 @@ Marilou Verhoeven,15:45,sailing,Lieke
 Mats Hachmer,10:00,sailing,Tim
 Mats Hachmer,10:15,sailing,Tim
 Mats Hachmer,10:30,sailing,Tim
-Mats Hachmer,10:45,transit_to,
-Mats Hachmer,11:00,on_island,
-Mats Hachmer,11:15,on_banana,
-Mats Hachmer,11:30,transit_from,
+Mats Hachmer,10:45,sailing,Tim
+Mats Hachmer,11:00,sailing,Tim
+Mats Hachmer,11:15,sailing,Tim
+Mats Hachmer,11:30,sailing,Tim
 Mats Hachmer,11:45,sailing,Tim
-Mats Hachmer,12:00,sailing,Willy
-Mats Hachmer,12:15,sailing,Willy
-Mats Hachmer,12:30,sailing,Willy
-Mats Hachmer,12:45,sailing,Tim
+Mats Hachmer,12:00,transit_to,
+Mats Hachmer,12:15,on_island,
+Mats Hachmer,12:30,prep,
+Mats Hachmer,12:45,on_banana,
 Mats Hachmer,13:00,sailing,Tim
 Mats Hachmer,13:15,sailing,Tim
 Mats Hachmer,13:30,sailing,Tim
@@ -1296,21 +1296,21 @@ Mats Hachmer,15:15,sailing,Tim
 Mats Hachmer,15:30,sailing,Tim
 Mats Hachmer,15:45,sailing,Tim
 Maurice Schiebaan,10:00,sailing,Laure
-Maurice Schiebaan,10:15,on_banana,
-Maurice Schiebaan,10:30,on_island,
-Maurice Schiebaan,10:45,transit_from,
-Maurice Schiebaan,11:00,sailing,Koen
-Maurice Schiebaan,11:15,sailing,Nienke
-Maurice Schiebaan,11:30,sailing,Nienke
+Maurice Schiebaan,10:15,sailing,Laure
+Maurice Schiebaan,10:30,sailing,Laure
+Maurice Schiebaan,10:45,sailing,Laure
+Maurice Schiebaan,11:00,sailing,Laure
+Maurice Schiebaan,11:15,sailing,Laure
+Maurice Schiebaan,11:30,sailing,Laure
 Maurice Schiebaan,11:45,sailing,Laure
 Maurice Schiebaan,12:00,sailing,Laure
 Maurice Schiebaan,12:15,sailing,Laure
-Maurice Schiebaan,12:30,sailing,Laure
-Maurice Schiebaan,12:45,sailing,Laure
-Maurice Schiebaan,13:00,sailing,Laure
-Maurice Schiebaan,13:15,sailing,Laure
-Maurice Schiebaan,13:30,sailing,Laure
-Maurice Schiebaan,13:45,sailing,Laure
+Maurice Schiebaan,12:30,transit_to,
+Maurice Schiebaan,12:45,prep,
+Maurice Schiebaan,13:00,on_banana,
+Maurice Schiebaan,13:15,transit_from,
+Maurice Schiebaan,13:30,sailing,Esther
+Maurice Schiebaan,13:45,sailing,Esther
 Maurice Schiebaan,14:00,sailing,Laure
 Maurice Schiebaan,14:15,sailing,Laure
 Maurice Schiebaan,14:30,sailing,Laure
@@ -1319,22 +1319,22 @@ Maurice Schiebaan,15:00,sailing,Laure
 Maurice Schiebaan,15:15,sailing,Laure
 Maurice Schiebaan,15:30,sailing,Laure
 Maurice Schiebaan,15:45,sailing,Laure
-Meike Wijdeven,10:00,on_banana,
-Meike Wijdeven,10:15,on_island,
-Meike Wijdeven,10:30,transit_from,
-Meike Wijdeven,10:45,sailing,Stijn
-Meike Wijdeven,11:00,sailing,Stijn
-Meike Wijdeven,11:15,sailing,Nienke
-Meike Wijdeven,11:30,sailing,Nienke
+Meike Wijdeven,10:00,sailing,Laure
+Meike Wijdeven,10:15,sailing,Laure
+Meike Wijdeven,10:30,sailing,Laure
+Meike Wijdeven,10:45,sailing,Laure
+Meike Wijdeven,11:00,sailing,Laure
+Meike Wijdeven,11:15,sailing,Laure
+Meike Wijdeven,11:30,sailing,Laure
 Meike Wijdeven,11:45,sailing,Laure
 Meike Wijdeven,12:00,sailing,Laure
 Meike Wijdeven,12:15,sailing,Laure
 Meike Wijdeven,12:30,sailing,Laure
 Meike Wijdeven,12:45,sailing,Laure
-Meike Wijdeven,13:00,sailing,Laure
-Meike Wijdeven,13:15,sailing,Laure
-Meike Wijdeven,13:30,sailing,Laure
-Meike Wijdeven,13:45,sailing,Laure
+Meike Wijdeven,13:00,transit_to,
+Meike Wijdeven,13:15,prep,
+Meike Wijdeven,13:30,on_banana,
+Meike Wijdeven,13:45,transit_from,
 Meike Wijdeven,14:00,sailing,Laure
 Meike Wijdeven,14:15,sailing,Laure
 Meike Wijdeven,14:30,sailing,Laure
@@ -1343,17 +1343,17 @@ Meike Wijdeven,15:00,sailing,Laure
 Meike Wijdeven,15:15,sailing,Laure
 Meike Wijdeven,15:30,sailing,Laure
 Meike Wijdeven,15:45,sailing,Laure
-Menno Booij,10:00,sailing,Nienke
-Menno Booij,10:15,sailing,Nienke
-Menno Booij,10:30,sailing,Nienke
-Menno Booij,10:45,on_banana,
-Menno Booij,11:00,on_island,
-Menno Booij,11:15,transit_from,
-Menno Booij,11:30,sailing,Willy
-Menno Booij,11:45,sailing,Willy
-Menno Booij,12:00,sailing,Willy
-Menno Booij,12:15,sailing,Willy
-Menno Booij,12:30,sailing,Willy
+Menno Booij,10:00,sailing,Willy
+Menno Booij,10:15,sailing,Willy
+Menno Booij,10:30,sailing,Willy
+Menno Booij,10:45,sailing,Koen
+Menno Booij,11:00,sailing,Koen
+Menno Booij,11:15,sailing,Koen
+Menno Booij,11:30,sailing,Koen
+Menno Booij,11:45,transit_to,
+Menno Booij,12:00,on_island,
+Menno Booij,12:15,prep,
+Menno Booij,12:30,on_banana,
 Menno Booij,12:45,sailing,Willy
 Menno Booij,13:00,sailing,Willy
 Menno Booij,13:15,sailing,Willy
@@ -1370,18 +1370,18 @@ Menno Booij,15:45,sailing,Willy
 Mira Jobsen,10:00,sailing,Nienke
 Mira Jobsen,10:15,sailing,Nienke
 Mira Jobsen,10:30,sailing,Nienke
-Mira Jobsen,10:45,sailing,Nienke
-Mira Jobsen,11:00,sailing,Nienke
-Mira Jobsen,11:15,sailing,Nienke
-Mira Jobsen,11:30,sailing,Nienke
-Mira Jobsen,11:45,transit_to,
-Mira Jobsen,12:00,on_banana,
-Mira Jobsen,12:15,transit_from,
+Mira Jobsen,10:45,sailing,Esther
+Mira Jobsen,11:00,sailing,Esther
+Mira Jobsen,11:15,transit_to,
+Mira Jobsen,11:30,prep,
+Mira Jobsen,11:45,on_banana,
+Mira Jobsen,12:00,transit_from,
+Mira Jobsen,12:15,sailing,Nienke
 Mira Jobsen,12:30,sailing,Nienke
 Mira Jobsen,12:45,sailing,Nienke
-Mira Jobsen,13:00,sailing,Anouk
-Mira Jobsen,13:15,sailing,Anouk
-Mira Jobsen,13:30,sailing,Anouk
+Mira Jobsen,13:00,sailing,Nienke
+Mira Jobsen,13:15,sailing,Nienke
+Mira Jobsen,13:30,sailing,Nienke
 Mira Jobsen,13:45,sailing,Nienke
 Mira Jobsen,14:00,sailing,Nienke
 Mira Jobsen,14:15,sailing,Nienke
@@ -1391,20 +1391,20 @@ Mira Jobsen,15:00,sailing,Nienke
 Mira Jobsen,15:15,sailing,Nienke
 Mira Jobsen,15:30,sailing,Nienke
 Mira Jobsen,15:45,sailing,Nienke
-Niels Romkes,10:00,sailing,Nienke
-Niels Romkes,10:15,sailing,Nienke
-Niels Romkes,10:30,sailing,Nienke
-Niels Romkes,10:45,sailing,Willy
-Niels Romkes,11:00,sailing,Willy
-Niels Romkes,11:15,sailing,Willy
-Niels Romkes,11:30,sailing,Willy
-Niels Romkes,11:45,on_banana,
-Niels Romkes,12:00,on_island,
-Niels Romkes,12:15,transit_from,
-Niels Romkes,12:30,sailing,Willy
-Niels Romkes,12:45,sailing,Willy
-Niels Romkes,13:00,sailing,Willy
-Niels Romkes,13:15,sailing,Willy
+Niels Romkes,10:00,sailing,Willy
+Niels Romkes,10:15,sailing,Willy
+Niels Romkes,10:30,sailing,Willy
+Niels Romkes,10:45,sailing,Anouk
+Niels Romkes,11:00,sailing,Anouk
+Niels Romkes,11:15,sailing,Anouk
+Niels Romkes,11:30,sailing,Anouk
+Niels Romkes,11:45,sailing,Willy
+Niels Romkes,12:00,sailing,Willy
+Niels Romkes,12:15,sailing,Willy
+Niels Romkes,12:30,transit_to,
+Niels Romkes,12:45,prep,
+Niels Romkes,13:00,on_banana,
+Niels Romkes,13:15,transit_from,
 Niels Romkes,13:30,sailing,Willy
 Niels Romkes,13:45,sailing,Willy
 Niels Romkes,14:00,sailing,Willy
@@ -1416,9 +1416,9 @@ Niels Romkes,15:15,sailing,Willy
 Niels Romkes,15:30,sailing,Willy
 Niels Romkes,15:45,sailing,Willy
 Ole Smits,10:00,sailing,Pien
-Ole Smits,10:15,sailing,Sieds
-Ole Smits,10:30,sailing,Sieds
-Ole Smits,10:45,sailing,Sieds
+Ole Smits,10:15,transit_to,
+Ole Smits,10:30,prep,
+Ole Smits,10:45,on_banana,
 Ole Smits,11:00,sailing,Pien
 Ole Smits,11:15,sailing,Pien
 Ole Smits,11:30,sailing,Pien
@@ -1426,9 +1426,9 @@ Ole Smits,11:45,sailing,Pien
 Ole Smits,12:00,sailing,Pien
 Ole Smits,12:15,sailing,Pien
 Ole Smits,12:30,sailing,Pien
-Ole Smits,12:45,transit_to,
-Ole Smits,13:00,on_island,
-Ole Smits,13:15,on_banana,
+Ole Smits,12:45,sailing,Pien
+Ole Smits,13:00,sailing,Pien
+Ole Smits,13:15,sailing,Pien
 Ole Smits,13:30,sailing,Pien
 Ole Smits,13:45,sailing,Pien
 Ole Smits,14:00,sailing,Pien
@@ -1445,10 +1445,10 @@ Olivia Koelers,10:30,sailing,Stijn
 Olivia Koelers,10:45,sailing,Stijn
 Olivia Koelers,11:00,sailing,Stijn
 Olivia Koelers,11:15,sailing,Stijn
-Olivia Koelers,11:30,sailing,Stijn
-Olivia Koelers,11:45,transit_to,
-Olivia Koelers,12:00,on_island,
-Olivia Koelers,12:15,on_banana,
+Olivia Koelers,11:30,transit_to,
+Olivia Koelers,11:45,prep,
+Olivia Koelers,12:00,on_banana,
+Olivia Koelers,12:15,transit_from,
 Olivia Koelers,12:30,sailing,Stijn
 Olivia Koelers,12:45,sailing,Stijn
 Olivia Koelers,13:00,sailing,Stijn
@@ -1463,16 +1463,16 @@ Olivia Koelers,15:00,sailing,Stijn
 Olivia Koelers,15:15,sailing,Stijn
 Olivia Koelers,15:30,sailing,Stijn
 Olivia Koelers,15:45,sailing,Stijn
-Olivier van der Laan,10:00,sailing,Wouter
-Olivier van der Laan,10:15,sailing,Wouter
-Olivier van der Laan,10:30,sailing,Wouter
-Olivier van der Laan,10:45,sailing,Wouter
-Olivier van der Laan,11:00,on_banana,
-Olivier van der Laan,11:15,on_island,
+Olivier van der Laan,10:00,sailing,Koen
+Olivier van der Laan,10:15,sailing,Koen
+Olivier van der Laan,10:30,sailing,Koen
+Olivier van der Laan,10:45,transit_to,
+Olivier van der Laan,11:00,prep,
+Olivier van der Laan,11:15,on_banana,
 Olivier van der Laan,11:30,transit_from,
-Olivier van der Laan,11:45,sailing,Willy
-Olivier van der Laan,12:00,sailing,Esther
-Olivier van der Laan,12:15,sailing,Esther
+Olivier van der Laan,11:45,sailing,Wouter
+Olivier van der Laan,12:00,sailing,Wouter
+Olivier van der Laan,12:15,sailing,Wouter
 Olivier van der Laan,12:30,sailing,Wouter
 Olivier van der Laan,12:45,sailing,Wouter
 Olivier van der Laan,13:00,sailing,Wouter
@@ -1490,18 +1490,18 @@ Olivier van der Laan,15:45,sailing,Wouter
 Olle Speelman,10:00,sailing,Nienke
 Olle Speelman,10:15,sailing,Nienke
 Olle Speelman,10:30,sailing,Nienke
-Olle Speelman,10:45,sailing,Nienke
-Olle Speelman,11:00,sailing,Nienke
-Olle Speelman,11:15,sailing,Nienke
-Olle Speelman,11:30,sailing,Nienke
-Olle Speelman,11:45,sailing,Nienke
+Olle Speelman,10:45,sailing,Esther
+Olle Speelman,11:00,sailing,Esther
+Olle Speelman,11:15,sailing,Stijn
+Olle Speelman,11:30,sailing,Lieke
+Olle Speelman,11:45,sailing,Koen
 Olle Speelman,12:00,sailing,Nienke
 Olle Speelman,12:15,sailing,Nienke
 Olle Speelman,12:30,sailing,Nienke
 Olle Speelman,12:45,sailing,Nienke
-Olle Speelman,13:00,sailing,Esther
-Olle Speelman,13:15,sailing,Esther
-Olle Speelman,13:30,sailing,Esther
+Olle Speelman,13:00,sailing,Nienke
+Olle Speelman,13:15,sailing,Nienke
+Olle Speelman,13:30,sailing,Nienke
 Olle Speelman,13:45,sailing,Nienke
 Olle Speelman,14:00,sailing,Nienke
 Olle Speelman,14:15,sailing,Nienke
@@ -1514,15 +1514,15 @@ Olle Speelman,15:45,sailing,Nienke
 Pelle Kummel,10:00,sailing,Tim
 Pelle Kummel,10:15,sailing,Tim
 Pelle Kummel,10:30,sailing,Tim
-Pelle Kummel,10:45,on_banana,
-Pelle Kummel,11:00,on_island,
-Pelle Kummel,11:15,transit_from,
+Pelle Kummel,10:45,sailing,Tim
+Pelle Kummel,11:00,sailing,Tim
+Pelle Kummel,11:15,sailing,Tim
 Pelle Kummel,11:30,sailing,Tim
 Pelle Kummel,11:45,sailing,Tim
-Pelle Kummel,12:00,sailing,Willy
-Pelle Kummel,12:15,sailing,Willy
-Pelle Kummel,12:30,sailing,Wouter
-Pelle Kummel,12:45,sailing,Tim
+Pelle Kummel,12:00,transit_to,
+Pelle Kummel,12:15,on_island,
+Pelle Kummel,12:30,prep,
+Pelle Kummel,12:45,on_banana,
 Pelle Kummel,13:00,sailing,Tim
 Pelle Kummel,13:15,sailing,Tim
 Pelle Kummel,13:30,sailing,Tim
@@ -1536,17 +1536,17 @@ Pelle Kummel,15:15,sailing,Tim
 Pelle Kummel,15:30,sailing,Tim
 Pelle Kummel,15:45,sailing,Tim
 Pepijn Hetterschijt,10:00,sailing,Tim
-Pepijn Hetterschijt,10:15,transit_to,
-Pepijn Hetterschijt,10:30,on_banana,
-Pepijn Hetterschijt,10:45,transit_from,
+Pepijn Hetterschijt,10:15,sailing,Tim
+Pepijn Hetterschijt,10:30,sailing,Tim
+Pepijn Hetterschijt,10:45,sailing,Tim
 Pepijn Hetterschijt,11:00,sailing,Tim
 Pepijn Hetterschijt,11:15,sailing,Tim
 Pepijn Hetterschijt,11:30,sailing,Tim
 Pepijn Hetterschijt,11:45,sailing,Tim
-Pepijn Hetterschijt,12:00,sailing,Willy
-Pepijn Hetterschijt,12:15,sailing,Willy
-Pepijn Hetterschijt,12:30,sailing,Willy
-Pepijn Hetterschijt,12:45,sailing,Tim
+Pepijn Hetterschijt,12:00,transit_to,
+Pepijn Hetterschijt,12:15,on_island,
+Pepijn Hetterschijt,12:30,prep,
+Pepijn Hetterschijt,12:45,on_banana,
 Pepijn Hetterschijt,13:00,sailing,Tim
 Pepijn Hetterschijt,13:15,sailing,Tim
 Pepijn Hetterschijt,13:30,sailing,Tim
@@ -1564,15 +1564,15 @@ Pepijn Keukens,10:15,sailing,Boersma
 Pepijn Keukens,10:30,sailing,Boersma
 Pepijn Keukens,10:45,sailing,Boersma
 Pepijn Keukens,11:00,sailing,Boersma
-Pepijn Keukens,11:15,transit_to,
-Pepijn Keukens,11:30,on_banana,
-Pepijn Keukens,11:45,transit_from,
+Pepijn Keukens,11:15,sailing,Boersma
+Pepijn Keukens,11:30,sailing,Boersma
+Pepijn Keukens,11:45,sailing,Boersma
 Pepijn Keukens,12:00,sailing,Boersma
 Pepijn Keukens,12:15,sailing,Boersma
-Pepijn Keukens,12:30,sailing,Guus
-Pepijn Keukens,12:45,sailing,Guus
-Pepijn Keukens,13:00,sailing,Guus
-Pepijn Keukens,13:15,sailing,Boersma
+Pepijn Keukens,12:30,transit_to,
+Pepijn Keukens,12:45,on_island,
+Pepijn Keukens,13:00,prep,
+Pepijn Keukens,13:15,on_banana,
 Pepijn Keukens,13:30,sailing,Boersma
 Pepijn Keukens,13:45,sailing,Boersma
 Pepijn Keukens,14:00,sailing,Boersma
@@ -1589,9 +1589,9 @@ Phiene Hetterschijt,10:30,sailing,Stijn
 Phiene Hetterschijt,10:45,sailing,Stijn
 Phiene Hetterschijt,11:00,sailing,Stijn
 Phiene Hetterschijt,11:15,sailing,Stijn
-Phiene Hetterschijt,11:30,sailing,Stijn
-Phiene Hetterschijt,11:45,transit_to,
-Phiene Hetterschijt,12:00,on_island,
+Phiene Hetterschijt,11:30,transit_to,
+Phiene Hetterschijt,11:45,on_island,
+Phiene Hetterschijt,12:00,prep,
 Phiene Hetterschijt,12:15,on_banana,
 Phiene Hetterschijt,12:30,sailing,Stijn
 Phiene Hetterschijt,12:45,sailing,Stijn
@@ -1616,12 +1616,12 @@ Pieter van der Werf,11:15,sailing,Huib
 Pieter van der Werf,11:30,sailing,Huib
 Pieter van der Werf,11:45,sailing,Huib
 Pieter van der Werf,12:00,sailing,Huib
-Pieter van der Werf,12:15,sailing,Pien
-Pieter van der Werf,12:30,sailing,Pien
-Pieter van der Werf,12:45,sailing,Pien
-Pieter van der Werf,13:00,on_banana,
-Pieter van der Werf,13:15,on_island,
-Pieter van der Werf,13:30,transit_from,
+Pieter van der Werf,12:15,sailing,Huib
+Pieter van der Werf,12:30,sailing,Huib
+Pieter van der Werf,12:45,transit_to,
+Pieter van der Werf,13:00,on_island,
+Pieter van der Werf,13:15,prep,
+Pieter van der Werf,13:30,on_banana,
 Pieter van der Werf,13:45,sailing,Huib
 Pieter van der Werf,14:00,sailing,Huib
 Pieter van der Werf,14:15,sailing,Huib
@@ -1631,16 +1631,16 @@ Pieter van der Werf,15:00,sailing,Huib
 Pieter van der Werf,15:15,sailing,Huib
 Pieter van der Werf,15:30,sailing,Huib
 Pieter van der Werf,15:45,sailing,Huib
-Rein Koopmanschap,10:00,sailing,Wouter
-Rein Koopmanschap,10:15,sailing,Wouter
-Rein Koopmanschap,10:30,sailing,Wouter
+Rein Koopmanschap,10:00,transit_to,
+Rein Koopmanschap,10:15,prep,
+Rein Koopmanschap,10:30,on_banana,
 Rein Koopmanschap,10:45,sailing,Wouter
-Rein Koopmanschap,11:00,transit_to,
-Rein Koopmanschap,11:15,on_banana,
-Rein Koopmanschap,11:30,transit_from,
-Rein Koopmanschap,11:45,sailing,Lieke
-Rein Koopmanschap,12:00,sailing,Lieke
-Rein Koopmanschap,12:15,sailing,Lieke
+Rein Koopmanschap,11:00,sailing,Wouter
+Rein Koopmanschap,11:15,sailing,Wouter
+Rein Koopmanschap,11:30,sailing,Wouter
+Rein Koopmanschap,11:45,sailing,Wouter
+Rein Koopmanschap,12:00,sailing,Wouter
+Rein Koopmanschap,12:15,sailing,Wouter
 Rein Koopmanschap,12:30,sailing,Wouter
 Rein Koopmanschap,12:45,sailing,Wouter
 Rein Koopmanschap,13:00,sailing,Wouter
@@ -1655,16 +1655,16 @@ Rein Koopmanschap,15:00,sailing,Wouter
 Rein Koopmanschap,15:15,sailing,Wouter
 Rein Koopmanschap,15:30,sailing,Wouter
 Rein Koopmanschap,15:45,sailing,Wouter
-Rem Bastiaan,10:00,sailing,Wouter
-Rem Bastiaan,10:15,sailing,Wouter
-Rem Bastiaan,10:30,sailing,Wouter
+Rem Bastiaan,10:00,sailing,Anouk
+Rem Bastiaan,10:15,sailing,Anouk
+Rem Bastiaan,10:30,sailing,Anouk
 Rem Bastiaan,10:45,transit_to,
 Rem Bastiaan,11:00,on_island,
-Rem Bastiaan,11:15,on_banana,
-Rem Bastiaan,11:30,transit_from,
-Rem Bastiaan,11:45,sailing,Esther
-Rem Bastiaan,12:00,sailing,Esther
-Rem Bastiaan,12:15,sailing,Esther
+Rem Bastiaan,11:15,prep,
+Rem Bastiaan,11:30,on_banana,
+Rem Bastiaan,11:45,sailing,Wouter
+Rem Bastiaan,12:00,sailing,Wouter
+Rem Bastiaan,12:15,sailing,Wouter
 Rem Bastiaan,12:30,sailing,Wouter
 Rem Bastiaan,12:45,sailing,Wouter
 Rem Bastiaan,13:00,sailing,Wouter
@@ -1682,19 +1682,19 @@ Rem Bastiaan,15:45,sailing,Wouter
 Renzo Brouwer,10:00,sailing,Boersma
 Renzo Brouwer,10:15,sailing,Boersma
 Renzo Brouwer,10:30,sailing,Boersma
-Renzo Brouwer,10:45,on_banana,
-Renzo Brouwer,11:00,on_island,
-Renzo Brouwer,11:15,transit_from,
+Renzo Brouwer,10:45,sailing,Boersma
+Renzo Brouwer,11:00,sailing,Boersma
+Renzo Brouwer,11:15,sailing,Boersma
 Renzo Brouwer,11:30,sailing,Boersma
 Renzo Brouwer,11:45,sailing,Boersma
 Renzo Brouwer,12:00,sailing,Boersma
 Renzo Brouwer,12:15,sailing,Boersma
-Renzo Brouwer,12:30,sailing,Annegreet
-Renzo Brouwer,12:45,sailing,Annegreet
-Renzo Brouwer,13:00,sailing,Annegreet
-Renzo Brouwer,13:15,sailing,Boersma
-Renzo Brouwer,13:30,sailing,Boersma
-Renzo Brouwer,13:45,sailing,Boersma
+Renzo Brouwer,12:30,sailing,Guus
+Renzo Brouwer,12:45,sailing,Guus
+Renzo Brouwer,13:00,transit_to,
+Renzo Brouwer,13:15,on_island,
+Renzo Brouwer,13:30,prep,
+Renzo Brouwer,13:45,on_banana,
 Renzo Brouwer,14:00,sailing,Boersma
 Renzo Brouwer,14:15,sailing,Boersma
 Renzo Brouwer,14:30,sailing,Boersma
@@ -1708,10 +1708,10 @@ Romy van der Scheur,10:15,sailing,Koen
 Romy van der Scheur,10:30,sailing,Koen
 Romy van der Scheur,10:45,sailing,Koen
 Romy van der Scheur,11:00,sailing,Koen
-Romy van der Scheur,11:15,on_banana,
+Romy van der Scheur,11:15,transit_to,
 Romy van der Scheur,11:30,on_island,
-Romy van der Scheur,11:45,transit_from,
-Romy van der Scheur,12:00,sailing,Koen
+Romy van der Scheur,11:45,prep,
+Romy van der Scheur,12:00,on_banana,
 Romy van der Scheur,12:15,sailing,Koen
 Romy van der Scheur,12:30,sailing,Koen
 Romy van der Scheur,12:45,sailing,Koen
@@ -1730,19 +1730,19 @@ Romy van der Scheur,15:45,sailing,Koen
 Roos van Asch,10:00,sailing,Laure
 Roos van Asch,10:15,sailing,Laure
 Roos van Asch,10:30,sailing,Laure
-Roos van Asch,10:45,sailing,Willy
-Roos van Asch,11:00,sailing,Willy
-Roos van Asch,11:15,sailing,Willy
-Roos van Asch,11:30,sailing,Wouter
+Roos van Asch,10:45,sailing,Laure
+Roos van Asch,11:00,sailing,Laure
+Roos van Asch,11:15,sailing,Laure
+Roos van Asch,11:30,sailing,Laure
 Roos van Asch,11:45,sailing,Laure
 Roos van Asch,12:00,sailing,Laure
 Roos van Asch,12:15,sailing,Laure
 Roos van Asch,12:30,sailing,Laure
 Roos van Asch,12:45,sailing,Laure
-Roos van Asch,13:00,sailing,Laure
-Roos van Asch,13:15,sailing,Laure
-Roos van Asch,13:30,sailing,Laure
-Roos van Asch,13:45,sailing,Laure
+Roos van Asch,13:00,sailing,Willy
+Roos van Asch,13:15,sailing,Willy
+Roos van Asch,13:30,sailing,Wouter
+Roos van Asch,13:45,sailing,Wouter
 Roos van Asch,14:00,sailing,Laure
 Roos van Asch,14:15,sailing,Laure
 Roos van Asch,14:30,sailing,Laure
@@ -1757,11 +1757,11 @@ Samuel Heyning,10:30,sailing,Stijn
 Samuel Heyning,10:45,sailing,Stijn
 Samuel Heyning,11:00,sailing,Stijn
 Samuel Heyning,11:15,sailing,Stijn
-Samuel Heyning,11:30,sailing,Stijn
-Samuel Heyning,11:45,sailing,Esther
-Samuel Heyning,12:00,on_banana,
-Samuel Heyning,12:15,on_island,
-Samuel Heyning,12:30,transit_from,
+Samuel Heyning,11:30,transit_to,
+Samuel Heyning,11:45,on_island,
+Samuel Heyning,12:00,prep,
+Samuel Heyning,12:15,on_banana,
+Samuel Heyning,12:30,sailing,Stijn
 Samuel Heyning,12:45,sailing,Stijn
 Samuel Heyning,13:00,sailing,Stijn
 Samuel Heyning,13:15,sailing,Stijn
@@ -1776,17 +1776,17 @@ Samuel Heyning,15:15,sailing,Stijn
 Samuel Heyning,15:30,sailing,Stijn
 Samuel Heyning,15:45,sailing,Stijn
 Steppe Blokzijl,10:00,sailing,Pien
-Steppe Blokzijl,10:15,sailing,Sieds
-Steppe Blokzijl,10:30,sailing,Sieds
-Steppe Blokzijl,10:45,sailing,Sieds
-Steppe Blokzijl,11:00,sailing,Pien
+Steppe Blokzijl,10:15,sailing,Huib
+Steppe Blokzijl,10:30,transit_to,
+Steppe Blokzijl,10:45,prep,
+Steppe Blokzijl,11:00,on_banana,
 Steppe Blokzijl,11:15,sailing,Pien
 Steppe Blokzijl,11:30,sailing,Pien
 Steppe Blokzijl,11:45,sailing,Pien
 Steppe Blokzijl,12:00,sailing,Pien
-Steppe Blokzijl,12:15,transit_to,
-Steppe Blokzijl,12:30,on_island,
-Steppe Blokzijl,12:45,on_banana,
+Steppe Blokzijl,12:15,sailing,Pien
+Steppe Blokzijl,12:30,sailing,Pien
+Steppe Blokzijl,12:45,sailing,Pien
 Steppe Blokzijl,13:00,sailing,Pien
 Steppe Blokzijl,13:15,sailing,Pien
 Steppe Blokzijl,13:30,sailing,Pien
@@ -1799,9 +1799,9 @@ Steppe Blokzijl,15:00,sailing,Pien
 Steppe Blokzijl,15:15,sailing,Pien
 Steppe Blokzijl,15:30,sailing,Pien
 Steppe Blokzijl,15:45,sailing,Pien
-Stijn van der Toolen,10:00,transit_to,
-Stijn van der Toolen,10:15,on_banana,
-Stijn van der Toolen,10:30,transit_from,
+Stijn van der Toolen,10:00,sailing,Tim
+Stijn van der Toolen,10:15,sailing,Tim
+Stijn van der Toolen,10:30,sailing,Tim
 Stijn van der Toolen,10:45,sailing,Tim
 Stijn van der Toolen,11:00,sailing,Tim
 Stijn van der Toolen,11:15,sailing,Tim
@@ -1810,10 +1810,10 @@ Stijn van der Toolen,11:45,sailing,Tim
 Stijn van der Toolen,12:00,sailing,Willy
 Stijn van der Toolen,12:15,sailing,Willy
 Stijn van der Toolen,12:30,sailing,Willy
-Stijn van der Toolen,12:45,sailing,Tim
-Stijn van der Toolen,13:00,sailing,Tim
-Stijn van der Toolen,13:15,sailing,Tim
-Stijn van der Toolen,13:30,sailing,Tim
+Stijn van der Toolen,12:45,transit_to,
+Stijn van der Toolen,13:00,prep,
+Stijn van der Toolen,13:15,on_banana,
+Stijn van der Toolen,13:30,transit_from,
 Stijn van der Toolen,13:45,sailing,Tim
 Stijn van der Toolen,14:00,sailing,Tim
 Stijn van der Toolen,14:15,sailing,Tim
@@ -1823,16 +1823,16 @@ Stijn van der Toolen,15:00,sailing,Tim
 Stijn van der Toolen,15:15,sailing,Tim
 Stijn van der Toolen,15:30,sailing,Tim
 Stijn van der Toolen,15:45,sailing,Tim
-Tawan Smeets,10:00,sailing,Wouter
-Tawan Smeets,10:15,sailing,Wouter
-Tawan Smeets,10:30,sailing,Wouter
+Tawan Smeets,10:00,transit_to,
+Tawan Smeets,10:15,prep,
+Tawan Smeets,10:30,on_banana,
 Tawan Smeets,10:45,sailing,Wouter
 Tawan Smeets,11:00,sailing,Wouter
 Tawan Smeets,11:15,sailing,Wouter
 Tawan Smeets,11:30,sailing,Wouter
-Tawan Smeets,11:45,transit_to,
-Tawan Smeets,12:00,on_banana,
-Tawan Smeets,12:15,transit_from,
+Tawan Smeets,11:45,sailing,Wouter
+Tawan Smeets,12:00,sailing,Wouter
+Tawan Smeets,12:15,sailing,Wouter
 Tawan Smeets,12:30,sailing,Wouter
 Tawan Smeets,12:45,sailing,Wouter
 Tawan Smeets,13:00,sailing,Wouter
@@ -1848,17 +1848,17 @@ Tawan Smeets,15:15,sailing,Wouter
 Tawan Smeets,15:30,sailing,Wouter
 Tawan Smeets,15:45,sailing,Wouter
 Thijmen Romkes,10:00,sailing,Tim
-Thijmen Romkes,10:15,on_banana,
-Thijmen Romkes,10:30,on_island,
-Thijmen Romkes,10:45,transit_from,
+Thijmen Romkes,10:15,sailing,Tim
+Thijmen Romkes,10:30,sailing,Tim
+Thijmen Romkes,10:45,sailing,Tim
 Thijmen Romkes,11:00,sailing,Tim
 Thijmen Romkes,11:15,sailing,Tim
 Thijmen Romkes,11:30,sailing,Tim
 Thijmen Romkes,11:45,sailing,Tim
-Thijmen Romkes,12:00,sailing,Willy
-Thijmen Romkes,12:15,sailing,Willy
-Thijmen Romkes,12:30,sailing,Laure
-Thijmen Romkes,12:45,sailing,Tim
+Thijmen Romkes,12:00,transit_to,
+Thijmen Romkes,12:15,prep,
+Thijmen Romkes,12:30,on_banana,
+Thijmen Romkes,12:45,transit_from,
 Thijmen Romkes,13:00,sailing,Tim
 Thijmen Romkes,13:15,sailing,Tim
 Thijmen Romkes,13:30,sailing,Tim
@@ -1876,16 +1876,16 @@ Thijmen van Dijk,10:15,sailing,Tim
 Thijmen van Dijk,10:30,sailing,Tim
 Thijmen van Dijk,10:45,sailing,Tim
 Thijmen van Dijk,11:00,sailing,Tim
-Thijmen van Dijk,11:15,on_banana,
-Thijmen van Dijk,11:30,on_island,
-Thijmen van Dijk,11:45,transit_from,
+Thijmen van Dijk,11:15,sailing,Tim
+Thijmen van Dijk,11:30,sailing,Tim
+Thijmen van Dijk,11:45,sailing,Tim
 Thijmen van Dijk,12:00,sailing,Willy
 Thijmen van Dijk,12:15,sailing,Willy
 Thijmen van Dijk,12:30,sailing,Willy
-Thijmen van Dijk,12:45,sailing,Tim
-Thijmen van Dijk,13:00,sailing,Tim
-Thijmen van Dijk,13:15,sailing,Tim
-Thijmen van Dijk,13:30,sailing,Tim
+Thijmen van Dijk,12:45,transit_to,
+Thijmen van Dijk,13:00,prep,
+Thijmen van Dijk,13:15,on_banana,
+Thijmen van Dijk,13:30,transit_from,
 Thijmen van Dijk,13:45,sailing,Tim
 Thijmen van Dijk,14:00,sailing,Tim
 Thijmen van Dijk,14:15,sailing,Tim
@@ -1919,16 +1919,16 @@ Thijs Wagemakers,15:00,sailing,Guus
 Thijs Wagemakers,15:15,sailing,Guus
 Thijs Wagemakers,15:30,sailing,Guus
 Thijs Wagemakers,15:45,sailing,Guus
-Thomas Kok,10:00,sailing,Wouter
-Thomas Kok,10:15,sailing,Wouter
-Thomas Kok,10:30,sailing,Wouter
+Thomas Kok,10:00,transit_to,
+Thomas Kok,10:15,prep,
+Thomas Kok,10:30,on_banana,
 Thomas Kok,10:45,sailing,Wouter
-Thomas Kok,11:00,on_banana,
-Thomas Kok,11:15,on_island,
-Thomas Kok,11:30,transit_from,
-Thomas Kok,11:45,sailing,Lieke
-Thomas Kok,12:00,sailing,Lieke
-Thomas Kok,12:15,sailing,Nienke
+Thomas Kok,11:00,sailing,Wouter
+Thomas Kok,11:15,sailing,Wouter
+Thomas Kok,11:30,sailing,Wouter
+Thomas Kok,11:45,sailing,Wouter
+Thomas Kok,12:00,sailing,Wouter
+Thomas Kok,12:15,sailing,Wouter
 Thomas Kok,12:30,sailing,Wouter
 Thomas Kok,12:45,sailing,Wouter
 Thomas Kok,13:00,sailing,Wouter
@@ -1943,17 +1943,17 @@ Thomas Kok,15:00,sailing,Wouter
 Thomas Kok,15:15,sailing,Wouter
 Thomas Kok,15:30,sailing,Wouter
 Thomas Kok,15:45,sailing,Wouter
-Tim van der Toolen,10:00,sailing,Nienke
-Tim van der Toolen,10:15,sailing,Nienke
-Tim van der Toolen,10:30,sailing,Nienke
-Tim van der Toolen,10:45,transit_to,
-Tim van der Toolen,11:00,on_island,
-Tim van der Toolen,11:15,on_island,
-Tim van der Toolen,11:30,on_banana,
-Tim van der Toolen,11:45,sailing,Willy
-Tim van der Toolen,12:00,sailing,Willy
-Tim van der Toolen,12:15,sailing,Willy
-Tim van der Toolen,12:30,sailing,Willy
+Tim van der Toolen,10:00,sailing,Willy
+Tim van der Toolen,10:15,sailing,Willy
+Tim van der Toolen,10:30,sailing,Willy
+Tim van der Toolen,10:45,sailing,Wouter
+Tim van der Toolen,11:00,sailing,Wouter
+Tim van der Toolen,11:15,sailing,Wouter
+Tim van der Toolen,11:30,sailing,Wouter
+Tim van der Toolen,11:45,transit_to,
+Tim van der Toolen,12:00,on_island,
+Tim van der Toolen,12:15,prep,
+Tim van der Toolen,12:30,on_banana,
 Tim van der Toolen,12:45,sailing,Willy
 Tim van der Toolen,13:00,sailing,Willy
 Tim van der Toolen,13:15,sailing,Willy
@@ -1992,9 +1992,9 @@ Tjibbe van Rees,15:15,sailing,Guus
 Tjibbe van Rees,15:30,sailing,Guus
 Tjibbe van Rees,15:45,sailing,Guus
 Vajen de Heer,10:00,sailing,Pien
-Vajen de Heer,10:15,sailing,Sieds
-Vajen de Heer,10:30,sailing,Sieds
-Vajen de Heer,10:45,sailing,Sieds
+Vajen de Heer,10:15,transit_to,
+Vajen de Heer,10:30,prep,
+Vajen de Heer,10:45,on_banana,
 Vajen de Heer,11:00,sailing,Pien
 Vajen de Heer,11:15,sailing,Pien
 Vajen de Heer,11:30,sailing,Pien
@@ -2002,9 +2002,9 @@ Vajen de Heer,11:45,sailing,Pien
 Vajen de Heer,12:00,sailing,Pien
 Vajen de Heer,12:15,sailing,Pien
 Vajen de Heer,12:30,sailing,Pien
-Vajen de Heer,12:45,transit_to,
-Vajen de Heer,13:00,on_island,
-Vajen de Heer,13:15,on_banana,
+Vajen de Heer,12:45,sailing,Pien
+Vajen de Heer,13:00,sailing,Pien
+Vajen de Heer,13:15,sailing,Pien
 Vajen de Heer,13:30,sailing,Pien
 Vajen de Heer,13:45,sailing,Pien
 Vajen de Heer,14:00,sailing,Pien
@@ -2020,10 +2020,10 @@ Veerle Knol,10:15,sailing,Koen
 Veerle Knol,10:30,sailing,Koen
 Veerle Knol,10:45,sailing,Koen
 Veerle Knol,11:00,sailing,Koen
-Veerle Knol,11:15,on_banana,
-Veerle Knol,11:30,on_island,
-Veerle Knol,11:45,transit_from,
-Veerle Knol,12:00,sailing,Koen
+Veerle Knol,11:15,transit_to,
+Veerle Knol,11:30,prep,
+Veerle Knol,11:45,on_banana,
+Veerle Knol,12:00,transit_from,
 Veerle Knol,12:15,sailing,Koen
 Veerle Knol,12:30,sailing,Koen
 Veerle Knol,12:45,sailing,Koen
@@ -2039,19 +2039,19 @@ Veerle Knol,15:00,sailing,Koen
 Veerle Knol,15:15,sailing,Koen
 Veerle Knol,15:30,sailing,Koen
 Veerle Knol,15:45,sailing,Koen
-Vincent Meerburg,10:00,on_banana,
-Vincent Meerburg,10:15,on_island,
-Vincent Meerburg,10:30,transit_from,
-Vincent Meerburg,10:45,sailing,Nienke
-Vincent Meerburg,11:00,sailing,Nienke
-Vincent Meerburg,11:15,sailing,Nienke
-Vincent Meerburg,11:30,sailing,Nienke
+Vincent Meerburg,10:00,sailing,Anouk
+Vincent Meerburg,10:15,sailing,Anouk
+Vincent Meerburg,10:30,sailing,Anouk
+Vincent Meerburg,10:45,transit_to,
+Vincent Meerburg,11:00,prep,
+Vincent Meerburg,11:15,on_banana,
+Vincent Meerburg,11:30,transit_from,
 Vincent Meerburg,11:45,sailing,Anouk
 Vincent Meerburg,12:00,sailing,Anouk
-Vincent Meerburg,12:15,sailing,Anouk
-Vincent Meerburg,12:30,sailing,Anouk
-Vincent Meerburg,12:45,sailing,Anouk
-Vincent Meerburg,13:00,sailing,Anouk
+Vincent Meerburg,12:15,sailing,Esther
+Vincent Meerburg,12:30,sailing,Esther
+Vincent Meerburg,12:45,sailing,Esther
+Vincent Meerburg,13:00,sailing,Esther
 Vincent Meerburg,13:15,sailing,Anouk
 Vincent Meerburg,13:30,sailing,Anouk
 Vincent Meerburg,13:45,sailing,Anouk
@@ -2066,19 +2066,19 @@ Vincent Meerburg,15:45,sailing,Anouk
 Wieger Booij,10:00,sailing,Boersma
 Wieger Booij,10:15,sailing,Boersma
 Wieger Booij,10:30,sailing,Boersma
-Wieger Booij,10:45,transit_to,
-Wieger Booij,11:00,on_banana,
-Wieger Booij,11:15,transit_from,
+Wieger Booij,10:45,sailing,Boersma
+Wieger Booij,11:00,sailing,Boersma
+Wieger Booij,11:15,sailing,Boersma
 Wieger Booij,11:30,sailing,Boersma
 Wieger Booij,11:45,sailing,Boersma
 Wieger Booij,12:00,sailing,Boersma
 Wieger Booij,12:15,sailing,Boersma
-Wieger Booij,12:30,sailing,Annegreet
-Wieger Booij,12:45,sailing,Annegreet
-Wieger Booij,13:00,sailing,Annegreet
-Wieger Booij,13:15,sailing,Boersma
-Wieger Booij,13:30,sailing,Boersma
-Wieger Booij,13:45,sailing,Boersma
+Wieger Booij,12:30,sailing,Guus
+Wieger Booij,12:45,sailing,Guus
+Wieger Booij,13:00,transit_to,
+Wieger Booij,13:15,on_island,
+Wieger Booij,13:30,prep,
+Wieger Booij,13:45,on_banana,
 Wieger Booij,14:00,sailing,Boersma
 Wieger Booij,14:15,sailing,Boersma
 Wieger Booij,14:30,sailing,Boersma
@@ -2093,10 +2093,10 @@ William Koelers,10:30,sailing,Stijn
 William Koelers,10:45,sailing,Stijn
 William Koelers,11:00,sailing,Stijn
 William Koelers,11:15,sailing,Stijn
-William Koelers,11:30,sailing,Stijn
-William Koelers,11:45,transit_to,
-William Koelers,12:00,on_island,
-William Koelers,12:15,on_banana,
+William Koelers,11:30,transit_to,
+William Koelers,11:45,prep,
+William Koelers,12:00,on_banana,
+William Koelers,12:15,transit_from,
 William Koelers,12:30,sailing,Stijn
 William Koelers,12:45,sailing,Stijn
 William Koelers,13:00,sailing,Stijn

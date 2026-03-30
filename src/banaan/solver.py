@@ -125,10 +125,37 @@ class BanaanSolver:
             for t in range(T):
                 on_island[i, t] = model.NewBoolVar(f"oi_{i}_{t}")
 
+        # Pre-compute discipline-compatible instructor indices
+        nbs_compat: dict[int, list[int]] = {}
+        for nbs in range(n_nbs):
+            disc = normalise_discipline(self.non_banana_students[nbs].discipline)
+            valid = cfg.coverage_map.get(disc, {disc})
+            nbs_compat[nbs] = [
+                i for i in range(n_inst)
+                if normalise_discipline(self.instructors[i].discipline) in valid
+            ]
+        bs_compat: dict[int, list[int]] = {}
+        for s in range(n_bs):
+            disc = normalise_discipline(self.banana_students[s].discipline)
+            valid = cfg.coverage_map.get(disc, {disc})
+            bs_compat[s] = [
+                i for i in range(n_inst)
+                if normalise_discipline(self.instructors[i].discipline) in valid
+            ]
+        # Reverse: which students can instructor i cover?
+        inst_compat_nbs: dict[int, list[int]] = {i: [] for i in range(n_inst)}
+        for nbs, insts in nbs_compat.items():
+            for i in insts:
+                inst_compat_nbs[i].append(nbs)
+        inst_compat_bs: dict[int, list[int]] = {i: [] for i in range(n_inst)}
+        for s, insts in bs_compat.items():
+            for i in insts:
+                inst_compat_bs[i].append(s)
+
         # cover[nbs, i, t]: instructor i covers non-banana student nbs at slot t
         cover: dict[tuple[int, int, int], cp_model.IntVar] = {}
         for nbs in range(n_nbs):
-            for i in range(n_inst):
+            for i in nbs_compat[nbs]:
                 for t in range(T):
                     cover[nbs, i, t] = model.NewBoolVar(f"c_{nbs}_{i}_{t}")
 
@@ -142,7 +169,7 @@ class BanaanSolver:
         # (when the student is sailing, not on island)
         cover_banana: dict[tuple[int, int, int], cp_model.IntVar] = {}
         for s in range(n_bs):
-            for i in range(n_inst):
+            for i in bs_compat[s]:
                 for t in range(T):
                     cover_banana[s, i, t] = model.NewBoolVar(f"cb_{s}_{i}_{t}")
 
@@ -248,17 +275,10 @@ class BanaanSolver:
         #     instructor (who isn't on island) covers.  We still create
         #     cover variables so O7 (capacity) can reference them.
         for nbs in range(n_nbs):
-            disc = normalise_discipline(self.non_banana_students[nbs].discipline)
-            valid_discs = cfg.coverage_map.get(disc, {disc})
             own_i = self.instructor_idx.get(self.non_banana_students[nbs].instructor)
-            for i in range(n_inst):
-                inst_disc = normalise_discipline(self.instructors[i].discipline)
-                if inst_disc not in valid_discs:
-                    for t in range(T):
-                        model.Add(cover[nbs, i, t] == 0)
             for t in range(T):
-                model.Add(sum(cover[nbs, i, t] for i in range(n_inst)) == 1)
-                for i in range(n_inst):
+                model.Add(sum(cover[nbs, i, t] for i in nbs_compat[nbs]) == 1)
+                for i in nbs_compat[nbs]:
                     model.Add(cover[nbs, i, t] == 0).OnlyEnforceIf(on_island[i, t])
                 if own_i is not None:
                     model.Add(cover[nbs, own_i, t] == 1).OnlyEnforceIf(on_island[own_i, t].Not())
@@ -268,22 +288,15 @@ class BanaanSolver:
         # is on island, a backup covers — we add a switch penalty (O13)
         # to keep the backup stable.
         for s in range(n_bs):
-            disc = normalise_discipline(self.banana_students[s].discipline)
-            valid_discs = cfg.coverage_map.get(disc, {disc})
             own_i = self.instructor_idx.get(self.banana_students[s].instructor)
-            for i in range(n_inst):
-                inst_disc = normalise_discipline(self.instructors[i].discipline)
-                if inst_disc not in valid_discs:
-                    for t in range(T):
-                        model.Add(cover_banana[s, i, t] == 0)
             for t in range(T):
                 model.Add(
-                    sum(cover_banana[s, i, t] for i in range(n_inst)) == 1
+                    sum(cover_banana[s, i, t] for i in bs_compat[s]) == 1
                 ).OnlyEnforceIf(student_on_island[s, t].Not())
                 model.Add(
-                    sum(cover_banana[s, i, t] for i in range(n_inst)) == 0
+                    sum(cover_banana[s, i, t] for i in bs_compat[s]) == 0
                 ).OnlyEnforceIf(student_on_island[s, t])
-                for i in range(n_inst):
+                for i in bs_compat[s]:
                     model.Add(cover_banana[s, i, t] == 0).OnlyEnforceIf(on_island[i, t])
                 if own_i is not None:
                     both_avail = model.NewBoolVar(f"ba_{s}_{t}")
@@ -401,8 +414,8 @@ class BanaanSolver:
                 total_covered = model.NewIntVar(0, n_nbs + n_bs, f"tc_{i}_{t}")
                 model.Add(
                     total_covered == (
-                        sum(cover[nbs, i, t] for nbs in range(n_nbs))
-                        + sum(cover_banana[s, i, t] for s in range(n_bs))
+                        sum(cover[nbs, i, t] for nbs in inst_compat_nbs[i])
+                        + sum(cover_banana[s, i, t] for s in inst_compat_bs[i])
                     )
                 )
                 over = model.NewIntVar(0, n_nbs + n_bs, f"co_{i}_{t}")
@@ -419,7 +432,7 @@ class BanaanSolver:
         # O9: Cover same-discipline bonus (non-banana students)
         for nbs in range(n_nbs):
             nbs_disc = normalise_discipline(self.non_banana_students[nbs].discipline)
-            for i in range(n_inst):
+            for i in nbs_compat[nbs]:
                 if normalise_discipline(self.instructors[i].discipline) == nbs_disc:
                     for t in range(T):
                         obj_terms.append(w["cover_disc_bonus"] * cover[nbs, i, t])
@@ -451,7 +464,7 @@ class BanaanSolver:
                 both_sailing = model.NewBoolVar(f"bs_{s}_{t}")
                 model.AddBoolAnd([student_on_island[s, t].Not(), student_on_island[s, t + 1].Not()]).OnlyEnforceIf(both_sailing)
                 model.AddBoolOr([student_on_island[s, t], student_on_island[s, t + 1]]).OnlyEnforceIf(both_sailing.Not())
-                for i in range(n_inst):
+                for i in bs_compat[s]:
                     lost = model.NewBoolVar(f"lc_{s}_{i}_{t}")
                     model.AddBoolAnd([cover_banana[s, i, t], cover_banana[s, i, t + 1].Not()]).OnlyEnforceIf(lost)
                     model.AddBoolOr([cover_banana[s, i, t].Not(), cover_banana[s, i, t + 1]]).OnlyEnforceIf(lost.Not())
@@ -506,8 +519,10 @@ class BanaanSolver:
         solver = cp_model.CpSolver()
         solver.parameters.max_time_in_seconds = timeout
         solver.parameters.num_workers = 8
+        solver.parameters.log_search_progress = True
         status = solver.Solve(model)
 
+        print(f"  Status: {solver.StatusName(status)}, time: {solver.WallTime():.1f}s")
         if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             return self._extract_solution(solver, ride_slot, ride_at, banana_used,
                                           goes, depart_slot, return_depart,
@@ -585,7 +600,7 @@ class BanaanSolver:
                     # Sailing — find covering instructor
                     covering_inst = None
                     for i in range(n_inst):
-                        if solver.Value(cover_banana[s, i, t]):
+                        if (s, i, t) in cover_banana and solver.Value(cover_banana[s, i, t]):
                             covering_inst = self.instructors[i].name
                             break
                     entries.append(StudentScheduleEntry(
@@ -600,7 +615,7 @@ class BanaanSolver:
             for t in range(T):
                 covering_inst = None
                 for i in range(n_inst):
-                    if solver.Value(cover[nbs, i, t]):
+                    if (nbs, i, t) in cover and solver.Value(cover[nbs, i, t]):
                         covering_inst = self.instructors[i].name
                         break
                 entries.append(StudentScheduleEntry(
@@ -639,12 +654,12 @@ class BanaanSolver:
                     covered_nbs = [
                         self.non_banana_students[nbs].name
                         for nbs in range(n_nbs)
-                        if solver.Value(cover[nbs, i, t])
+                        if (nbs, i, t) in cover and solver.Value(cover[nbs, i, t])
                     ]
                     covered_bs = [
                         self.banana_students[s].name
                         for s in range(n_bs)
-                        if solver.Value(cover_banana[s, i, t])
+                        if (s, i, t) in cover_banana and solver.Value(cover_banana[s, i, t])
                     ]
                     all_covered = covered_nbs + covered_bs
                     state = InstructorState.INSTRUCTING
