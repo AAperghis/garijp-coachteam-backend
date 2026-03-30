@@ -1,72 +1,72 @@
 Name,Discipline,Original Instructor,Assignment,Time,Transport Instructor
-Pieter Niemans,jz,Rein,Banana Group 1,10:30,Pien
-Pip Roffel,jz,Anouk,Banana Group 1,10:30,Pien
-Thom de Boer,ws,Pien,Banana Group 1,10:30,Pien
-Pippa Duparc,ws,Pien,Banana Group 1,10:30,Pien
-Fleur Heukensveldt Slaghek,jz,Rein,Banana Group 2,10:45,Eva
-Noud Themmen,jz,Rein,Banana Group 2,10:45,Eva
-Pien Zuethoff,jz,Eva,Banana Group 2,10:45,Eva
-Philou Oostenbroek,jz,Eva,Banana Group 2,10:45,Eva
-Lou Roffel,jz,Anouk,Banana Group 2,10:45,Eva
-Jette Zuethoff,jz,Eva,Banana Group 3,11:00,Anouk
-Pip Lauren Pol van der Meulen,jz,Anouk,Banana Group 3,11:00,Anouk
-Jojanneke,zb,Pieternel,Banana Group 4,11:15,Peiternell
-Sietse,zb,Emese,Banana Group 4,11:15,Peiternell
-Kaia de Boer,ws,Pien,Banana Group 4,11:15,Peiternell
-Veerle Beimers,jz,Rein,Banana Group 5,11:30,Jelle
-Julie,zb,Pieternel,Banana Group 5,11:30,Jelle
-Kaate,zb,Emese,Banana Group 5,11:30,Jelle
-Vince,cat,Jelle,Banana Group 5,11:30,Jelle
-Arie,cat,Tim,Banana Group 5,11:30,Jelle
-pepijn,cat,Tim,Banana Group 5,11:30,Jelle
-hidde,cat,Jelle,Banana Group 6,11:45,Tim
-Micha Helfrich,jz,Rein,Banana Group 7,12:00,Jochem
-Bert Kalma,jz,Rein,Banana Group 7,12:00,Jochem
-Alejandro,kb,Hidde B,Banana Group 7,12:00,Jochem
-Annabel,kb,Jochem,Banana Group 7,12:00,Jochem
-zaliya,kb,Lotte B,Banana Group 7,12:00,Jochem
-Marie,zb,Pieternel,Banana Group 7,12:00,Jochem
-Anna Hoozemans,zb,Benthe,Banana Group 8,12:15,Emese
-sofie,kb,Lotte B,Banana Group 8,12:15,Emese
-Noor,zb,Pieternel,Banana Group 8,12:15,Emese
-Britt,zb,Emese,Banana Group 8,12:15,Emese
-xemme,cat,Jelle,Banana Group 8,12:15,Emese
-Freek,cat,Tim,Banana Group 8,12:15,Emese
-Femke Bakker,jz,Anouk,Banana Group 9,12:30,Anouk
-Emmely Laeven,jz,Anouk,Banana Group 9,12:30,Anouk
-nicole,kb,Lotte B,Banana Group 9,12:30,Anouk
-Laura,cat,Jelle,Banana Group 9,12:30,Anouk
-Anna Leijenaar,ws,Pien,Banana Group 9,12:30,Anouk
-Jens van den Berg,ws,Pien,Banana Group 9,12:30,Anouk
-Yara stienstra,jz,Eva,Banana Group 10,12:45,Hidde B
-Noa Heegsma,jz,Eva,Banana Group 10,12:45,Hidde B
-Freek,kb,Hidde B,Banana Group 10,12:45,Hidde B
-Lotte,kb,Jochem,Banana Group 10,12:45,Hidde B
-Lola,kb,Lotte B,Banana Group 10,12:45,Hidde B
-Anna niemans,zb,Pieternel,Banana Group 10,12:45,Hidde B
-casimir,kb,Jochem,Banana Group 11,13:00,Guusje
-Judith,kb,Albert,Banana Group 11,13:00,Guusje
-Cato,kb,Albert,Banana Group 11,13:00,Guusje
-Louise,kb,Guusje,Banana Group 11,13:00,Guusje
-Valerie,kb,Guusje,Banana Group 11,13:00,Guusje
-Annefleur,kb,Guusje,Banana Group 11,13:00,Guusje
-Cato Beimers,zb,Benthe,Banana Group 12,13:15,Emese
-Femke Stienstra,zb,Benthe,Banana Group 12,13:15,Emese
-Eva,zb,Benthe,Banana Group 12,13:15,Emese
-Jules,zb,Emese,Banana Group 12,13:15,Emese
-Huib,zb,Emese,Banana Group 12,13:15,Emese
-Annemijn Wijtvliet,zb,Benthe,Banana Group 13,13:30,Benthe
-Iris,zb,Benthe,Banana Group 13,13:30,Benthe
-Florijn,kb,Hidde B,Banana Group 13,13:30,Benthe
-Wieger,kb,Hidde B,Banana Group 13,13:30,Benthe
-Femke,zb,Pieternel,Banana Group 13,13:30,Benthe
-Cees,cat,Tim,Banana Group 13,13:30,Benthe
+Veerle Beimers,jz,Rein,Banana Group 1,10:30,"Rein, Eva, Anouk"
+Noud Themmen,jz,Rein,Banana Group 1,10:30,"Rein, Eva, Anouk"
+Philou Oostenbroek,jz,Eva,Banana Group 1,10:30,"Rein, Eva, Anouk"
+Yara stienstra,jz,Eva,Banana Group 1,10:30,"Rein, Eva, Anouk"
+Noa Heegsma,jz,Eva,Banana Group 1,10:30,"Rein, Eva, Anouk"
+Annemijn Wijtvliet,zb,Benthe,Banana Group 2,10:45,"Benthe, Peiternell, Emese"
+Femke Stienstra,zb,Benthe,Banana Group 2,10:45,"Benthe, Peiternell, Emese"
+Jojanneke,zb,Pieternel,Banana Group 2,10:45,"Benthe, Peiternell, Emese"
+Anna niemans,zb,Pieternel,Banana Group 2,10:45,"Benthe, Peiternell, Emese"
+Kaate,zb,Emese,Banana Group 2,10:45,"Benthe, Peiternell, Emese"
+Pieter Niemans,jz,Rein,Banana Group 3,11:00,Tim
+Lou Roffel,jz,Anouk,Banana Group 3,11:00,Tim
+Pip Roffel,jz,Anouk,Banana Group 3,11:00,Tim
+xemme,cat,Jelle,Banana Group 3,11:00,Tim
+Arie,cat,Tim,Banana Group 3,11:00,Tim
+Jens van den Berg,ws,Pien,Banana Group 3,11:00,Tim
+Judith,kb,Albert,Banana Group 4,11:15,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Cato,kb,Albert,Banana Group 4,11:15,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Louise,kb,Guusje,Banana Group 4,11:15,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Valerie,kb,Guusje,Banana Group 4,11:15,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Annefleur,kb,Guusje,Banana Group 4,11:15,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Thom de Boer,ws,Pien,Banana Group 5,11:30,Pien
+Micha Helfrich,jz,Rein,Banana Group 6,11:45,"Rein, Eva, Anouk"
+Pien Zuethoff,jz,Eva,Banana Group 6,11:45,"Rein, Eva, Anouk"
+Femke Bakker,jz,Anouk,Banana Group 6,11:45,"Rein, Eva, Anouk"
+Emmely Laeven,jz,Anouk,Banana Group 6,11:45,"Rein, Eva, Anouk"
+Iris,zb,Benthe,Banana Group 7,12:00,"Benthe, Peiternell, Emese"
+Anna Hoozemans,zb,Benthe,Banana Group 7,12:00,"Benthe, Peiternell, Emese"
+Marie,zb,Pieternel,Banana Group 7,12:00,"Benthe, Peiternell, Emese"
+Jules,zb,Emese,Banana Group 7,12:00,"Benthe, Peiternell, Emese"
+Florijn,kb,Hidde B,Banana Group 8,12:15,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim"
+Alejandro,kb,Hidde B,Banana Group 8,12:15,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim"
+Wieger,kb,Hidde B,Banana Group 8,12:15,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim"
+casimir,kb,Jochem,Banana Group 8,12:15,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim"
+Laura,cat,Jelle,Banana Group 8,12:15,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim"
+Freek,cat,Tim,Banana Group 8,12:15,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim"
+Kaia de Boer,ws,Pien,Banana Group 9,12:30,Pien
+Anna Leijenaar,ws,Pien,Banana Group 9,12:30,Pien
+Sietse,zb,Emese,Banana Group 10,12:45,Rein
+Jette Zuethoff,jz,Eva,Banana Group 11,13:00,"Eva, Anouk, Benthe, Peiternell, Emese"
+Pip Lauren Pol van der Meulen,jz,Anouk,Banana Group 11,13:00,"Eva, Anouk, Benthe, Peiternell, Emese"
+Eva,zb,Benthe,Banana Group 11,13:00,"Eva, Anouk, Benthe, Peiternell, Emese"
+Femke,zb,Pieternel,Banana Group 11,13:00,"Eva, Anouk, Benthe, Peiternell, Emese"
+Julie,zb,Pieternel,Banana Group 11,13:00,"Eva, Anouk, Benthe, Peiternell, Emese"
+Britt,zb,Emese,Banana Group 11,13:00,"Eva, Anouk, Benthe, Peiternell, Emese"
+pepijn,cat,Tim,Banana Group 12,13:15,Tim
+Lotte,kb,Jochem,Banana Group 13,13:30,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+zaliya,kb,Lotte B,Banana Group 13,13:30,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+nicole,kb,Lotte B,Banana Group 13,13:30,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Lola,kb,Lotte B,Banana Group 13,13:30,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+sofie,kb,Lotte B,Banana Group 13,13:30,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Pippa Duparc,ws,Pien,Banana Group 13,13:30,"Hidde B, Albert, Guusje, Jochem, Lotte B"
+Huib,zb,Emese,Banana Group 14,13:45,Pien
+Cato Beimers,zb,Benthe,Banana Group 15,14:00,"Benthe, Peiternell"
+Vince,cat,Jelle,Banana Group 16,14:15,"Jelle, Tim"
+hidde,cat,Jelle,Banana Group 16,14:15,"Jelle, Tim"
+Cees,cat,Tim,Banana Group 16,14:15,"Jelle, Tim"
+Fleur Heukensveldt Slaghek,jz,Rein,Banana Group 17,14:30,"Rein, Eva, Anouk, Hidde B, Albert, Guusje, Jochem, Lotte B"
+Bert Kalma,jz,Rein,Banana Group 17,14:30,"Rein, Eva, Anouk, Hidde B, Albert, Guusje, Jochem, Lotte B"
+Freek,kb,Hidde B,Banana Group 17,14:30,"Rein, Eva, Anouk, Hidde B, Albert, Guusje, Jochem, Lotte B"
+Annabel,kb,Jochem,Banana Group 17,14:30,"Rein, Eva, Anouk, Hidde B, Albert, Guusje, Jochem, Lotte B"
+Noor,zb,Pieternel,Banana Group 17,14:30,"Rein, Eva, Anouk, Hidde B, Albert, Guusje, Jochem, Lotte B"
 ZE,cat,Jelle,Covered by Jelle,10:30,
 ZE,cat,Jelle,Covered by Jelle,10:45,
-ZE,cat,Jelle,Covered by Tim,11:00,
-ZE,cat,Jelle,Covered by Benthe,11:15,
-ZE,cat,Jelle,Covered by Benthe,11:30,
-ZE,cat,Jelle,Covered by Benthe,11:45,
+ZE,cat,Jelle,Covered by Jelle,11:00,
+ZE,cat,Jelle,Covered by Jelle,11:15,
+ZE,cat,Jelle,Covered by Jelle,11:30,
+ZE,cat,Jelle,Covered by Jelle,11:45,
 ZE,cat,Jelle,Covered by Jelle,12:00,
 ZE,cat,Jelle,Covered by Jelle,12:15,
 ZE,cat,Jelle,Covered by Jelle,12:30,
@@ -74,10 +74,10 @@ ZE,cat,Jelle,Covered by Jelle,12:45,
 ZE,cat,Jelle,Covered by Jelle,13:00,
 ZE,cat,Jelle,Covered by Jelle,13:15,
 ZE,cat,Jelle,Covered by Jelle,13:30,
-ZE,cat,Jelle,Covered by Jelle,13:45,
-ZE,cat,Jelle,Covered by Jelle,14:00,
-ZE,cat,Jelle,Covered by Jelle,14:15,
-ZE,cat,Jelle,Covered by Jelle,14:30,
+ZE,cat,Jelle,Covered by Emese,13:45,
+ZE,cat,Jelle,Covered by Emese,14:00,
+ZE,cat,Jelle,Covered by Emese,14:15,
+ZE,cat,Jelle,Covered by Emese,14:30,
 ZE,cat,Jelle,Covered by Jelle,14:45,
 ZE,cat,Jelle,Covered by Jelle,15:00,
 ZE,cat,Jelle,Covered by Jelle,15:15,

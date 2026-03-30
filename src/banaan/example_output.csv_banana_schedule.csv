@@ -1,14 +1,18 @@
 Time,Group,Students,Count,Transport Instructor,Disciplines
-10:30,1,"Pieter Niemans, Pip Roffel, Thom de Boer, Pippa Duparc",4,Pien,"jz, ws"
-10:45,2,"Fleur Heukensveldt Slaghek, Noud Themmen, Pien Zuethoff, Philou Oostenbroek, Lou Roffel",5,Eva,jz
-11:00,3,"Jette Zuethoff, Pip Lauren Pol van der Meulen",2,Anouk,jz
-11:15,4,"Jojanneke, Sietse, Kaia de Boer",3,Peiternell,"ws, zb"
-11:30,5,"Veerle Beimers, Julie, Kaate, Vince, Arie, pepijn",6,Jelle,"cat, jz, zb"
-11:45,6,hidde,1,Tim,cat
-12:00,7,"Micha Helfrich, Bert Kalma, Alejandro, Annabel, zaliya, Marie",6,Jochem,"jz, kb, zb"
-12:15,8,"Anna Hoozemans, sofie, Noor, Britt, xemme, Freek",6,Emese,"cat, kb, zb"
-12:30,9,"Femke Bakker, Emmely Laeven, nicole, Laura, Anna Leijenaar, Jens van den Berg",6,Anouk,"cat, jz, kb, ws"
-12:45,10,"Yara stienstra, Noa Heegsma, Freek, Lotte, Lola, Anna niemans",6,Hidde B,"jz, kb, zb"
-13:00,11,"casimir, Judith, Cato, Louise, Valerie, Annefleur",6,Guusje,kb
-13:15,12,"Cato Beimers, Femke Stienstra, Eva, Jules, Huib",5,Emese,zb
-13:30,13,"Annemijn Wijtvliet, Iris, Florijn, Wieger, Femke, Cees",6,Benthe,"cat, kb, zb"
+10:30,1,"Veerle Beimers, Noud Themmen, Philou Oostenbroek, Yara stienstra, Noa Heegsma",5,"Rein, Eva, Anouk",jz
+10:45,2,"Annemijn Wijtvliet, Femke Stienstra, Jojanneke, Anna niemans, Kaate",5,"Benthe, Peiternell, Emese",zb
+11:00,3,"Pieter Niemans, Lou Roffel, Pip Roffel, xemme, Arie, Jens van den Berg",6,Tim,"cat, jz, ws"
+11:15,4,"Judith, Cato, Louise, Valerie, Annefleur",5,"Hidde B, Albert, Guusje, Jochem, Lotte B",kb
+11:30,5,Thom de Boer,1,Pien,ws
+11:45,6,"Micha Helfrich, Pien Zuethoff, Femke Bakker, Emmely Laeven",4,"Rein, Eva, Anouk",jz
+12:00,7,"Iris, Anna Hoozemans, Marie, Jules",4,"Benthe, Peiternell, Emese",zb
+12:15,8,"Florijn, Alejandro, Wieger, casimir, Laura, Freek",6,"Hidde B, Albert, Guusje, Jochem, Lotte B, Tim","cat, kb"
+12:30,9,"Kaia de Boer, Anna Leijenaar",2,Pien,ws
+12:45,10,Sietse,1,Rein,zb
+13:00,11,"Jette Zuethoff, Pip Lauren Pol van der Meulen, Eva, Femke, Julie, Britt",6,"Eva, Anouk, Benthe, Peiternell, Emese","jz, zb"
+13:15,12,pepijn,1,Tim,cat
+13:30,13,"Lotte, zaliya, nicole, Lola, sofie, Pippa Duparc",6,"Hidde B, Albert, Guusje, Jochem, Lotte B","kb, ws"
+13:45,14,Huib,1,Pien,zb
+14:00,15,Cato Beimers,1,"Benthe, Peiternell",zb
+14:15,16,"Vince, hidde, Cees",3,"Jelle, Tim",cat
+14:30,17,"Fleur Heukensveldt Slaghek, Bert Kalma, Freek, Annabel, Noor",5,"Rein, Eva, Anouk, Hidde B, Albert, Guusje, Jochem, Lotte B","jz, kb, zb"

@@ -1,551 +1,684 @@
 """CP-SAT solver for the banana-boat scheduling problem.
 
-Groups banana-wanting students into sequential boat rides, assigns transport
-instructors, and ensures non-banana students always have discipline coverage.
-Discipline phase ordering (jz → zb/ws/cat → kb) is a soft preference.
+State-based model: decides where every student and instructor is at every
+15-min time slot.  Supports flexible transport (multiple instructors can
+supply kids to the same banana ride; one instructor can span multiple rides).
 """
 
 from __future__ import annotations
 
+import math
+
 from ortools.sat.python import cp_model
 
 from .models import (
-    NonBananaAssignment,
     Student,
     Instructor,
     BanaanConfig,
-    BanaanGroup,
-    BanaanSolution,
+    BananaRide,
+    BananaSolution,
+    StudentScheduleEntry,
+    InstructorScheduleEntry,
+    StudentState,
+    InstructorState,
+    normalise_discipline,
 )
 
-# Occupation window: an instructor transporting group g is busy for
-# 4 consecutive slots [g-2, g+1] (transport out, prep, ride, transport back).
-OCCUPATION_SLOTS = 4
 
-# Cross-discipline coverage: which disciplines' instructors can supervise
-# non-banana students of a given discipline.  JZ ↔ ZB and ZB ↔ CAT.
-COVERAGE_MAP: dict[str, set[str]] = {
-    "jz":  {"jz", "zb"},
-    "zb":  {"jz", "zb", "cat"},
-    "ws":  {"ws"},
-    "cat": {"zb", "cat"},
-    "kb":  {"kb"},
-}
+class BanaanSolver:
+    """Solver for the banana-boat scheduling problem using OR-Tools CP-SAT.
 
-
-class BanaanSolver:            
-    """Solver for the banana-boat scheduling problem using OR-Tools CP-SAT."""
+    Core idea: instead of assigning students to groups and then assigning
+    instructors, we decide *per student* which slot they ride and *per
+    instructor* when they go to the island.  This allows multiple
+    instructors to jointly supply a single ride and one instructor to
+    transport kids who ride in different (but nearby) slots.
+    """
 
     def __init__(
         self,
         students: list[Student],
         instructors: list[Instructor],
         config: BanaanConfig,
-    ):
-        self.all_students = students
+    ) -> None:
+        self.students = students
         self.banana_students = [s for s in students if s.wants_banana]
         self.non_banana_students = [s for s in students if not s.wants_banana]
         self.instructors = instructors
         self.config = config
 
-        # Index lookups
-        self.student_idx = {s.name: i for i, s in enumerate(self.banana_students)}
-        self.instructor_idx = {inst.name: i for i, inst in enumerate(self.instructors)}
+        self.instructor_idx = {inst.name: i for i, inst in enumerate(instructors)}
 
-        # Parse time window
-        h, m = map(int, self.config.start_time.split(":"))
-        self.start_time_min = h * 60 + m
-        h2, m2 = map(int, self.config.end_time.split(":"))
-        self.end_time_min = h2 * 60 + m2
-
-        # Upper bound on groups: bounded by time slots and student count.
-        # The solver decides the actual number via group_active variables.
+        T = config.total_slots
+        self.T = T  # total available time slots
         n_banana = len(self.banana_students)
-        max_time_slots = (self.end_time_min - self.start_time_min) // self.config.slot_duration_min
-        self.max_groups = min(n_banana, max_time_slots) if n_banana > 0 else 0
+        self.max_rides = min(n_banana, T) if n_banana else 0
 
-    def solve(self) -> BanaanSolution | None:
-        """Run the CP-SAT solver.  Returns a BanaanSolution or None if infeasible."""
+    # ── Public API ───────────────────────────────────────────────────────
+
+    def solve(self, timeout: int = 120) -> BananaSolution | None:
         if not self.banana_students:
-            return BanaanSolution(
-                groups=[],
-                non_banana_assignments={},
-                config=self.config,
-                start_time_minutes=self.start_time_min,
-            )
-
-        if self.max_groups == 0:
+            return self._empty_solution()
+        if self.max_rides == 0:
             return None
 
         model = cp_model.CpModel()
-        n_students_nb = len(self.non_banana_students)
-        n_students_banana = len(self.banana_students)
-        n_instructors = len(self.instructors)
-        G = self.max_groups
+        T = self.T
+        cfg = self.config
+        n_bs = len(self.banana_students)
+        n_nbs = len(self.non_banana_students)
+        n_inst = len(self.instructors)
+        transit = cfg.transit_slots  # slots for transit to/from island
+        prep = cfg.prep_slots        # slots waiting on island before ride
 
         # ── Decision variables ───────────────────────────────────────────
-        # cover[ns, i, t]: non-banana student ns is covered by instructor i at time t
+
+        # ride_slot[s]: which time slot banana-student s rides the banana
+        ride_slot: dict[int, cp_model.IntVar] = {}
+        for s in range(n_bs):
+            ride_slot[s] = model.NewIntVar(0, T - 1, f"ride_{s}")
+
+        # banana_used[t]: whether any student rides at slot t
+        banana_used: dict[int, cp_model.IntVar] = {}
+        for t in range(T):
+            banana_used[t] = model.NewBoolVar(f"bu_{t}")
+
+        # ride_at[s, t]: student s rides at slot t
+        ride_at: dict[tuple[int, int], cp_model.IntVar] = {}
+        for s in range(n_bs):
+            for t in range(T):
+                ride_at[s, t] = model.NewBoolVar(f"ra_{s}_{t}")
+                # Link to ride_slot
+                model.Add(ride_slot[s] == t).OnlyEnforceIf(ride_at[s, t])
+                model.Add(ride_slot[s] != t).OnlyEnforceIf(ride_at[s, t].Not())
+
+        # Link banana_used to ride_at
+        for t in range(T):
+            riders = [ride_at[s, t] for s in range(n_bs)]
+            model.AddMaxEquality(banana_used[t], riders + [model.NewConstant(0)])
+
+        # goes[i]: does instructor i go to the island at all?
+        goes: dict[int, cp_model.IntVar] = {}
+        for i in range(n_inst):
+            goes[i] = model.NewBoolVar(f"goes_{i}")
+
+        # depart_slot[i]: slot when instructor i starts transit TO island
+        depart_slot: dict[int, cp_model.IntVar] = {}
+        for i in range(n_inst):
+            depart_slot[i] = model.NewIntVar(0, T - 1, f"dep_{i}")
+
+        # return_depart[i]: slot when instructor i starts transit back FROM island
+        return_depart: dict[int, cp_model.IntVar] = {}
+        for i in range(n_inst):
+            return_depart[i] = model.NewIntVar(0, T - 1, f"ret_{i}")
+
+        # transported_by[s, i]: instructor i transports banana-student s
+        transported_by: dict[tuple[int, int], cp_model.IntVar] = {}
+        for s in range(n_bs):
+            for i in range(n_inst):
+                transported_by[s, i] = model.NewBoolVar(f"tb_{s}_{i}")
+
+        # on_island[i, t]: instructor i is on/around the island at slot t
+        # (transit_to, on_island, or transit_from)
+        on_island: dict[tuple[int, int], cp_model.IntVar] = {}
+        for i in range(n_inst):
+            for t in range(T):
+                on_island[i, t] = model.NewBoolVar(f"oi_{i}_{t}")
+
+        # cover[nbs, i, t]: instructor i covers non-banana student nbs at slot t
         cover: dict[tuple[int, int, int], cp_model.IntVar] = {}
-        for nbs_idx in range(n_students_nb):
-            for i_idx in range(n_instructors):
-                for t in range(G):
-                    cover[nbs_idx, i_idx, t] = model.NewBoolVar(f"c_{nbs_idx}_{i_idx}_{t}")
+        for nbs in range(n_nbs):
+            for i in range(n_inst):
+                for t in range(T):
+                    cover[nbs, i, t] = model.NewBoolVar(f"c_{nbs}_{i}_{t}")
 
-        # assign[s, g]: banana student s is in group g
-        assign: dict[tuple[int, int], cp_model.IntVar] = {}
-        for bs_idx in range(n_students_banana):
-            for g in range(G):
-                assign[bs_idx, g] = model.NewBoolVar(f"a_{bs_idx}_{g}")
+        # student_on_island[s, t]: banana student s is away from sailing at slot t
+        student_on_island: dict[tuple[int, int], cp_model.IntVar] = {}
+        for s in range(n_bs):
+            for t in range(T):
+                student_on_island[s, t] = model.NewBoolVar(f"soi_{s}_{t}")
 
-        # transport[i, g]: instructor i transports group g
-        transport: dict[tuple[int, int], cp_model.IntVar] = {}
-        for i_idx in range(n_instructors):
-            for g in range(G):
-                transport[i_idx, g] = model.NewBoolVar(f"t_{i_idx}_{g}")
+        # cover_banana[s, i, t]: instructor i covers banana student s at slot t
+        # (when the student is sailing, not on island)
+        cover_banana: dict[tuple[int, int, int], cp_model.IntVar] = {}
+        for s in range(n_bs):
+            for i in range(n_inst):
+                for t in range(T):
+                    cover_banana[s, i, t] = model.NewBoolVar(f"cb_{s}_{i}_{t}")
 
-        # group_active[g]: whether group g is used
-        group_active: dict[int, cp_model.IntVar] = {}
-        for g in range(G):
-            group_active[g] = model.NewBoolVar(f"ga_{g}")
+        # ── Hard constraints ─────────────────────────────────────────────
 
-        # group_size[g]: number of students in group g (0 if inactive)
-        group_size: dict[int, cp_model.IntVar] = {}
-        for g in range(G):
-            group_size[g] = model.NewIntVar(0, self.config.boat_capacity, f"gs_{g}")
+        # C1: Each banana student rides exactly once (already by ride_slot domain)
+        for s in range(n_bs):
+            model.Add(sum(ride_at[s, t] for t in range(T)) == 1)
+
+        # C2: Banana capacity — at most boat_capacity kids ride per slot
+        for t in range(T):
+            model.Add(sum(ride_at[s, t] for s in range(n_bs)) <= cfg.boat_capacity)
+
+        # C3: Contiguous banana slots — used slots form a single consecutive block.
+        #     Use first_ride and last_ride to define the block, then force all
+        #     slots in [first_ride, last_ride] to be used.
+        first_ride = model.NewIntVar(0, T - 1, "first_ride")
+        last_ride = model.NewIntVar(0, T - 1, "last_ride")
+        model.Add(first_ride <= last_ride)
+
+        # Link first_ride/last_ride to banana_used
+        for t in range(T):
+            # If banana_used[t], then first_ride <= t and last_ride >= t
+            model.Add(first_ride <= t).OnlyEnforceIf(banana_used[t])
+            model.Add(last_ride >= t).OnlyEnforceIf(banana_used[t])
+
+            # If first_ride <= t <= last_ride, then banana_used[t]
+            in_range = model.NewBoolVar(f"in_range_{t}")
+            b_after_first = model.NewBoolVar(f"af_{t}")
+            model.Add(first_ride <= t).OnlyEnforceIf(b_after_first)
+            model.Add(first_ride > t).OnlyEnforceIf(b_after_first.Not())
+            b_before_last = model.NewBoolVar(f"bl_{t}")
+            model.Add(last_ride >= t).OnlyEnforceIf(b_before_last)
+            model.Add(last_ride < t).OnlyEnforceIf(b_before_last.Not())
+            model.AddBoolAnd([b_after_first, b_before_last]).OnlyEnforceIf(in_range)
+            model.AddBoolOr([b_after_first.Not(), b_before_last.Not()]).OnlyEnforceIf(in_range.Not())
+            model.Add(banana_used[t] == 1).OnlyEnforceIf(in_range)
+
+        # C4: Each banana student transported by exactly 1 instructor
+        for s in range(n_bs):
+            model.Add(sum(transported_by[s, i] for i in range(n_inst)) == 1)
+
+        # C5: Transport capacity — per instructor
+        for i in range(n_inst):
             model.Add(
-                group_size[g]
-                == sum(assign[bs_idx, g] for bs_idx in range(n_students_banana))
+                sum(transported_by[s, i] for s in range(n_bs))
+                <= self.instructors[i].transport_capacity
             )
-            model.Add(group_size[g] >= 1).OnlyEnforceIf(group_active[g])
-            model.Add(group_size[g] == 0).OnlyEnforceIf(group_active[g].Not())
+            # Also: if instructor doesn't go, they transport nobody
+            for s in range(n_bs):
+                model.Add(transported_by[s, i] == 0).OnlyEnforceIf(goes[i].Not())
 
-        # ── Constraints ──────────────────────────────────────────────────
+        # C6: Instructor island presence — on_island[i,t] iff goes[i] and
+        #     depart_slot[i] <= t <= return_depart[i] + transit - 1
+        for i in range(n_inst):
+            for t in range(T):
+                # on_island[i,t] => goes[i]
+                model.Add(goes[i] == 1).OnlyEnforceIf(on_island[i, t])
+                # on_island[i,t] => depart_slot[i] <= t
+                model.Add(depart_slot[i] <= t).OnlyEnforceIf(on_island[i, t])
+                # on_island[i,t] => t <= return_depart[i] + transit - 1
+                model.Add(t <= return_depart[i] + transit - 1).OnlyEnforceIf(on_island[i, t])
+                # NOT on_island[i,t] if any of the above fail
+                # We use indicator: on_island[i,t] <=> goes[i] AND depart[i]<=t AND t<=ret[i]+transit-1
+                b_goes = goes[i]
+                b_after_depart = model.NewBoolVar(f"ad_{i}_{t}")
+                model.Add(depart_slot[i] <= t).OnlyEnforceIf(b_after_depart)
+                model.Add(depart_slot[i] > t).OnlyEnforceIf(b_after_depart.Not())
+                b_before_return = model.NewBoolVar(f"br_{i}_{t}")
+                model.Add(return_depart[i] + transit - 1 >= t).OnlyEnforceIf(b_before_return)
+                model.Add(return_depart[i] + transit - 1 < t).OnlyEnforceIf(b_before_return.Not())
+                # on_island[i,t] <=> b_goes AND b_after_depart AND b_before_return
+                model.AddBoolAnd([b_goes, b_after_depart, b_before_return]).OnlyEnforceIf(on_island[i, t])
+                model.AddBoolOr([b_goes.Not(), b_after_depart.Not(), b_before_return.Not()]).OnlyEnforceIf(on_island[i, t].Not())
 
-        # C1: each banana student → exactly 1 group
-        for bs_idx in range(n_students_banana):
-            model.Add(sum(assign[bs_idx, g] for g in range(G)) == 1)
+            # Ordering: depart before return
+            model.Add(depart_slot[i] + transit + prep <= return_depart[i]).OnlyEnforceIf(goes[i])
 
-        # C2: active groups form a global prefix (group index = time slot)
-        for g in range(G - 1):
-            model.Add(group_active[g] >= group_active[g + 1])
+        # C7: Student on-island timing — if transported_by[s,i], student must
+        #     be on island from instructor's depart through instructor's return+transit-1
+        #     Student rides during ride_slot[s].
+        #     student_on_island[s,t] <=> exists i: transported_by[s,i] AND on_island[i,t]
+        for s in range(n_bs):
+            for t in range(T):
+                on_island_via = []
+                for i in range(n_inst):
+                    both = model.NewBoolVar(f"tb_oi_{s}_{i}_{t}")
+                    model.AddBoolAnd([transported_by[s, i], on_island[i, t]]).OnlyEnforceIf(both)
+                    model.AddBoolOr([transported_by[s, i].Not(), on_island[i, t].Not()]).OnlyEnforceIf(both.Not())
+                    on_island_via.append(both)
+                model.AddMaxEquality(student_on_island[s, t], on_island_via + [model.NewConstant(0)])
 
-        # C3: each active group has exactly 1 transport instructor;
-        #     inactive groups have none
-        for g in range(G):
-            model.Add(
-                sum(transport[i_idx, g] for i_idx in range(n_instructors)) == 1
-            ).OnlyEnforceIf(group_active[g])
-            for i_idx in range(n_instructors):
-                model.Add(transport[i_idx, g] == 0).OnlyEnforceIf(
-                    group_active[g].Not()
-                )
+        # Student can only ride when they're on the island
+        for s in range(n_bs):
+            for t in range(T):
+                model.Add(student_on_island[s, t] >= ride_at[s, t])
 
-        # C4: transport instructor capacity ≥ group size
-        for g in range(G):
-            for i_idx, inst in enumerate(self.instructors):
+        # C8: Coverage — every student not on the island must have a
+        #     compatible instructor supervising them at every slot.
+        #
+        #     Non-banana students: hard-locked to own instructor when
+        #     available.  When own instructor is on island, any compatible
+        #     instructor (who isn't on island) covers.  We still create
+        #     cover variables so O7 (capacity) can reference them.
+        for nbs in range(n_nbs):
+            disc = normalise_discipline(self.non_banana_students[nbs].discipline)
+            valid_discs = cfg.coverage_map.get(disc, {disc})
+            own_i = self.instructor_idx.get(self.non_banana_students[nbs].instructor)
+            for i in range(n_inst):
+                inst_disc = normalise_discipline(self.instructors[i].discipline)
+                if inst_disc not in valid_discs:
+                    for t in range(T):
+                        model.Add(cover[nbs, i, t] == 0)
+            for t in range(T):
+                model.Add(sum(cover[nbs, i, t] for i in range(n_inst)) == 1)
+                for i in range(n_inst):
+                    model.Add(cover[nbs, i, t] == 0).OnlyEnforceIf(on_island[i, t])
+                if own_i is not None:
+                    model.Add(cover[nbs, own_i, t] == 1).OnlyEnforceIf(on_island[own_i, t].Not())
+
+        # Banana students while they're sailing (not on island):
+        # Hard-lock to own instructor when available.  When own instructor
+        # is on island, a backup covers — we add a switch penalty (O13)
+        # to keep the backup stable.
+        for s in range(n_bs):
+            disc = normalise_discipline(self.banana_students[s].discipline)
+            valid_discs = cfg.coverage_map.get(disc, {disc})
+            own_i = self.instructor_idx.get(self.banana_students[s].instructor)
+            for i in range(n_inst):
+                inst_disc = normalise_discipline(self.instructors[i].discipline)
+                if inst_disc not in valid_discs:
+                    for t in range(T):
+                        model.Add(cover_banana[s, i, t] == 0)
+            for t in range(T):
                 model.Add(
-                    group_size[g] <= inst.transport_capacity
-                ).OnlyEnforceIf(transport[i_idx, g])
+                    sum(cover_banana[s, i, t] for i in range(n_inst)) == 1
+                ).OnlyEnforceIf(student_on_island[s, t].Not())
+                model.Add(
+                    sum(cover_banana[s, i, t] for i in range(n_inst)) == 0
+                ).OnlyEnforceIf(student_on_island[s, t])
+                for i in range(n_inst):
+                    model.Add(cover_banana[s, i, t] == 0).OnlyEnforceIf(on_island[i, t])
+                if own_i is not None:
+                    both_avail = model.NewBoolVar(f"ba_{s}_{t}")
+                    model.AddBoolAnd([student_on_island[s, t].Not(), on_island[own_i, t].Not()]).OnlyEnforceIf(both_avail)
+                    model.AddBoolOr([student_on_island[s, t], on_island[own_i, t]]).OnlyEnforceIf(both_avail.Not())
+                    model.Add(cover_banana[s, own_i, t] == 1).OnlyEnforceIf(both_avail)
 
-        # C5: same instructor can't transport groups whose slots differ by < 4
-        #     (since active groups form a prefix, group index = actual slot)
-        for i_idx in range(n_instructors):
-            for g1 in range(G):
-                for g2 in range(g1 + 1, G):
-                    if g2 - g1 < OCCUPATION_SLOTS:
-                        model.Add(
-                            transport[i_idx, g1] + transport[i_idx, g2] <= 1
-                        )
+        # C9: Friends ride in the same slot (hard)
+        friend_map = {}
+        for s, stud in enumerate(self.banana_students):
+            if stud.friends:
+                for fname in stud.friends:
+                    f_idx = next(
+                        (j for j, st in enumerate(self.banana_students) if st.name == fname),
+                        None,
+                    )
+                    if f_idx is not None:
+                        model.Add(ride_slot[s] == ride_slot[f_idx])
+                        friend_map.setdefault(s, []).append(f_idx)
 
-        # C6: friend hard constraint
-        self._add_friend_constraints(model, assign)
+        # C10: Time window — rides must happen within [0, T-1] (already by domain)
+        #      But also: instructor must return before end of day
+        for i in range(n_inst):
+            model.Add(return_depart[i] + transit <= T).OnlyEnforceIf(goes[i])
 
-        # C7: non-banana coverage
-        self._add_coverage_constraints(model, transport, cover, group_active)
+        # C11: Minimum banana group size — no kid alone on the banana
+        #      (only applies when there are enough banana students)
+        if n_bs >= 2:
+            for t in range(T):
+                model.Add(
+                    sum(ride_at[s, t] for s in range(n_bs)) >= 2
+                ).OnlyEnforceIf(banana_used[t])
 
-        # ── Objective ────────────────────────────────────────────────────
-        obj_terms = self._build_objective(model, assign, transport, group_active, cover)
+        # C12: Instructor ride span — all kids transported by the same
+        #      instructor must ride in at most 2 consecutive banana slots.
+        #      This prevents instructors from being parked on the island for
+        #      many slots and naturally limits instructors-per-banana.
+        for i in range(n_inst):
+            inst_min_ride = model.NewIntVar(0, T - 1, f"imr_{i}")
+            inst_max_ride = model.NewIntVar(0, T - 1, f"ixr_{i}")
+            for s in range(n_bs):
+                model.Add(inst_min_ride <= ride_slot[s]).OnlyEnforceIf(transported_by[s, i])
+                model.Add(inst_max_ride >= ride_slot[s]).OnlyEnforceIf(transported_by[s, i])
+            # Span <= 1 means at most 2 consecutive slots
+            model.Add(inst_max_ride - inst_min_ride <= 1).OnlyEnforceIf(goes[i])
+
+        # ── Soft objectives ──────────────────────────────────────────────
+        w = cfg.weights
+        obj_terms: list = []
+
+        # O1: Minimize banana slots used (highest weight)
+        for t in range(T):
+            obj_terms.append(-w["group_penalty"] * banana_used[t])
+
+        # O2: Earlier is better
+        for s in range(n_bs):
+            obj_terms.append(-w["early_bonus"] * ride_slot[s])
+
+        # O3: Phase ordering (almost-hard) — penalize phase-order violations
+        for s1 in range(n_bs):
+            for s2 in range(s1 + 1, n_bs):
+                p1 = self.banana_students[s1].phase
+                p2 = self.banana_students[s2].phase
+                if p1 < p2:
+                    # s1 should ride before or same as s2
+                    violation = model.NewBoolVar(f"pv_{s1}_{s2}")
+                    model.Add(ride_slot[s1] > ride_slot[s2]).OnlyEnforceIf(violation)
+                    model.Add(ride_slot[s1] <= ride_slot[s2]).OnlyEnforceIf(violation.Not())
+                    obj_terms.append(-w["phase_order"] * violation)
+                elif p1 > p2:
+                    violation = model.NewBoolVar(f"pv_{s1}_{s2}")
+                    model.Add(ride_slot[s1] < ride_slot[s2]).OnlyEnforceIf(violation)
+                    model.Add(ride_slot[s1] >= ride_slot[s2]).OnlyEnforceIf(violation.Not())
+                    obj_terms.append(-w["phase_order"] * violation)
+
+        # O4: Minimize island waiting — quadratic penalty on total slots each
+        #     student spends on the island.  Quadratic makes many-slot waits
+        #     disproportionately expensive (4 slots → cost 16 vs 4 linear).
+        for s in range(n_bs):
+            island_slots = model.NewIntVar(0, T, f"is_{s}")
+            model.Add(island_slots == sum(student_on_island[s, t] for t in range(T)))
+            island_slots_sq = model.NewIntVar(0, T * T, f"is_sq_{s}")
+            model.AddMultiplicationEquality(island_slots_sq, island_slots, island_slots)
+            obj_terms.append(-w["island_wait_penalty"] * island_slots_sq)
+
+        # O4b: Instructor trip compactness — quadratic penalty on trip length.
+        #      trip_len² makes a 6-slot trip cost 36 vs 6, strongly pushing
+        #      toward short, compact trips.
+        for i in range(n_inst):
+            trip_len = model.NewIntVar(0, T + transit, f"tl_{i}")
+            model.Add(
+                trip_len == return_depart[i] + transit - depart_slot[i]
+            ).OnlyEnforceIf(goes[i])
+            model.Add(trip_len == 0).OnlyEnforceIf(goes[i].Not())
+            trip_len_sq = model.NewIntVar(0, (T + transit) ** 2, f"tl_sq_{i}")
+            model.AddMultiplicationEquality(trip_len_sq, trip_len, trip_len)
+            obj_terms.append(-w["instructor_trip_penalty"] * trip_len_sq)
+
+        # O5: Prefer own instructor for transport
+        for s in range(n_bs):
+            own_i = self.instructor_idx.get(self.banana_students[s].instructor)
+            if own_i is not None:
+                obj_terms.append(w["own_instructor_bonus"] * transported_by[s, own_i])
+
+        # O6: Prefer same-discipline transport
+        for s in range(n_bs):
+            s_disc = normalise_discipline(self.banana_students[s].discipline)
+            for i in range(n_inst):
+                if normalise_discipline(self.instructors[i].discipline) == s_disc:
+                    obj_terms.append(w["same_disc_bonus"] * transported_by[s, i])
+
+        # O7: Cover capacity (soft) — penalize overloaded instructors
+        for t in range(T):
+            for i in range(n_inst):
+                total_covered = model.NewIntVar(0, n_nbs + n_bs, f"tc_{i}_{t}")
+                model.Add(
+                    total_covered == (
+                        sum(cover[nbs, i, t] for nbs in range(n_nbs))
+                        + sum(cover_banana[s, i, t] for s in range(n_bs))
+                    )
+                )
+                over = model.NewIntVar(0, n_nbs + n_bs, f"co_{i}_{t}")
+                model.AddMaxEquality(over, [total_covered - self.instructors[i].cover_capacity, 0])
+                obj_terms.append(-w["cover_over_penalty"] * over)
+
+        # O8: Cover own instructor bonus (non-banana students)
+        for nbs in range(n_nbs):
+            own_i = self.instructor_idx.get(self.non_banana_students[nbs].instructor)
+            if own_i is not None:
+                for t in range(T):
+                    obj_terms.append(w["cover_own_bonus"] * cover[nbs, own_i, t])
+
+        # O9: Cover same-discipline bonus (non-banana students)
+        for nbs in range(n_nbs):
+            nbs_disc = normalise_discipline(self.non_banana_students[nbs].discipline)
+            for i in range(n_inst):
+                if normalise_discipline(self.instructors[i].discipline) == nbs_disc:
+                    for t in range(T):
+                        obj_terms.append(w["cover_disc_bonus"] * cover[nbs, i, t])
+
+        # O10: Cover own instructor bonus (banana students while sailing)
+        for s in range(n_bs):
+            own_i = self.instructor_idx.get(self.banana_students[s].instructor)
+            if own_i is not None:
+                for t in range(T):
+                    obj_terms.append(w["cover_own_bonus"] * cover_banana[s, own_i, t])
+
+        # O11: Multi-trip penalty — fixed cost for each instructor who goes
+        #      to the island.  Fewer trips = simpler schedule.
+        for i in range(n_inst):
+            obj_terms.append(-w["multi_trip_penalty"] * goes[i])
+
+        # O12: Friend bonus (on top of the hard constraint, reward proximity)
+        for s, friends in friend_map.items():
+            for f in friends:
+                if f > s:  # avoid double counting
+                    obj_terms.append(w["friend_bonus"])  # constant bonus since it's hard
+
+        # O13: Cover switch penalty — penalize backup instructor changes for
+        #      banana students between consecutive sailing slots.  Non-banana
+        #      students are hard-locked to own instructor so no penalty needed.
+        for s in range(n_bs):
+            for t in range(T - 1):
+                # Only between consecutive sailing slots
+                both_sailing = model.NewBoolVar(f"bs_{s}_{t}")
+                model.AddBoolAnd([student_on_island[s, t].Not(), student_on_island[s, t + 1].Not()]).OnlyEnforceIf(both_sailing)
+                model.AddBoolOr([student_on_island[s, t], student_on_island[s, t + 1]]).OnlyEnforceIf(both_sailing.Not())
+                for i in range(n_inst):
+                    lost = model.NewBoolVar(f"lc_{s}_{i}_{t}")
+                    model.AddBoolAnd([cover_banana[s, i, t], cover_banana[s, i, t + 1].Not()]).OnlyEnforceIf(lost)
+                    model.AddBoolOr([cover_banana[s, i, t].Not(), cover_banana[s, i, t + 1]]).OnlyEnforceIf(lost.Not())
+                    switched = model.NewBoolVar(f"cbsw_{s}_{i}_{t}")
+                    model.AddBoolAnd([both_sailing, lost]).OnlyEnforceIf(switched)
+                    model.AddBoolOr([both_sailing.Not(), lost.Not()]).OnlyEnforceIf(switched.Not())
+                    obj_terms.append(-w["cover_switch_penalty"] * switched)
+
+        # C13: Instructor student grouping — each instructor's banana students
+        #      must ride within a compact window.  The minimum slots needed
+        #      is ceil(n/capacity); we allow some buffer beyond minimum.
+        for i, inst in enumerate(self.instructors):
+            own_students = [
+                s for s in range(n_bs)
+                if self.banana_students[s].instructor == inst.name
+            ]
+            if len(own_students) < 2:
+                continue
+            min_slots_needed = math.ceil(len(own_students) / cfg.boat_capacity)
+            # spread = max_slot - min_slot; allow some buffer beyond minimum
+            max_spread = min_slots_needed + 2
+            ig_min = model.NewIntVar(0, T - 1, f"igmin_{i}")
+            ig_max = model.NewIntVar(0, T - 1, f"igmax_{i}")
+            for s in own_students:
+                model.Add(ig_min <= ride_slot[s])
+                model.Add(ig_max >= ride_slot[s])
+            model.Add(ig_max - ig_min <= max_spread)
+
+        # C14: Maximum student island time — no student should be stuck on
+        #      the island for an unreasonable amount of time.
+        #      min trip = ~3 slots; allow up to 8 (= 2 hours).
+        max_island_slots = 2 * transit + prep + 2 + 3  # e.g. 2+1+2+3=8
+
+        # C15: Mandatory prep — each banana student must be on the island
+        #      for at least prep_slots before their ride.  Enforced by
+        #      requiring ride_slot >= depart_slot + transit + prep for the
+        #      transporting instructor.
+        if prep > 0:
+            for s in range(n_bs):
+                for i in range(n_inst):
+                    model.Add(
+                        ride_slot[s] >= depart_slot[i] + transit + prep
+                    ).OnlyEnforceIf(transported_by[s, i])
+        for s in range(n_bs):
+            model.Add(
+                sum(student_on_island[s, t] for t in range(T)) <= max_island_slots
+            )
+
         model.Maximize(sum(obj_terms))
 
         # ── Solve ────────────────────────────────────────────────────────
         solver = cp_model.CpSolver()
-        solver.parameters.max_time_in_seconds = 30
+        solver.parameters.max_time_in_seconds = timeout
+        solver.parameters.num_workers = 8
         status = solver.Solve(model)
 
         if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-            return self._extract_solution(solver, assign, transport, group_active, cover)
+            return self._extract_solution(solver, ride_slot, ride_at, banana_used,
+                                          goes, depart_slot, return_depart,
+                                          transported_by, on_island,
+                                          student_on_island, cover, cover_banana)
         return None
 
-    # ── Constraint helpers ───────────────────────────────────────────────
-    def _add_friend_constraints(self, model, assign):
-        """
-        Hard: Each student with at least one friend (who also wants banana) must be in a group with at least one of their friends.
-        Soft: Reward for each additional friend in the same group.
-        """
-        self.friend_pairs = []  # For use in the objective
-        n_groups = self.max_groups
-        for s_idx, s in enumerate(self.banana_students):
-            # Find all friends of s who are also banana students
-            friend_indices = [self.student_idx[f] for f in s.friends if f in self.student_idx] if s.friends else []
-            if not friend_indices:
-                continue
-            # Hard: at least one group where s and a friend are together
-            together_vars = []
-            for f_idx in friend_indices:
-                for g in range(n_groups):
-                    v = model.NewBoolVar(f"friend_{s_idx}_{f_idx}_{g}")
-                    model.AddBoolAnd([assign[s_idx, g], assign[f_idx, g]]).OnlyEnforceIf(v)
-                    model.AddBoolOr([assign[s_idx, g].Not(), assign[f_idx, g].Not()]).OnlyEnforceIf(v.Not())
-                    together_vars.append(v)
-                    self.friend_pairs.append((s_idx, f_idx, g, v))
-            model.Add(sum(together_vars) >= 1)
+    # ── Solution extraction ──────────────────────────────────────────────
 
-    def _add_coverage_constraints(self, model, transport, cover, group_active):
-        """
-        For each time slot, any non-banana student must be covered by exactly one valid instructor who is not busy transporting a group at that slot (or during their occupation window).
-        """
-        G = self.max_groups
-        for t in range(G):
-            for nbs_idx, nbs in enumerate(self.non_banana_students):
-                disc = nbs.discipline
-                valid_instructors = [
-                    i_idx for i_idx, inst in enumerate(self.instructors)
-                    if inst.discipline in COVERAGE_MAP.get(disc, set())
-                ]
-                invalid_instructors = set(range(len(self.instructors))) - set(valid_instructors)
-                # Cannot be covered by invalid instructors
-                for i_idx in invalid_instructors:
-                    model.Add(cover[nbs_idx, i_idx, t] == 0)
+    def _extract_solution(self, solver, ride_slot, ride_at, banana_used,
+                          goes, depart_slot, return_depart,
+                          transported_by, on_island,
+                          student_on_island, cover, cover_banana) -> BananaSolution:
+        cfg = self.config
+        T = self.T
+        n_bs = len(self.banana_students)
+        n_nbs = len(self.non_banana_students)
+        n_inst = len(self.instructors)
+        transit = cfg.transit_slots
 
-                # Exactly one valid instructor must cover this student at this time
-                model.Add(sum(cover[nbs_idx, i_idx, t] for i_idx in valid_instructors) == 1)
-                for i_idx in valid_instructors:
-                    # Instructor cannot cover if busy transporting a group whose occupation window includes t
-                    busy_slots = []
-                    for g in range(G):
-                        # Group g occupies slots [g-2, g+1]
-                        occ_start = g - 2
-                        occ_end = g + 1
-                        if occ_start <= t <= occ_end:
-                            busy_slots.append(transport[i_idx, g])
-                    if busy_slots:
-                        # If instructor is busy at t, cannot cover
-                        model.Add(sum(busy_slots) == 0).OnlyEnforceIf(cover[nbs_idx, i_idx, t])
-
-    # ── Objective ────────────────────────────────────────────────────────
-
-    def _build_objective(self, model, assign, transport, group_active, cover) -> list[cp_model.IntVar]:
-        # Soft reward 
-        """Build objective terms to maximize.
-
-        Components (all additive; we maximize the sum):
-        - Large penalty per active group  → minimise group count
-        - Bonus for own-instructor match  → keep instructor groups intact
-        - Bonus for same-discipline match → keep discipline groups intact
-        - Phase ordering preference       → jz early, kb late
-        - Penalty for frequent instructor switches for non-banana students
-        """
-        w = self.config.weights
-        G = self.max_groups
-        terms: list = []
-        # Penalty for frequent instructor switches for non-banana students
-        COVER_SWITCH_PENALTY = w.get("cover_switch_penalty", 10)
-        for nbs_idx, nbs in enumerate(self.non_banana_students):
-            for t in range(G - 1):
-                for i_idx in range(len(self.instructors)):
-                    # cover[nbs_idx, i_idx, t] and cover[nbs_idx, j_idx, t+1] for j_idx != i_idx
-                    for j_idx in range(len(self.instructors)):
-                        if j_idx == i_idx:
-                            continue
-                        switch = model.NewBoolVar(f"cover_switch_{nbs_idx}_{i_idx}_{j_idx}_{t}")
-                        model.AddBoolAnd([cover[nbs_idx, i_idx, t], cover[nbs_idx, j_idx, t+1]]).OnlyEnforceIf(switch)
-                        model.AddBoolOr([cover[nbs_idx, i_idx, t].Not(), cover[nbs_idx, j_idx, t+1].Not()]).OnlyEnforceIf(switch.Not())
-                        terms.append(-COVER_SWITCH_PENALTY * switch)
-
-        # Penalty for every active group (minimise group count)
-        GROUP_PENALTY = self.config.weights.get("banana_group", 100)
-        for g in range(G):
-            terms.append(-GROUP_PENALTY * group_active[g])
-
-        # Soft penalty for instructors covering more than a set number of non-banana students at any time slot
-        COVER_OVER_PENALTY = self.config.weights.get("cover_over_penalty", 10)  # penalty per extra student
-        n_students_nb = len(self.non_banana_students)
-        n_instructors = len(self.instructors)
-        for t in range(G):
-            for i_idx in range(n_instructors):
-                # Number of non-banana students covered by instructor i at time t
-                covered_count = model.NewIntVar(0, n_students_nb, f"covered_{i_idx}_{t}")
-                model.Add(covered_count == sum(cover[nbs_idx, i_idx, t] for nbs_idx in range(n_students_nb)))
-                # Penalize if covered_count > COVER_LIMIT
-                over = model.NewIntVar(0, n_students_nb, f"cover_over_{i_idx}_{t}")
-                model.AddMaxEquality(over, [covered_count - self.instructors[i_idx].cover_capacity, 0])
-                terms.append(-COVER_OVER_PENALTY * over)
-
-        # Phase ordering preference: phase-0 students get bonus for low group
-        # index, phase-2 for high group index. This encourages the preferred
-        # jz → zb/ws/cat → kb ordering without making it mandatory.
-        PHASE_ORDER_WEIGHT = w.get("phase_order", 3)
-        for s_idx, s in enumerate(self.banana_students):
-            for g in range(G):
-                if s.phase == 0:
-                    terms.append(PHASE_ORDER_WEIGHT * (G - g) * assign[s_idx, g])
-                elif s.phase == 2:
-                    terms.append(PHASE_ORDER_WEIGHT * g * assign[s_idx, g])
-                # Phase 1 is neutral
-
-        # Bonus per student for keeping their original instructor / discipline
-        for s_idx, s in enumerate(self.banana_students):
-            orig_i = self.instructor_idx.get(s.instructor)
-            same_disc_is = [
-                i for i, inst in enumerate(self.instructors)
-                if inst.discipline == s.discipline
-            ]
-
-            for g in range(G):
-                # Bonus: transported by own instructor
-                if orig_i is not None:
-                    own = model.NewBoolVar(f"own_{s_idx}_{g}")
-                    model.Add(own <= assign[s_idx, g])
-                    model.Add(own <= transport[orig_i, g])
-                    model.Add(own >= assign[s_idx, g] + transport[orig_i, g] - 1)
-                    terms.append(w["instructor_switch"] * own)
-
-                # Bonus: transported by same-discipline instructor
-                for i_idx in same_disc_is:
-                    dm = model.NewBoolVar(f"dm_{s_idx}_{g}_{i_idx}")
-                    model.Add(dm <= assign[s_idx, g])
-                    model.Add(dm <= transport[i_idx, g])
-                    model.Add(dm >= assign[s_idx, g] + transport[i_idx, g] - 1)
-                    terms.append(w["discipline_switch"] * dm)
-        
-        # Bonus for covering non-banana students with original instructor / discipline
-        for nbs_idx, nbs in enumerate(self.non_banana_students):
-            orig_i = self.instructor_idx.get(nbs.instructor)
-            same_disc_is = [
-                i for i, inst in enumerate(self.instructors)
-                if inst.discipline == nbs.discipline
-            ]
-            for t in range(G):
-                # Bonus: covered by own instructor at time t
-                if orig_i is not None:
-                    own_cov = model.NewBoolVar(f"own_cov_{nbs_idx}_{t}")
-                    model.Add(own_cov <= cover[nbs_idx, orig_i, t])
-                    terms.append(w["instructor_switch"] * own_cov)
-                # Bonus: covered by same-discipline instructor at time t
-                for i_idx in same_disc_is:
-                    dm_cov = model.NewBoolVar(f"dm_cov_{nbs_idx}_{i_idx}_{t}")
-                    model.Add(dm_cov <= cover[nbs_idx, i_idx, t])
-                    terms.append(w["discipline_switch"] * dm_cov)
-
-        # Bonus for each friend pair together in a group
-        FRIEND_REWARD = w.get("friend_reward", 10)
-        if hasattr(self, "friend_pairs"):
-            for s_idx, f_idx, g, v in self.friend_pairs:
-                terms.append(FRIEND_REWARD * v)
-        
-        # Bonus for groups (banana and covered) with similar age and cwo
-        AGE_SIMILARITY_REWARD = w.get("age_similarity_reward", 5)
-        CWO_SIMILARITY_REWARD = w.get("cwo_similarity_reward", 5)
-        # Banana groups: reward if all students in a group are close in age
-        for g in range(G):
-            group_students = [s_idx for s_idx in range(len(self.banana_students))]
-            for s1 in group_students:
-                for s2 in group_students:
-                    if s1 >= s2:
-                        continue
-                    # Both in group g
-                    both_in_group = model.NewBoolVar(f"both_banana_{s1}_{s2}_{g}")
-                    model.AddBoolAnd([assign[s1, g], assign[s2, g]]).OnlyEnforceIf(both_in_group)
-                    model.AddBoolOr([assign[s1, g].Not(), assign[s2, g].Not()]).OnlyEnforceIf(both_in_group.Not())
-                    # Reward if ages are close
-                    age_diff = abs(self.banana_students[s1].age - self.banana_students[s2].age)
-                    if age_diff <= 1:
-                        terms.append(AGE_SIMILARITY_REWARD * both_in_group)
-
-        # Covered (non-banana) students: reward if covered by same instructor at same time and are similar in age/cwo
-        for t in range(G):
-            for i_idx in range(n_instructors):
-                nb_students = [nbs_idx for nbs_idx in range(len(self.non_banana_students))]
-                for s1 in nb_students:
-                    for s2 in nb_students:
-                        if s1 >= s2:
-                            continue
-                        both_covered = model.NewBoolVar(f"both_cov_{s1}_{s2}_{i_idx}_{t}")
-                        model.AddBoolAnd([cover[s1, i_idx, t], cover[s2, i_idx, t]]).OnlyEnforceIf(both_covered)
-                        model.AddBoolOr([cover[s1, i_idx, t].Not(), cover[s2, i_idx, t].Not()]).OnlyEnforceIf(both_covered.Not())
-                        age_diff = abs(self.non_banana_students[s1].age - self.non_banana_students[s2].age)
-                        if age_diff <= 1:
-                            terms.append(AGE_SIMILARITY_REWARD * both_covered)
-                        cwo_diff = abs(self.non_banana_students[s1].cwo - self.non_banana_students[s2].cwo)
-                        if cwo_diff <= 1:
-                            terms.append(CWO_SIMILARITY_REWARD * both_covered)
-        # Bonus/penalty for non-banana students: cwo match with covering instructor
-        CWO_MATCH_BONUS = w.get("instructor_cwo_match_bonus", 5)
-        for nbs_idx, nbs in enumerate(self.non_banana_students):
-            for t in range(G):
-                for i_idx, inst in enumerate(self.instructors):
-                    cwo_match = model.NewBoolVar(f"cwo_match_nonbanana_{nbs_idx}_{t}_{i_idx}")
-                    model.Add(cwo_match <= cover[nbs_idx, i_idx, t])
-                    if abs(nbs.cwo - inst.cwo) <= 1:
-                        terms.append(CWO_MATCH_BONUS * cwo_match)
-                    else:
-                        terms.append(-CWO_MATCH_BONUS * cwo_match)
-
-        # Bonus for non-banana students who have the same original instructor and are covered by the same instructor in a slot
-        STICK_WITH_GROUP_BONUS = w.get("stick_with_group_bonus", 5)
-        # Non-banana students
-        for t in range(G):
-            for s1 in range(len(self.non_banana_students)):
-                for s2 in range(s1+1, len(self.non_banana_students)):
-                    nbs1 = self.non_banana_students[s1]
-                    nbs2 = self.non_banana_students[s2]
-                    if nbs1.instructor == nbs2.instructor:
-                        for i_idx in range(len(self.instructors)):
-                            both_covered = model.NewBoolVar(f"stick_orig_instr_{t}_{s1}_{s2}_{i_idx}")
-                            model.AddBoolAnd([cover[s1, i_idx, t], cover[s2, i_idx, t]]).OnlyEnforceIf(both_covered)
-                            model.AddBoolOr([cover[s1, i_idx, t].Not(), cover[s2, i_idx, t].Not()]).OnlyEnforceIf(both_covered.Not())
-                            terms.append(STICK_WITH_GROUP_BONUS * both_covered)
-
-        # Banana groups: bonus if students from the same original group are assigned to the same group and covered by the same instructor
-        for t in range(G):
-            for s1 in range(len(self.banana_students)):
-                for s2 in range(s1+1, len(self.banana_students)):
-                    bs1 = self.banana_students[s1]
-                    bs2 = self.banana_students[s2]
-                    # Assuming banana_students have an 'orig_group' attribute
-                    if hasattr(bs1, 'orig_group') and hasattr(bs2, 'orig_group') and bs1.orig_group == bs2.orig_group:
-                        for i_idx in range(len(self.instructors)):
-                            both_covered = model.NewBoolVar(f"stick_banana_group_{t}_{s1}_{s2}_{i_idx}")
-                            model.AddBoolAnd([cover[s1, i_idx, t], cover[s2, i_idx, t]]).OnlyEnforceIf(both_covered)
-                            model.AddBoolOr([cover[s1, i_idx, t].Not(), cover[s2, i_idx, t].Not()]).OnlyEnforceIf(both_covered.Not())
-                            terms.append(STICK_WITH_GROUP_BONUS * both_covered)
-        return terms
-
-    # ── Helpers ──────────────────────────────────────────────────────────
-
-    def _extract_solution(self, solver, assign, transport, group_active, cover) -> BanaanSolution:
-        groups: list[BanaanGroup] = []
-        slot = 0
-        for g in range(self.max_groups):
-            if not solver.Value(group_active[g]):
-                continue
-            students = [
-                self.banana_students[s_idx]
-                for s_idx in range(len(self.banana_students))
-                if solver.Value(assign[s_idx, g])
-            ]
-            inst = None
-            for i_idx, instructor in enumerate(self.instructors):
-                if solver.Value(transport[i_idx, g]):
-                    inst = instructor
-                    break
-            # Determine the dominant phase of this group
-            phase_counts: dict[int, int] = {}
-            for s in students:
-                phase_counts[s.phase] = phase_counts.get(s.phase, 0) + 1
-            phase = max(phase_counts, key=phase_counts.get) if phase_counts else 0
-            groups.append(
-                BanaanGroup(
-                    index=slot,
-                    slot=slot,
-                    phase=phase,
+        # Build rides
+        rides: list[BananaRide] = []
+        for t in range(T):
+            if solver.Value(banana_used[t]):
+                students = []
+                student_transport: dict[str, str] = {}
+                transport_insts = set()
+                for s in range(n_bs):
+                    if solver.Value(ride_at[s, t]):
+                        sname = self.banana_students[s].name
+                        students.append(sname)
+                        for i in range(n_inst):
+                            if solver.Value(transported_by[s, i]):
+                                iname = self.instructors[i].name
+                                student_transport[sname] = iname
+                                transport_insts.add(iname)
+                                break
+                rides.append(BananaRide(
+                    slot=t,
                     students=students,
-                    transport_instructor=inst,
-                )
-            )
-            slot += 1
+                    transport_instructors=sorted(transport_insts),
+                    student_transport=student_transport,
+                ))
 
-        # Extract non-banana coverage assignments: (student_name, slot) -> [instructor_name, ...]
-        non_banana_assignments = []
-        n_students_nb = len(self.non_banana_students)
-        n_instructors = len(self.instructors)
-        G = self.max_groups
-        for t in range(G):
-            for nbs_idx, nbs in enumerate(self.non_banana_students):
-                covered_by = []
-                for i_idx, inst in enumerate(self.instructors):
-                    # Only include if this instructor covers this student at this slot
-                    try:
-                        v = cover[nbs_idx, i_idx, t]
-                    except KeyError:
-                        continue
-                    if solver.Value(v):
-                        covered_by.append(inst.name)
-                if covered_by and len(covered_by) == 1:
-                    non_banana_assignments.append(NonBananaAssignment(
-                        student=nbs,
-                        slot=t,
-                        instructor_name=covered_by[0],
+        # Build student schedules
+        student_schedules: dict[str, list[StudentScheduleEntry]] = {}
+
+        # Banana students
+        for s in range(n_bs):
+            stud = self.banana_students[s]
+            entries = []
+            for t in range(T):
+                if solver.Value(student_on_island[s, t]):
+                    if solver.Value(ride_at[s, t]):
+                        state = StudentState.ON_BANANA
+                    else:
+                        # Determine if in transit or waiting
+                        # Find which instructor transports this student
+                        trans_i = next(i for i in range(n_inst) if solver.Value(transported_by[s, i]))
+                        dep = solver.Value(depart_slot[trans_i])
+                        ret = solver.Value(return_depart[trans_i])
+                        if t < dep + transit:
+                            state = StudentState.TRANSIT_TO
+                        elif t >= ret:
+                            state = StudentState.TRANSIT_FROM
+                        else:
+                            # Prep slots are the prep_slots immediately before the ride
+                            student_ride = solver.Value(ride_slot[s])
+                            if student_ride - cfg.prep_slots <= t < student_ride:
+                                state = StudentState.PREP
+                            else:
+                                state = StudentState.ON_ISLAND
+                    entries.append(StudentScheduleEntry(slot=t, state=state))
+                else:
+                    # Sailing — find covering instructor
+                    covering_inst = None
+                    for i in range(n_inst):
+                        if solver.Value(cover_banana[s, i, t]):
+                            covering_inst = self.instructors[i].name
+                            break
+                    entries.append(StudentScheduleEntry(
+                        slot=t, state=StudentState.SAILING, instructor=covering_inst
+                    ))
+            student_schedules[stud.name] = entries
+
+        # Non-banana students
+        for nbs in range(n_nbs):
+            stud = self.non_banana_students[nbs]
+            entries = []
+            for t in range(T):
+                covering_inst = None
+                for i in range(n_inst):
+                    if solver.Value(cover[nbs, i, t]):
+                        covering_inst = self.instructors[i].name
+                        break
+                entries.append(StudentScheduleEntry(
+                    slot=t, state=StudentState.SAILING, instructor=covering_inst
+                ))
+            student_schedules[stud.name] = entries
+
+        # Build instructor schedules
+        instructor_schedules: dict[str, list[InstructorScheduleEntry]] = {}
+        for i in range(n_inst):
+            inst = self.instructors[i]
+            entries = []
+            for t in range(T):
+                if solver.Value(on_island[i, t]):
+                    dep = solver.Value(depart_slot[i])
+                    ret = solver.Value(return_depart[i])
+                    if t < dep + transit:
+                        state = InstructorState.TRANSPORTING_TO
+                    elif t >= ret:
+                        state = InstructorState.TRANSPORTING_FROM
+                    else:
+                        state = InstructorState.ON_ISLAND
+                    # Count kids this instructor has on island
+                    kids = [
+                        self.banana_students[s].name
+                        for s in range(n_bs)
+                        if solver.Value(transported_by[s, i])
+                        and solver.Value(student_on_island[s, t])
+                    ]
+                    entries.append(InstructorScheduleEntry(
+                        slot=t, state=state,
+                        details=f"with {', '.join(kids)}" if kids else "",
                     ))
                 else:
-                    raise ValueError(f"Expected exactly one instructor covering non-banana student {nbs.name} at slot {t}, but got: {covered_by}")
+                    # Instructing/covering
+                    covered_nbs = [
+                        self.non_banana_students[nbs].name
+                        for nbs in range(n_nbs)
+                        if solver.Value(cover[nbs, i, t])
+                    ]
+                    covered_bs = [
+                        self.banana_students[s].name
+                        for s in range(n_bs)
+                        if solver.Value(cover_banana[s, i, t])
+                    ]
+                    all_covered = covered_nbs + covered_bs
+                    state = InstructorState.INSTRUCTING
+                    entries.append(InstructorScheduleEntry(
+                        slot=t, state=state,
+                        details=f"{len(all_covered)} kids" if all_covered else "free",
+                    ))
+            instructor_schedules[inst.name] = entries
 
-        # Debug: Cover assignments and their reasons
-        debug_lines = []
-        debug_lines.append("==== BANANA SOLVER DEBUG OUTPUT ====")
-        debug_lines.append(f"Weights: {self.config.weights}")
-        debug_lines.append("")
-        for group in groups:
-            debug_lines.append(f"Group {group.index}: phase={group.phase}, instructor={group.transport_instructor.name if group.transport_instructor else None}, students={[s.name for s in group.students]}")
-            group_penalty = -self.config.weights.get("banana_group", 100)
-            debug_lines.append(f"  Penalty: group active = {group_penalty}")
-            for s in group.students:
-                if group.transport_instructor and s.instructor == group.transport_instructor.name:
-                    debug_lines.append(f"    Bonus: {s.name} with own instructor {group.transport_instructor.name} (+{self.config.weights.get('instructor_switch', 0)})")
-                if group.transport_instructor and s.discipline == group.transport_instructor.discipline:
-                    debug_lines.append(f"    Bonus: {s.name} with same discipline {group.transport_instructor.discipline} (+{self.config.weights.get('discipline_switch', 0)})")
-        for nba in non_banana_assignments:
-            debug_lines.append(f"Non-banana {nba.student.name} at slot {nba.slot} covered by {nba.instructor_name}")
-        debug_lines.append("\n-- Cover assignments by slot --")
-        for t in range(G):
-            debug_lines.append(f"Slot {t}:")
-            for nbs_idx, nbs in enumerate(self.non_banana_students):
-                for i_idx, inst in enumerate(self.instructors):
-                    v = cover[nbs_idx, i_idx, t]
-                    if solver.Value(v):
-                        reasons = []
-                        # Instructor switch penalty
-                        if t > 0:
-                            for j_idx in range(n_instructors):
-                                if j_idx != i_idx and solver.Value(cover[nbs_idx, j_idx, t-1]):
-                                    reasons.append(f"switch from {self.instructors[j_idx].name} (penalty {self.config.weights.get('cover_switch_penalty', 10)})")
-                        # CWO match bonus/penalty
-                        cwo_diff = abs(nbs.cwo - inst.cwo)
-                        cwo_bonus = self.config.weights.get('instructor_cwo_match_bonus', 5)
-                        if cwo_diff <= 1:
-                            reasons.append(f"cwo match (bonus {cwo_bonus})")
-                        else:
-                            reasons.append(f"cwo mismatch (penalty {cwo_bonus})")
-                        # Instructor/discipline bonus
-                        if inst.name == nbs.instructor:
-                            reasons.append(f"own instructor (bonus {self.config.weights.get('instructor_switch', 0)})")
-                        if inst.discipline == nbs.discipline:
-                            reasons.append(f"same discipline (bonus {self.config.weights.get('discipline_switch', 0)})")
-                        # Stick with group bonus
-                        stick_bonus = self.config.weights.get('stick_with_group_bonus', 5)
-                        for t_prev in range(max(0, t-1), t):
-                            for other_idx, other in enumerate(self.non_banana_students):
-                                if other_idx != nbs_idx and solver.Value(cover[other_idx, i_idx, t]) and solver.Value(cover[other_idx, i_idx, t_prev]):
-                                    reasons.append(f"stick with group (bonus {stick_bonus})")
-                        # Age/cwo similarity bonus
-                        age_sim = self.config.weights.get('age_similarity_reward', 5)
-                        cwo_sim = self.config.weights.get('cwo_similarity_reward', 5)
-                        for other_idx, other in enumerate(self.non_banana_students):
-                            if other_idx != nbs_idx and solver.Value(cover[other_idx, i_idx, t]):
-                                if abs(nbs.age - other.age) <= 1:
-                                    reasons.append(f"age similarity with {other.name} (bonus {age_sim})")
-                                if abs(nbs.cwo - other.cwo) <= 1:
-                                    reasons.append(f"cwo similarity with {other.name} (bonus {cwo_sim})")
-                        debug_lines.append(f"  {nbs.name} covered by {inst.name}: {', '.join(reasons) if reasons else 'no special reason'}")
-        debug_lines.append("==== END DEBUG OUTPUT ====")
-        # Save debug output to a log file instead of printing
-        log_path = "banaan_cover_debug.log"
-        with open(log_path, "w") as f:
-            f.write("\n".join(debug_lines))
+        return BananaSolution(
+            rides=rides,
+            student_schedules=student_schedules,
+            instructor_schedules=instructor_schedules,
+            config=cfg,
+        )
 
-        return BanaanSolution(
-            groups=groups,
-            non_banana_assignments=non_banana_assignments,
-            config=self.config,
-            start_time_minutes=self.start_time_min,
+    def _empty_solution(self) -> BananaSolution:
+        cfg = self.config
+        T = self.T
+        student_schedules = {}
+        for s in self.students:
+            student_schedules[s.name] = [
+                StudentScheduleEntry(slot=t, state=StudentState.SAILING, instructor=s.instructor)
+                for t in range(T)
+            ]
+        instructor_schedules = {}
+        for inst in self.instructors:
+            instructor_schedules[inst.name] = [
+                InstructorScheduleEntry(slot=t, state=InstructorState.INSTRUCTING)
+                for t in range(T)
+            ]
+        return BananaSolution(
+            rides=[],
+            student_schedules=student_schedules,
+            instructor_schedules=instructor_schedules,
+            config=cfg,
         )
