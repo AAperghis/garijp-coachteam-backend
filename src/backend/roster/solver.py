@@ -1,5 +1,5 @@
 from ortools.sat.python import cp_model
-from .models import Roster
+from backend.roster.models import Roster
 from typing import Dict, List, Tuple, Optional
 
 class RosterSolver:

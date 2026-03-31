@@ -37,12 +37,13 @@ wheels = [
 [[package]]
 name = "backend"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "openpyxl" },
     { name = "ortools" },
     { name = "pandas" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -56,6 +57,7 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.1,<4" },
     { name = "ortools", specifier = ">=9.14.6206,<10" },
     { name = "pandas", specifier = ">=2.2,<3" },
+    { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 
 [package.metadata.requires-dev]

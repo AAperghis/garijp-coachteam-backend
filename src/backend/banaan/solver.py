@@ -11,7 +11,7 @@ import math
 
 from ortools.sat.python import cp_model
 
-from .models import (
+from  backend.banaan.models import (
     Student,
     Instructor,
     BanaanConfig,

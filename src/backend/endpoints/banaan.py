@@ -5,9 +5,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import pandas as pd
 
-from banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
-from banaan.solver import BanaanSolver
-from banaan.output import generate_output
+from backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
+from backend.banaan.solver import BanaanSolver
+from backend.banaan.output import generate_output
 
 router = APIRouter(prefix="/banaan")
 
@@ -162,19 +162,8 @@ def _to_domain(req: BanaanRequest) -> tuple[list[Student], list[Instructor], Ban
 # ── Endpoints ────────────────────────────────────────────────────────────
 
 
-@router.post("/upload", response_model=UploadResponse)
-async def upload_banaan(file: UploadFile):
-    contents = await file.read()
-    filename = file.filename or ""
-
-    try:
-        if filename.endswith(".xlsx"):
-            df = pd.read_excel(io.BytesIO(contents))
-        else:
-            df = pd.read_csv(io.BytesIO(contents))
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Could not parse file: {exc}")
-
+def _parse_students_df(df: pd.DataFrame) -> tuple[list[StudentInput], dict[str, str]]:
+    """Parse a students DataFrame. Returns (students, instructor_name→discipline map)."""
     required_cols = {"Name", "Discipline", "Instructor", "Will banana"}
     missing = required_cols - set(df.columns)
     if missing:
@@ -207,10 +196,76 @@ async def upload_banaan(file: UploadFile):
         ))
         instructor_set[instructor] = discipline
 
-    instructors = [
-        InstructorInput(name=name, discipline=disc)
-        for name, disc in instructor_set.items()
-    ]
+    return students, instructor_set
+
+
+def _parse_instructors_df(df: pd.DataFrame) -> list[InstructorInput]:
+    """Parse an instructors DataFrame (Name, Discipline, cwo, transport_capacity, cover_capacity)."""
+    required_cols = {"Name", "Discipline"}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Instructors file missing columns: {', '.join(sorted(missing))}",
+        )
+
+    instructors: list[InstructorInput] = []
+    for _, row in df.iterrows():
+        name = str(row["Name"]).strip()
+        discipline = normalise_discipline(str(row["Discipline"]).strip())
+        cwo = int(row["cwo"]) if "cwo" in df.columns and pd.notna(row.get("cwo")) else 1
+        transport_capacity = (
+            int(row["transport_capacity"])
+            if "transport_capacity" in df.columns and pd.notna(row.get("transport_capacity"))
+            else 6
+        )
+        cover_capacity = (
+            int(row["cover_capacity"])
+            if "cover_capacity" in df.columns and pd.notna(row.get("cover_capacity"))
+            else 6
+        )
+        instructors.append(InstructorInput(
+            name=name, discipline=discipline, cwo=cwo,
+            transport_capacity=transport_capacity, cover_capacity=cover_capacity,
+        ))
+    return instructors
+
+
+def _read_upload(file_bytes: bytes, filename: str) -> pd.DataFrame:
+    try:
+        if filename.endswith(".xlsx"):
+            return pd.read_excel(io.BytesIO(file_bytes))
+        return pd.read_csv(io.BytesIO(file_bytes))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Could not parse file: {exc}")
+
+
+@router.post("/upload", response_model=UploadResponse)
+async def upload_banaan(
+    file: UploadFile,
+    instructors_file: UploadFile | None = None,
+):
+    """Upload a students CSV/XLSX and an optional separate instructors CSV/XLSX.
+
+    - **file**: students file (required) — columns: Name, Discipline, Instructor,
+      Will banana, Friends (optional), cwo (optional), Age (optional)
+    - **instructors_file**: instructors file (optional) — columns: Name, Discipline,
+      cwo (optional), transport_capacity (optional), cover_capacity (optional).
+      When omitted, instructors are auto-derived from the students file using default
+      capacities (cwo=1, transport_capacity=6, cover_capacity=6).
+    """
+    students_df = _read_upload(await file.read(), file.filename or "")
+    students, instructor_set = _parse_students_df(students_df)
+
+    if instructors_file is not None:
+        instr_df = _read_upload(await instructors_file.read(), instructors_file.filename or "")
+        instructors = _parse_instructors_df(instr_df)
+    else:
+        # Fall back: derive instructors from student rows with default capacities.
+        instructors = [
+            InstructorInput(name=name, discipline=disc)
+            for name, disc in instructor_set.items()
+        ]
 
     return UploadResponse(
         students=students,
