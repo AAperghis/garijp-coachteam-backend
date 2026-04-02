@@ -5,9 +5,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import pandas as pd
 
-from banaan.models import Student, Instructor, BanaanConfig, BanaanGroup, BanaanSolution
+from banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
 from banaan.solver import BanaanSolver
-from banaan.output import generate_output, export_to_xlsx
+from banaan.output import generate_output
 
 router = APIRouter(prefix="/banaan")
 
@@ -18,7 +18,9 @@ router = APIRouter(prefix="/banaan")
 class InstructorInput(BaseModel):
     name: str
     discipline: str
-    transport_capacity: int
+    cwo: int = 1
+    transport_capacity: int = 6
+    cover_capacity: int = 6
 
 
 class StudentInput(BaseModel):
@@ -26,17 +28,69 @@ class StudentInput(BaseModel):
     discipline: str
     instructor: str
     wants_banana: bool
-    friend: str | None = None
+    cwo: int = 1
+    age: int = 13
+    friends: list[str] | None = None
 
 
 class ConfigInput(BaseModel):
     boat_capacity: int = 6
     slot_duration_min: int = 15
-    prep_time_min: int = 15
-    transport_time_min: int = 15
+    transit_slots: int = 1
+    prep_slots: int = 1
     start_time: str = "10:30"
     end_time: str = "16:00"
-    weights: dict[str, int] = {"instructor_switch": 10, "discipline_switch": 50}
+    weights: dict[str, int] = {}
+
+
+# ── Update endpoints ───────────────────────────────────────────────────
+
+from typing import Optional
+
+class UpdateStudentRequest(BaseModel):
+    students: list[StudentInput]
+    index: Optional[int] = None
+    name: Optional[str] = None
+    new_values: dict
+
+class UpdateInstructorRequest(BaseModel):
+    instructors: list[InstructorInput]
+    index: Optional[int] = None
+    name: Optional[str] = None
+    new_values: dict
+
+class UpdateConfigRequest(BaseModel):
+    config: ConfigInput
+    new_values: dict
+
+@router.post("/student/update", response_model=list[StudentInput])
+async def update_student(req: UpdateStudentRequest):
+    students = list(req.students)
+    idx = req.index
+    if idx is None and req.name is not None:
+        idx = next((i for i, s in enumerate(students) if s.name == req.name), None)
+    if idx is None or idx < 0 or idx >= len(students):
+        raise HTTPException(status_code=404, detail="Student not found")
+    updated = students[idx].model_copy(update=req.new_values)
+    students[idx] = updated
+    return students
+
+@router.post("/instructor/update", response_model=list[InstructorInput])
+async def update_instructor(req: UpdateInstructorRequest):
+    instructors = list(req.instructors)
+    idx = req.index
+    if idx is None and req.name is not None:
+        idx = next((i for i, s in enumerate(instructors) if s.name == req.name), None)
+    if idx is None or idx < 0 or idx >= len(instructors):
+        raise HTTPException(status_code=404, detail="Instructor not found")
+    updated = instructors[idx].model_copy(update=req.new_values)
+    instructors[idx] = updated
+    return instructors
+
+@router.post("/config/update", response_model=ConfigInput)
+async def update_config(req: UpdateConfigRequest):
+    config = req.config.model_copy(update=req.new_values)
+    return config
 
 
 class UploadResponse(BaseModel):
@@ -51,21 +105,58 @@ class BanaanRequest(BaseModel):
     config: ConfigInput = ConfigInput()
 
 
-class GroupOutput(BaseModel):
-    index: int
+class RideOutput(BaseModel):
     slot: int
     time: str
-    phase: int
     students: list[str]
-    disciplines: list[str]
-    transport_instructor: str | None
+    count: int
+    transport_instructors: list[str]
 
 
 class BanaanResponse(BaseModel):
-    groups: list[GroupOutput]
-    non_banana_assignments: dict[str, str]
-    total_groups: int
+    rides: list[RideOutput]
+    total_rides: int
     total_banana_students: int
+
+
+# ── Helper to build domain objects ───────────────────────────────────────
+
+def _to_domain(req: BanaanRequest) -> tuple[list[Student], list[Instructor], BanaanConfig]:
+    students = [
+        Student(
+            name=s.name,
+            discipline=normalise_discipline(s.discipline),
+            instructor=s.instructor,
+            wants_banana=s.wants_banana,
+            cwo=s.cwo,
+            age=s.age,
+            friends=s.friends,
+        )
+        for s in req.students
+    ]
+    instructors = [
+        Instructor(
+            name=i.name,
+            discipline=normalise_discipline(i.discipline),
+            cwo=i.cwo,
+            transport_capacity=i.transport_capacity,
+            cover_capacity=i.cover_capacity,
+        )
+        for i in req.instructors
+    ]
+    cfg = req.config
+    default_weights = BanaanConfig().weights
+    merged_weights = {**default_weights, **cfg.weights}
+    config = BanaanConfig(
+        boat_capacity=cfg.boat_capacity,
+        slot_duration_min=cfg.slot_duration_min,
+        transit_slots=cfg.transit_slots,
+        prep_slots=cfg.prep_slots,
+        start_time=cfg.start_time,
+        end_time=cfg.end_time,
+        weights=merged_weights,
+    )
+    return students, instructors, config
 
 
 # ── Endpoints ────────────────────────────────────────────────────────────
@@ -73,11 +164,6 @@ class BanaanResponse(BaseModel):
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_banaan(file: UploadFile):
-    """Parse an uploaded CSV/XLSX student file.
-
-    Returns the student list, extracted instructor list, and default config
-    so the frontend can display a preview and let the user adjust parameters.
-    """
     contents = await file.read()
     filename = file.filename or ""
 
@@ -98,33 +184,31 @@ async def upload_banaan(file: UploadFile):
         )
 
     students: list[StudentInput] = []
-    instructor_set: dict[str, str] = {}  # name -> discipline
+    instructor_set: dict[str, str] = {}
     for _, row in df.iterrows():
-        friend_val = row.get("Friend")
-        friend = (
-            str(friend_val).strip()
-            if pd.notna(friend_val) and str(friend_val).strip()
-            else None
-        )
         name = str(row["Name"]).strip()
-        discipline = str(row["Discipline"]).strip().lower()
+        discipline = normalise_discipline(str(row["Discipline"]).strip())
         instructor = str(row["Instructor"]).strip()
         wants_banana = str(row["Will banana"]).strip().lower() in (
             "yes", "true", "1", "ja",
         )
-        students.append(
-            StudentInput(
-                name=name,
-                discipline=discipline,
-                instructor=instructor,
-                wants_banana=wants_banana,
-                friend=friend,
-            )
-        )
+
+        friend_val = row.get("Friends") if "Friends" in df.columns else row.get("Friend")
+        friends = None
+        if pd.notna(friend_val) and str(friend_val).strip():
+            friends = [f.strip() for f in str(friend_val).split(",") if f.strip()]
+
+        cwo = int(row["cwo"]) if "cwo" in df.columns and pd.notna(row.get("cwo")) else 1
+        age = int(row["Age"]) if "Age" in df.columns and pd.notna(row.get("Age")) else 13
+
+        students.append(StudentInput(
+            name=name, discipline=discipline, instructor=instructor,
+            wants_banana=wants_banana, friends=friends, cwo=cwo, age=age,
+        ))
         instructor_set[instructor] = discipline
 
     instructors = [
-        InstructorInput(name=name, discipline=disc, transport_capacity=6)
+        InstructorInput(name=name, discipline=disc)
         for name, disc in instructor_set.items()
     ]
 
@@ -137,35 +221,7 @@ async def upload_banaan(file: UploadFile):
 
 @router.post("/solve", response_model=BanaanResponse)
 async def solve_banaan(req: BanaanRequest):
-    """Run the solver on the (possibly edited) student/instructor/config data."""
-    students = [
-        Student(
-            name=s.name,
-            discipline=s.discipline,
-            instructor=s.instructor,
-            wants_banana=s.wants_banana,
-            friend=s.friend,
-        )
-        for s in req.students
-    ]
-    instructors = [
-        Instructor(
-            name=i.name,
-            discipline=i.discipline,
-            transport_capacity=i.transport_capacity,
-        )
-        for i in req.instructors
-    ]
-    cfg = req.config
-    config = BanaanConfig(
-        boat_capacity=cfg.boat_capacity,
-        slot_duration_min=cfg.slot_duration_min,
-        prep_time_min=cfg.prep_time_min,
-        transport_time_min=cfg.transport_time_min,
-        start_time=cfg.start_time,
-        end_time=cfg.end_time,
-        weights=cfg.weights,
-    )
+    students, instructors, config = _to_domain(req)
 
     solver = BanaanSolver(students, instructors, config)
     solution = solver.solve()
@@ -173,61 +229,27 @@ async def solve_banaan(req: BanaanRequest):
     if solution is None:
         raise HTTPException(status_code=422, detail="No feasible schedule found")
 
-    groups = [
-        GroupOutput(
-            index=g.index,
-            slot=g.slot,
-            time=solution.slot_to_time(g.slot),
-            phase=g.phase,
-            students=[s.name for s in g.students],
-            disciplines=sorted({s.discipline for s in g.students}),
-            transport_instructor=(
-                g.transport_instructor.name if g.transport_instructor else None
-            ),
+    rides = [
+        RideOutput(
+            slot=r.slot,
+            time=solution.slot_to_time(r.slot),
+            students=r.students,
+            count=len(r.students),
+            transport_instructors=r.transport_instructors,
         )
-        for g in solution.groups
+        for r in solution.rides
     ]
 
     return BanaanResponse(
-        groups=groups,
-        non_banana_assignments=solution.non_banana_assignments,
-        total_groups=len(solution.groups),
-        total_banana_students=sum(len(g.students) for g in solution.groups),
+        rides=rides,
+        total_rides=len(solution.rides),
+        total_banana_students=sum(len(r.students) for r in solution.rides),
     )
 
 
 @router.post("/download")
 async def download_banaan(req: BanaanRequest):
-    """Solve and return the result as a downloadable XLSX file."""
-    # Re-use the solve logic
-    students = [
-        Student(
-            name=s.name,
-            discipline=s.discipline,
-            instructor=s.instructor,
-            wants_banana=s.wants_banana,
-            friend=s.friend,
-        )
-        for s in req.students
-    ]
-    instructors = [
-        Instructor(
-            name=i.name,
-            discipline=i.discipline,
-            transport_capacity=i.transport_capacity,
-        )
-        for i in req.instructors
-    ]
-    cfg = req.config
-    config = BanaanConfig(
-        boat_capacity=cfg.boat_capacity,
-        slot_duration_min=cfg.slot_duration_min,
-        prep_time_min=cfg.prep_time_min,
-        transport_time_min=cfg.transport_time_min,
-        start_time=cfg.start_time,
-        end_time=cfg.end_time,
-        weights=cfg.weights,
-    )
+    students, instructors, config = _to_domain(req)
 
     solver = BanaanSolver(students, instructors, config)
     solution = solver.solve()

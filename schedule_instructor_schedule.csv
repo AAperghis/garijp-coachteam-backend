@@ -1,0 +1,385 @@
+Instructor,Time,State,Details
+Annegreet,10:00,instructing,2 kids
+Annegreet,10:15,instructing,2 kids
+Annegreet,10:30,instructing,2 kids
+Annegreet,10:45,instructing,2 kids
+Annegreet,11:00,instructing,2 kids
+Annegreet,11:15,instructing,2 kids
+Annegreet,11:30,instructing,2 kids
+Annegreet,11:45,transporting_to,"with Florine van Dijk, Jade Martens, Dries Zaanen, Lente Muilwijk, Menno Booij, Tim van der Toolen"
+Annegreet,12:00,on_island,"with Florine van Dijk, Jade Martens, Dries Zaanen, Lente Muilwijk, Menno Booij, Tim van der Toolen"
+Annegreet,12:15,on_island,"with Florine van Dijk, Jade Martens, Dries Zaanen, Lente Muilwijk, Menno Booij, Tim van der Toolen"
+Annegreet,12:30,transporting_from,"with Florine van Dijk, Jade Martens, Dries Zaanen, Lente Muilwijk, Menno Booij, Tim van der Toolen"
+Annegreet,12:45,instructing,1 kids
+Annegreet,13:00,instructing,free
+Annegreet,13:15,instructing,free
+Annegreet,13:30,instructing,free
+Annegreet,13:45,instructing,1 kids
+Annegreet,14:00,instructing,2 kids
+Annegreet,14:15,instructing,2 kids
+Annegreet,14:30,instructing,2 kids
+Annegreet,14:45,instructing,2 kids
+Annegreet,15:00,instructing,2 kids
+Annegreet,15:15,instructing,2 kids
+Annegreet,15:30,instructing,2 kids
+Annegreet,15:45,instructing,2 kids
+Anouk,10:00,instructing,6 kids
+Anouk,10:15,instructing,6 kids
+Anouk,10:30,instructing,5 kids
+Anouk,10:45,instructing,6 kids
+Anouk,11:00,instructing,6 kids
+Anouk,11:15,instructing,7 kids
+Anouk,11:30,instructing,6 kids
+Anouk,11:45,instructing,5 kids
+Anouk,12:00,instructing,5 kids
+Anouk,12:15,transporting_to,"with Floris Schiebaan, Lars van de Kerk, Imke van Berkel"
+Anouk,12:30,on_island,"with Floris Schiebaan, Lars van de Kerk, Imke van Berkel"
+Anouk,12:45,on_island,"with Floris Schiebaan, Lars van de Kerk, Imke van Berkel"
+Anouk,13:00,transporting_from,"with Floris Schiebaan, Lars van de Kerk, Imke van Berkel"
+Anouk,13:15,instructing,5 kids
+Anouk,13:30,instructing,5 kids
+Anouk,13:45,instructing,5 kids
+Anouk,14:00,instructing,5 kids
+Anouk,14:15,instructing,5 kids
+Anouk,14:30,instructing,5 kids
+Anouk,14:45,instructing,5 kids
+Anouk,15:00,instructing,5 kids
+Anouk,15:15,instructing,5 kids
+Anouk,15:30,instructing,5 kids
+Anouk,15:45,instructing,5 kids
+Boersma,10:00,instructing,4 kids
+Boersma,10:15,instructing,4 kids
+Boersma,10:30,instructing,4 kids
+Boersma,10:45,instructing,4 kids
+Boersma,11:00,instructing,4 kids
+Boersma,11:15,instructing,4 kids
+Boersma,11:30,instructing,4 kids
+Boersma,11:45,instructing,4 kids
+Boersma,12:00,instructing,4 kids
+Boersma,12:15,instructing,4 kids
+Boersma,12:30,transporting_to,"with Luc Sturm, Pepijn Keukens, Juul Bastiaan, Maurice Schiebaan, Fedde Jobsen, Niels Romkes"
+Boersma,12:45,on_island,"with Luc Sturm, Pepijn Keukens, Juul Bastiaan, Maurice Schiebaan, Fedde Jobsen, Niels Romkes"
+Boersma,13:00,on_island,"with Luc Sturm, Pepijn Keukens, Juul Bastiaan, Maurice Schiebaan, Fedde Jobsen, Niels Romkes"
+Boersma,13:15,transporting_from,"with Luc Sturm, Pepijn Keukens, Juul Bastiaan, Maurice Schiebaan, Fedde Jobsen, Niels Romkes"
+Boersma,13:30,instructing,2 kids
+Boersma,13:45,instructing,2 kids
+Boersma,14:00,instructing,4 kids
+Boersma,14:15,instructing,4 kids
+Boersma,14:30,instructing,4 kids
+Boersma,14:45,instructing,4 kids
+Boersma,15:00,instructing,4 kids
+Boersma,15:15,instructing,4 kids
+Boersma,15:30,instructing,4 kids
+Boersma,15:45,instructing,4 kids
+Esther,10:00,instructing,2 kids
+Esther,10:15,instructing,2 kids
+Esther,10:30,instructing,1 kids
+Esther,10:45,instructing,5 kids
+Esther,11:00,instructing,6 kids
+Esther,11:15,transporting_to,"with Benthe de Heer, Emma Wurzer, Romy van der Scheur, Veerle Knol, Hugo van Oosten, Mira Jobsen"
+Esther,11:30,on_island,"with Benthe de Heer, Emma Wurzer, Romy van der Scheur, Veerle Knol, Hugo van Oosten, Mira Jobsen"
+Esther,11:45,on_island,"with Benthe de Heer, Emma Wurzer, Romy van der Scheur, Veerle Knol, Hugo van Oosten, Mira Jobsen"
+Esther,12:00,transporting_from,"with Benthe de Heer, Emma Wurzer, Romy van der Scheur, Veerle Knol, Hugo van Oosten, Mira Jobsen"
+Esther,12:15,instructing,6 kids
+Esther,12:30,instructing,6 kids
+Esther,12:45,instructing,6 kids
+Esther,13:00,instructing,6 kids
+Esther,13:15,instructing,5 kids
+Esther,13:30,instructing,6 kids
+Esther,13:45,instructing,6 kids
+Esther,14:00,instructing,4 kids
+Esther,14:15,instructing,4 kids
+Esther,14:30,instructing,4 kids
+Esther,14:45,instructing,4 kids
+Esther,15:00,instructing,4 kids
+Esther,15:15,instructing,4 kids
+Esther,15:30,instructing,4 kids
+Esther,15:45,instructing,4 kids
+Guus,10:00,instructing,4 kids
+Guus,10:15,instructing,4 kids
+Guus,10:30,instructing,4 kids
+Guus,10:45,instructing,4 kids
+Guus,11:00,instructing,4 kids
+Guus,11:15,instructing,4 kids
+Guus,11:30,instructing,4 kids
+Guus,11:45,instructing,6 kids
+Guus,12:00,instructing,6 kids
+Guus,12:15,instructing,6 kids
+Guus,12:30,instructing,8 kids
+Guus,12:45,instructing,6 kids
+Guus,13:00,instructing,4 kids
+Guus,13:15,instructing,4 kids
+Guus,13:30,instructing,4 kids
+Guus,13:45,instructing,4 kids
+Guus,14:00,instructing,4 kids
+Guus,14:15,instructing,4 kids
+Guus,14:30,instructing,4 kids
+Guus,14:45,instructing,4 kids
+Guus,15:00,instructing,4 kids
+Guus,15:15,instructing,4 kids
+Guus,15:30,instructing,4 kids
+Guus,15:45,instructing,4 kids
+Huib,10:00,instructing,5 kids
+Huib,10:15,instructing,6 kids
+Huib,10:30,instructing,5 kids
+Huib,10:45,instructing,5 kids
+Huib,11:00,instructing,5 kids
+Huib,11:15,instructing,5 kids
+Huib,11:30,instructing,5 kids
+Huib,11:45,instructing,5 kids
+Huib,12:00,instructing,5 kids
+Huib,12:15,instructing,5 kids
+Huib,12:30,instructing,4 kids
+Huib,12:45,transporting_to,"with Duco van Deursen, Charlotte Meerburg, Elise Houtekamer, Feike Dopheide, Pieter van der Werf, Stijn van der Toolen, Thijmen van Dijk"
+Huib,13:00,on_island,"with Duco van Deursen, Charlotte Meerburg, Elise Houtekamer, Feike Dopheide, Pieter van der Werf, Stijn van der Toolen, Thijmen van Dijk"
+Huib,13:15,on_island,"with Duco van Deursen, Charlotte Meerburg, Elise Houtekamer, Feike Dopheide, Pieter van der Werf, Stijn van der Toolen, Thijmen van Dijk"
+Huib,13:30,transporting_from,"with Duco van Deursen, Charlotte Meerburg, Elise Houtekamer, Feike Dopheide, Pieter van der Werf, Stijn van der Toolen, Thijmen van Dijk"
+Huib,13:45,instructing,5 kids
+Huib,14:00,instructing,5 kids
+Huib,14:15,instructing,5 kids
+Huib,14:30,instructing,5 kids
+Huib,14:45,instructing,5 kids
+Huib,15:00,instructing,5 kids
+Huib,15:15,instructing,5 kids
+Huib,15:30,instructing,5 kids
+Huib,15:45,instructing,5 kids
+Koen,10:00,instructing,5 kids
+Koen,10:15,instructing,5 kids
+Koen,10:30,instructing,5 kids
+Koen,10:45,instructing,8 kids
+Koen,11:00,instructing,8 kids
+Koen,11:15,instructing,6 kids
+Koen,11:30,instructing,6 kids
+Koen,11:45,instructing,3 kids
+Koen,12:00,instructing,2 kids
+Koen,12:15,instructing,6 kids
+Koen,12:30,instructing,6 kids
+Koen,12:45,instructing,6 kids
+Koen,13:00,instructing,6 kids
+Koen,13:15,instructing,5 kids
+Koen,13:30,instructing,5 kids
+Koen,13:45,instructing,5 kids
+Koen,14:00,instructing,4 kids
+Koen,14:15,instructing,4 kids
+Koen,14:30,instructing,4 kids
+Koen,14:45,instructing,4 kids
+Koen,15:00,instructing,4 kids
+Koen,15:15,instructing,4 kids
+Koen,15:30,instructing,4 kids
+Koen,15:45,instructing,4 kids
+Laure,10:00,instructing,7 kids
+Laure,10:15,instructing,7 kids
+Laure,10:30,instructing,7 kids
+Laure,10:45,instructing,7 kids
+Laure,11:00,instructing,7 kids
+Laure,11:15,instructing,7 kids
+Laure,11:30,instructing,7 kids
+Laure,11:45,instructing,7 kids
+Laure,12:00,instructing,7 kids
+Laure,12:15,instructing,5 kids
+Laure,12:30,instructing,4 kids
+Laure,12:45,instructing,4 kids
+Laure,13:00,transporting_to,"with Cas Straatman, Renzo Brouwer, Wieger Booij, Anna Derks, Emma Hulscher, Meike Wijdeven"
+Laure,13:15,on_island,"with Cas Straatman, Renzo Brouwer, Wieger Booij, Anna Derks, Emma Hulscher, Meike Wijdeven"
+Laure,13:30,on_island,"with Cas Straatman, Renzo Brouwer, Wieger Booij, Anna Derks, Emma Hulscher, Meike Wijdeven"
+Laure,13:45,transporting_from,"with Cas Straatman, Renzo Brouwer, Wieger Booij, Anna Derks, Emma Hulscher, Meike Wijdeven"
+Laure,14:00,instructing,7 kids
+Laure,14:15,instructing,7 kids
+Laure,14:30,instructing,7 kids
+Laure,14:45,instructing,7 kids
+Laure,15:00,instructing,7 kids
+Laure,15:15,instructing,7 kids
+Laure,15:30,instructing,7 kids
+Laure,15:45,instructing,7 kids
+Lieke,10:00,instructing,5 kids
+Lieke,10:15,instructing,3 kids
+Lieke,10:30,transporting_to,"with Douwe Sjoerd, Alexander op ten Noort, Bo van Berkel, Marilou Verhoeven, Steppe Blokzijl, Floris Koopmanschap"
+Lieke,10:45,on_island,"with Douwe Sjoerd, Alexander op ten Noort, Bo van Berkel, Marilou Verhoeven, Steppe Blokzijl, Floris Koopmanschap"
+Lieke,11:00,transporting_from,"with Douwe Sjoerd, Alexander op ten Noort, Bo van Berkel, Marilou Verhoeven, Steppe Blokzijl, Floris Koopmanschap"
+Lieke,11:15,instructing,4 kids
+Lieke,11:30,instructing,6 kids
+Lieke,11:45,instructing,6 kids
+Lieke,12:00,instructing,6 kids
+Lieke,12:15,instructing,5 kids
+Lieke,12:30,instructing,5 kids
+Lieke,12:45,instructing,5 kids
+Lieke,13:00,instructing,5 kids
+Lieke,13:15,instructing,4 kids
+Lieke,13:30,instructing,4 kids
+Lieke,13:45,instructing,4 kids
+Lieke,14:00,instructing,4 kids
+Lieke,14:15,instructing,4 kids
+Lieke,14:30,instructing,4 kids
+Lieke,14:45,instructing,4 kids
+Lieke,15:00,instructing,4 kids
+Lieke,15:15,instructing,4 kids
+Lieke,15:30,instructing,4 kids
+Lieke,15:45,instructing,4 kids
+Nienke,10:00,instructing,9 kids
+Nienke,10:15,instructing,9 kids
+Nienke,10:30,instructing,9 kids
+Nienke,10:45,transporting_to,"with Emilie Heerkens Thijssen, Indi Martens, Jasmijn Steenhoven, Juliette Beerman, Louis Heyning, Isolde Bouman, Lotte Schouten"
+Nienke,11:00,on_island,"with Emilie Heerkens Thijssen, Indi Martens, Jasmijn Steenhoven, Juliette Beerman, Louis Heyning, Isolde Bouman, Lotte Schouten"
+Nienke,11:15,on_island,"with Emilie Heerkens Thijssen, Indi Martens, Jasmijn Steenhoven, Juliette Beerman, Louis Heyning, Isolde Bouman, Lotte Schouten"
+Nienke,11:30,on_island,"with Emilie Heerkens Thijssen, Indi Martens, Jasmijn Steenhoven, Juliette Beerman, Louis Heyning, Isolde Bouman, Lotte Schouten"
+Nienke,11:45,transporting_from,"with Emilie Heerkens Thijssen, Indi Martens, Jasmijn Steenhoven, Juliette Beerman, Louis Heyning, Isolde Bouman, Lotte Schouten"
+Nienke,12:00,instructing,6 kids
+Nienke,12:15,instructing,8 kids
+Nienke,12:30,instructing,8 kids
+Nienke,12:45,instructing,9 kids
+Nienke,13:00,instructing,9 kids
+Nienke,13:15,instructing,9 kids
+Nienke,13:30,instructing,9 kids
+Nienke,13:45,instructing,9 kids
+Nienke,14:00,instructing,9 kids
+Nienke,14:15,instructing,9 kids
+Nienke,14:30,instructing,9 kids
+Nienke,14:45,instructing,9 kids
+Nienke,15:00,instructing,9 kids
+Nienke,15:15,instructing,9 kids
+Nienke,15:30,instructing,9 kids
+Nienke,15:45,instructing,9 kids
+Pien,10:00,instructing,5 kids
+Pien,10:15,transporting_to,"with Juliet van Donk, Jolette Derks, Ole Smits, Vajen de Heer, Leonore van Dijk, Bram Kok"
+Pien,10:30,on_island,"with Juliet van Donk, Jolette Derks, Ole Smits, Vajen de Heer, Leonore van Dijk, Bram Kok"
+Pien,10:45,transporting_from,"with Juliet van Donk, Jolette Derks, Ole Smits, Vajen de Heer, Leonore van Dijk, Bram Kok"
+Pien,11:00,instructing,3 kids
+Pien,11:15,instructing,4 kids
+Pien,11:30,instructing,4 kids
+Pien,11:45,instructing,4 kids
+Pien,12:00,instructing,5 kids
+Pien,12:15,instructing,5 kids
+Pien,12:30,instructing,5 kids
+Pien,12:45,instructing,5 kids
+Pien,13:00,instructing,5 kids
+Pien,13:15,instructing,5 kids
+Pien,13:30,instructing,5 kids
+Pien,13:45,instructing,5 kids
+Pien,14:00,instructing,5 kids
+Pien,14:15,instructing,5 kids
+Pien,14:30,instructing,5 kids
+Pien,14:45,instructing,5 kids
+Pien,15:00,instructing,5 kids
+Pien,15:15,instructing,5 kids
+Pien,15:30,instructing,5 kids
+Pien,15:45,instructing,5 kids
+Sieds,10:00,instructing,4 kids
+Sieds,10:15,instructing,4 kids
+Sieds,10:30,instructing,4 kids
+Sieds,10:45,instructing,free
+Sieds,11:00,instructing,1 kids
+Sieds,11:15,instructing,1 kids
+Sieds,11:30,instructing,1 kids
+Sieds,11:45,instructing,3 kids
+Sieds,12:00,instructing,4 kids
+Sieds,12:15,instructing,4 kids
+Sieds,12:30,instructing,4 kids
+Sieds,12:45,instructing,4 kids
+Sieds,13:00,instructing,4 kids
+Sieds,13:15,instructing,4 kids
+Sieds,13:30,instructing,5 kids
+Sieds,13:45,instructing,4 kids
+Sieds,14:00,instructing,4 kids
+Sieds,14:15,instructing,4 kids
+Sieds,14:30,instructing,4 kids
+Sieds,14:45,instructing,4 kids
+Sieds,15:00,instructing,4 kids
+Sieds,15:15,instructing,4 kids
+Sieds,15:30,instructing,4 kids
+Sieds,15:45,instructing,4 kids
+Stijn,10:00,instructing,8 kids
+Stijn,10:15,instructing,8 kids
+Stijn,10:30,instructing,8 kids
+Stijn,10:45,instructing,8 kids
+Stijn,11:00,instructing,8 kids
+Stijn,11:15,instructing,9 kids
+Stijn,11:30,transporting_to,"with Gijs Derks, Iza Berger, Juliette Buijn, Olivia Koelers, Phiene Hetterschijt, Samuel Heyning, William Koelers, Casper van Deursen"
+Stijn,11:45,on_island,"with Gijs Derks, Iza Berger, Juliette Buijn, Olivia Koelers, Phiene Hetterschijt, Samuel Heyning, William Koelers, Casper van Deursen"
+Stijn,12:00,on_island,"with Gijs Derks, Iza Berger, Juliette Buijn, Olivia Koelers, Phiene Hetterschijt, Samuel Heyning, William Koelers, Casper van Deursen"
+Stijn,12:15,transporting_from,"with Gijs Derks, Iza Berger, Juliette Buijn, Olivia Koelers, Phiene Hetterschijt, Samuel Heyning, William Koelers, Casper van Deursen"
+Stijn,12:30,instructing,7 kids
+Stijn,12:45,instructing,8 kids
+Stijn,13:00,instructing,8 kids
+Stijn,13:15,instructing,8 kids
+Stijn,13:30,instructing,8 kids
+Stijn,13:45,instructing,8 kids
+Stijn,14:00,instructing,8 kids
+Stijn,14:15,instructing,8 kids
+Stijn,14:30,instructing,8 kids
+Stijn,14:45,instructing,8 kids
+Stijn,15:00,instructing,8 kids
+Stijn,15:15,instructing,8 kids
+Stijn,15:30,instructing,8 kids
+Stijn,15:45,instructing,8 kids
+Tim,10:00,instructing,8 kids
+Tim,10:15,instructing,8 kids
+Tim,10:30,instructing,8 kids
+Tim,10:45,instructing,8 kids
+Tim,11:00,instructing,8 kids
+Tim,11:15,instructing,8 kids
+Tim,11:30,instructing,8 kids
+Tim,11:45,instructing,8 kids
+Tim,12:00,transporting_to,"with Dominic van den Hevel, Jelt Holswilder, Mats Hachmer, Pelle Kummel, Pepijn Hetterschijt, Thijmen Romkes"
+Tim,12:15,on_island,"with Dominic van den Hevel, Jelt Holswilder, Mats Hachmer, Pelle Kummel, Pepijn Hetterschijt, Thijmen Romkes"
+Tim,12:30,on_island,"with Dominic van den Hevel, Jelt Holswilder, Mats Hachmer, Pelle Kummel, Pepijn Hetterschijt, Thijmen Romkes"
+Tim,12:45,transporting_from,"with Dominic van den Hevel, Jelt Holswilder, Mats Hachmer, Pelle Kummel, Pepijn Hetterschijt, Thijmen Romkes"
+Tim,13:00,instructing,6 kids
+Tim,13:15,instructing,6 kids
+Tim,13:30,instructing,6 kids
+Tim,13:45,instructing,8 kids
+Tim,14:00,instructing,8 kids
+Tim,14:15,instructing,8 kids
+Tim,14:30,instructing,8 kids
+Tim,14:45,instructing,8 kids
+Tim,15:00,instructing,8 kids
+Tim,15:15,instructing,8 kids
+Tim,15:30,instructing,8 kids
+Tim,15:45,instructing,8 kids
+Willy,10:00,instructing,8 kids
+Willy,10:15,instructing,8 kids
+Willy,10:30,instructing,8 kids
+Willy,10:45,transporting_to,"with Bas de Haan, Vincent Meerburg, Annemijn van der Laan, Charlie van Asch, Ava Zaanen, Bente van Rees, Olivier van der Laan, Rem Bastiaan"
+Willy,11:00,on_island,"with Bas de Haan, Vincent Meerburg, Annemijn van der Laan, Charlie van Asch, Ava Zaanen, Bente van Rees, Olivier van der Laan, Rem Bastiaan"
+Willy,11:15,on_island,"with Bas de Haan, Vincent Meerburg, Annemijn van der Laan, Charlie van Asch, Ava Zaanen, Bente van Rees, Olivier van der Laan, Rem Bastiaan"
+Willy,11:30,transporting_from,"with Bas de Haan, Vincent Meerburg, Annemijn van der Laan, Charlie van Asch, Ava Zaanen, Bente van Rees, Olivier van der Laan, Rem Bastiaan"
+Willy,11:45,instructing,3 kids
+Willy,12:00,instructing,5 kids
+Willy,12:15,instructing,4 kids
+Willy,12:30,instructing,3 kids
+Willy,12:45,instructing,5 kids
+Willy,13:00,instructing,6 kids
+Willy,13:15,instructing,7 kids
+Willy,13:30,instructing,8 kids
+Willy,13:45,instructing,8 kids
+Willy,14:00,instructing,8 kids
+Willy,14:15,instructing,8 kids
+Willy,14:30,instructing,8 kids
+Willy,14:45,instructing,8 kids
+Willy,15:00,instructing,8 kids
+Willy,15:15,instructing,8 kids
+Willy,15:30,instructing,8 kids
+Willy,15:45,instructing,8 kids
+Wouter,10:00,transporting_to,"with David de Boer, Aron Hulscher, Gijs Tiesinga, Rein Koopmanschap, Tawan Smeets, Thomas Kok"
+Wouter,10:15,on_island,"with David de Boer, Aron Hulscher, Gijs Tiesinga, Rein Koopmanschap, Tawan Smeets, Thomas Kok"
+Wouter,10:30,transporting_from,"with David de Boer, Aron Hulscher, Gijs Tiesinga, Rein Koopmanschap, Tawan Smeets, Thomas Kok"
+Wouter,10:45,instructing,4 kids
+Wouter,11:00,instructing,5 kids
+Wouter,11:15,instructing,6 kids
+Wouter,11:30,instructing,6 kids
+Wouter,11:45,instructing,7 kids
+Wouter,12:00,instructing,7 kids
+Wouter,12:15,instructing,7 kids
+Wouter,12:30,instructing,7 kids
+Wouter,12:45,instructing,7 kids
+Wouter,13:00,instructing,7 kids
+Wouter,13:15,instructing,7 kids
+Wouter,13:30,instructing,8 kids
+Wouter,13:45,instructing,8 kids
+Wouter,14:00,instructing,7 kids
+Wouter,14:15,instructing,7 kids
+Wouter,14:30,instructing,7 kids
+Wouter,14:45,instructing,7 kids
+Wouter,15:00,instructing,7 kids
+Wouter,15:15,instructing,7 kids
+Wouter,15:30,instructing,7 kids
+Wouter,15:45,instructing,7 kids

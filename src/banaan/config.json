@@ -1,22 +1,24 @@
 {
-    "instructors": {
-        "Pieter": {"discipline": "jz", "transport_capacity": 6},
-        "Marie": {"discipline": "jz", "transport_capacity": 6},
-        "Hans": {"discipline": "zb", "transport_capacity": 6},
-        "Anna": {"discipline": "ws", "transport_capacity": 6},
-        "Lisa": {"discipline": "ws", "transport_capacity": 6},
-        "Tom": {"discipline": "cat", "transport_capacity": 6},
-        "Klaas": {"discipline": "kb", "transport_capacity": 6},
-        "Jan": {"discipline": "kb", "transport_capacity": 6}
-    },
     "boat_capacity": 6,
     "slot_duration_min": 15,
-    "prep_time_min": 15,
-    "transport_time_min": 15,
-    "start_time": "10:30",
+    "transit_slots": 1,
+    "prep_slots": 1,
+    "start_time": "10:00",
     "end_time": "16:00",
     "weights": {
-        "instructor_switch": 10,
-        "discipline_switch": 50
+        "group_penalty": 500,
+        "early_bonus": 5,
+        "phase_order": 500,
+        "island_wait_penalty": 2,
+        "instructor_trip_penalty": 300,
+        "own_instructor_bonus": 150,
+        "same_disc_bonus": 100,
+        "friend_bonus": 10,
+        "cover_over_penalty": 100,
+        "cover_own_bonus": 30,
+        "cover_disc_bonus": 60,
+        "multi_trip_penalty": 200,
+        "cover_switch_penalty": 200,
+        "instructor_group_penalty": 100
     }
 }

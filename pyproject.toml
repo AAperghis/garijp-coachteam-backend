@@ -1,22 +1,32 @@
-[tool.poetry]
+[project]
 name = "backend"
 version = "0.1.0"
 description = ""
-authors = ["AAperghis <albert@aperghis.nl>"]
+authors = [{ name = "AAperghis", email = "albert@aperghis.nl" }]
+requires-python = ">=3.12,<4"
 readme = "README.md"
-package-mode=false
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "fastapi[standard]>=0.115.14,<0.116",
+    "ortools>=9.14.6206,<10",
+    "pandas>=2.2,<3",
+    "openpyxl>=3.1,<4",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-fastapi = {extras = ["standard"], version = "^0.115.14"}
-ortools = "^9.14.6206"
-pandas = "^2.2"
-openpyxl = "^3.1"
+[dependency-groups]
+dev = [
+    "pytest>=8.0,<9",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.0"
-
+[tool.uv]
+package = false
+default-groups = "all"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.10.8,<0.11.0"]
+build-backend = "uv_build"
