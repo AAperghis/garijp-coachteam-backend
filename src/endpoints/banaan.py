@@ -5,9 +5,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import pandas as pd
 
-from backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
-from backend.banaan.solver import BanaanSolver
-from backend.banaan.output import generate_output
+from src.backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
+from src.backend.banaan.solver import BanaanSolver
+from src.backend.banaan.output import generate_output
 
 router = APIRouter(prefix="/banaan")
 
@@ -112,7 +112,7 @@ class RideOutput(BaseModel):
     count: int
     transport_instructors: list[str]
 
-# TODO: FIX. This is incorrect for the current solver output!
+
 class BanaanResponse(BaseModel):
     rides: list[RideOutput]
     total_rides: int

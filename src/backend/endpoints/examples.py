@@ -14,28 +14,24 @@ EXAMPLES_DIR = Path(__file__).parent.parent / "examples"
 
 
 class ExampleFile(BaseModel):
-    module: str
     name: str
     filename: str
 
 
-@router.get("", response_model=list[ExampleFile])
-def list_examples() -> list[ExampleFile]:
-    """Return all available example files, grouped by module (subfolder name)."""
-    if not EXAMPLES_DIR.is_dir():
+@router.get("/{module}", response_model=list[ExampleFile])
+def list_examples(module: str) -> list[ExampleFile]:
+    """Return all available example files for a specific module (subfolder name)."""
+    module_dir = EXAMPLES_DIR / module
+    if not module_dir.is_dir():
         return []
 
     results: list[ExampleFile] = []
-    for module_dir in sorted(EXAMPLES_DIR.iterdir()):
-        if not module_dir.is_dir():
-            continue
-        for file in sorted(module_dir.iterdir()):
-            if file.is_file() and not file.name.startswith("."):
-                results.append(ExampleFile(
-                    module=module_dir.name,
-                    name=file.stem,
-                    filename=file.name,
-                ))
+    for file in sorted(module_dir.iterdir()):
+        if file.is_file() and not file.name.startswith("."):
+            results.append(ExampleFile(
+                name=file.stem.replace("_", " ").title(),
+                filename=file.name,
+            ))
     return results
 
 
