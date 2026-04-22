@@ -1,4 +1,7 @@
 import io
+import json
+import queue
+import threading
 
 from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
@@ -6,7 +9,7 @@ from pydantic import BaseModel
 import pandas as pd
 
 from backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
-from backend.banaan.solver import BanaanSolver
+from backend.banaan.solver import BanaanSolver, SolveProgress
 from backend.banaan.output import generate_output
 
 router = APIRouter(prefix="/banaan")
@@ -103,6 +106,7 @@ class BanaanRequest(BaseModel):
     students: list[StudentInput]
     instructors: list[InstructorInput]
     config: ConfigInput = ConfigInput()
+    timeout: int = 300
 
 
 class RideOutput(BaseModel):
@@ -111,12 +115,21 @@ class RideOutput(BaseModel):
     students: list[str]
     count: int
     transport_instructors: list[str]
+    student_transport: dict[str, str] = {}
 
-# TODO: FIX. This is incorrect for the current solver output!
+
+class ScheduleCell(BaseModel):
+    state: str
+    detail: str = ""
+
+
 class BanaanResponse(BaseModel):
     rides: list[RideOutput]
     total_rides: int
     total_banana_students: int
+    times: list[str]
+    instructor_timeline: dict[str, list[ScheduleCell]]
+    student_timeline: dict[str, list[ScheduleCell]]
 
 
 # ── Helper to build domain objects ───────────────────────────────────────
@@ -279,27 +292,12 @@ async def solve_banaan(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
 
     solver = BanaanSolver(students, instructors, config)
-    solution = solver.solve()
+    solution = solver.solve(timeout=req.timeout)
 
     if solution is None:
         raise HTTPException(status_code=422, detail="No feasible schedule found")
 
-    rides = [
-        RideOutput(
-            slot=r.slot,
-            time=solution.slot_to_time(r.slot),
-            students=r.students,
-            count=len(r.students),
-            transport_instructors=r.transport_instructors,
-        )
-        for r in solution.rides
-    ]
-
-    return BanaanResponse(
-        rides=rides,
-        total_rides=len(solution.rides),
-        total_banana_students=sum(len(r.students) for r in solution.rides),
-    )
+    return _build_response(solution)
 
 
 @router.post("/download")
@@ -307,7 +305,7 @@ async def download_banaan(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
 
     solver = BanaanSolver(students, instructors, config)
-    solution = solver.solve()
+    solution = solver.solve(timeout=req.timeout)
 
     if solution is None:
         raise HTTPException(status_code=422, detail="No feasible schedule found")
@@ -324,4 +322,115 @@ async def download_banaan(req: BanaanRequest):
         buf,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=banaan_schedule.xlsx"},
+    )
+
+
+def _build_response(solution) -> BanaanResponse:
+    from backend.banaan.models import StudentState, InstructorState
+
+    cfg = solution.config
+    T = cfg.total_slots
+    times = [cfg.slot_to_time(t) for t in range(T)]
+
+    rides = [
+        RideOutput(
+            slot=r.slot,
+            time=solution.slot_to_time(r.slot),
+            students=r.students,
+            count=len(r.students),
+            transport_instructors=r.transport_instructors,
+            student_transport=r.student_transport,
+        )
+        for r in solution.rides
+    ]
+
+    # Instructor timeline: name → list of cells per slot
+    instructor_timeline: dict[str, list[ScheduleCell]] = {}
+    for name, entries in sorted(solution.instructor_schedules.items()):
+        cells: list[ScheduleCell] = []
+        for entry in entries:
+            state = entry.state
+            if state == InstructorState.TRANSPORTING_TO:
+                cells.append(ScheduleCell(state="transit_to", detail=entry.details))
+            elif state == InstructorState.ON_ISLAND:
+                cells.append(ScheduleCell(state="on_island", detail=entry.details))
+            elif state == InstructorState.TRANSPORTING_FROM:
+                cells.append(ScheduleCell(state="transit_from", detail=entry.details))
+            elif state == InstructorState.INSTRUCTING:
+                cells.append(ScheduleCell(state="instructing", detail=entry.details))
+            elif state == InstructorState.COVERING:
+                cells.append(ScheduleCell(state="covering", detail=entry.details))
+            else:
+                cells.append(ScheduleCell(state=state.value, detail=entry.details))
+        instructor_timeline[name] = cells
+
+    # Student timeline: name → list of cells per slot
+    student_timeline: dict[str, list[ScheduleCell]] = {}
+    for name, entries in sorted(solution.student_schedules.items()):
+        cells = []
+        for entry in entries:
+            state = entry.state
+            detail = entry.instructor or ""
+            cells.append(ScheduleCell(state=state.value, detail=detail))
+        student_timeline[name] = cells
+
+    return BanaanResponse(
+        rides=rides,
+        total_rides=len(solution.rides),
+        total_banana_students=sum(len(r.students) for r in solution.rides),
+        times=times,
+        instructor_timeline=instructor_timeline,
+        student_timeline=student_timeline,
+    )
+
+
+@router.post("/solve-stream")
+async def solve_stream(req: BanaanRequest):
+    students, instructors, config = _to_domain(req)
+    solver = BanaanSolver(students, instructors, config)
+    timeout = req.timeout
+
+    progress_queue: queue.Queue[str] = queue.Queue()
+
+    def on_progress(p: SolveProgress):
+        event = json.dumps({
+            "type": "progress",
+            "elapsed": round(p.elapsed, 1),
+            "timeout": p.timeout,
+            "time_fraction": round(p.time_fraction, 3),
+            "gap": round(p.gap, 4),
+            "solutions_found": p.solutions_found,
+        })
+        progress_queue.put(f"data: {event}\n\n")
+
+    result_holder: list = []
+
+    def run_solver():
+        solution = solver.solve(timeout=timeout, on_progress=on_progress)
+        result_holder.append(solution)
+        progress_queue.put(None)  # sentinel
+
+    thread = threading.Thread(target=run_solver, daemon=True)
+    thread.start()
+
+    def event_stream():
+        while True:
+            msg = progress_queue.get()
+            if msg is None:
+                break
+            yield msg
+
+        solution = result_holder[0] if result_holder else None
+        if solution is None:
+            event = json.dumps({"type": "error", "detail": "No feasible schedule found"})
+            yield f"data: {event}\n\n"
+        else:
+            response = _build_response(solution)
+            event = json.dumps({"type": "result", **response.model_dump()})
+            yield f"data: {event}\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

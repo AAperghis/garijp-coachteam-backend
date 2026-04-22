@@ -8,6 +8,9 @@ supply kids to the same banana ride; one instructor can span multiple rides).
 from __future__ import annotations
 
 import math
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
 
@@ -23,6 +26,48 @@ from  backend.banaan.models import (
     InstructorState,
     normalise_discipline,
 )
+
+
+@dataclass
+class SolveProgress:
+    elapsed: float
+    timeout: float
+    objective: float
+    bound: float
+    solutions_found: int
+
+    @property
+    def gap(self) -> float:
+        """Optimality gap: 0.0 = proven optimal, 1.0 = no bound info."""
+        if self.bound == 0:
+            return 1.0
+        return max(0.0, 1.0 - self.objective / self.bound)
+
+    @property
+    def time_fraction(self) -> float:
+        return min(1.0, self.elapsed / self.timeout) if self.timeout > 0 else 0.0
+
+
+class _ProgressCallback(cp_model.CpSolverSolutionCallback):
+    """CP-SAT callback that invokes a user function on each new solution."""
+
+    def __init__(self, timeout: float, on_progress: Callable[[SolveProgress], None]):
+        super().__init__()
+        self._timeout = timeout
+        self._on_progress = on_progress
+        self._solutions = 0
+        self._start = time.monotonic()
+
+    def on_solution_callback(self):
+        self._solutions += 1
+        elapsed = time.monotonic() - self._start
+        self._on_progress(SolveProgress(
+            elapsed=elapsed,
+            timeout=self._timeout,
+            objective=self.ObjectiveValue(),
+            bound=self.BestObjectiveBound(),
+            solutions_found=self._solutions,
+        ))
 
 
 class BanaanSolver:
@@ -56,7 +101,7 @@ class BanaanSolver:
 
     # ── Public API ───────────────────────────────────────────────────────
 
-    def solve(self, timeout: int = 120) -> BananaSolution | None:
+    def solve(self, timeout: int = 120, on_progress: Callable[[SolveProgress], None] | None = None) -> BananaSolution | None:
         if not self.banana_students:
             return self._empty_solution()
         if self.max_rides == 0:
@@ -520,7 +565,9 @@ class BanaanSolver:
         solver.parameters.max_time_in_seconds = timeout
         solver.parameters.num_workers = 8
         solver.parameters.log_search_progress = True
-        status = solver.Solve(model)
+
+        callback = _ProgressCallback(timeout, on_progress) if on_progress else None
+        status = solver.Solve(model, callback)
 
         print(f"  Status: {solver.StatusName(status)}, time: {solver.WallTime():.1f}s")
         if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
