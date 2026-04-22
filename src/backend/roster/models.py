@@ -24,3 +24,4 @@ class Roster:
     task_conflicts: List[Tuple[str, str]] = field(default_factory=list)  # Tasks that can't be done by same person on same day
     max_task_assignments: Dict[Tuple[str, str], int] = field(default_factory=dict)  # {(person_id, task_id): max_times_per_week}
     pre_assignments: List[Tuple[str, str, str]] = field(default_factory=list)  # [(person_id, task_id, day)]
+    task_blocks: List[Tuple[str, str, str]] = field(default_factory=list)  # [(person_id, task_id, day)] day="" means all days
