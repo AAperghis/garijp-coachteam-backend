@@ -7,8 +7,8 @@ from pydantic import BaseModel
 import pandas as pd
 import openpyxl  # noqa: F401 — ensures openpyxl engine is available for pd.read_excel
 
-from backend.roster.models import Person, Task, Roster
-from backend.roster.solver import RosterSolver
+from backend.roster.models import Person, Task, Roster, SolverConfig
+from backend.roster.solver import RosterSolver, SolverError
 from backend.roster.output import generate_roster_table
 
 router = APIRouter(prefix="/roster")
@@ -30,12 +30,23 @@ class TaskInput(BaseModel):
     min_people: int
 
 
+class SolverConfigInput(BaseModel):
+    preference_scale: int = 100
+    multi_task_day_penalty: int = 10
+    repeat_penalty: int = 20
+    no_repeat_penalty: int = 60
+    balance_penalty: int = 5
+    no_repeat_tasks: list[str] = []
+
+
 class RosterConfig(BaseModel):
     days: list[str]
     task_conflicts: list[tuple[str, str]] = []
     max_task_assignments: dict[str, int] = {}
     pre_assignments: list[tuple[str, str, str]] = []
     task_blocks: list[tuple[str, str, str]] = []  # (person_id, task_id, day) day="" for all days
+    disabled_task_days: dict[str, list[str]] = {}  # {task_id: [days]}
+    solver_config: SolverConfigInput = SolverConfigInput()
 
 
 class UploadResponse(BaseModel):
@@ -79,6 +90,16 @@ def _build_roster(req: RosterRequest) -> Roster:
         if len(parts) == 2:
             max_assignments[(parts[0], parts[1])] = val
 
+    sc = req.config.solver_config
+    solver_config = SolverConfig(
+        preference_scale=sc.preference_scale,
+        multi_task_day_penalty=sc.multi_task_day_penalty,
+        repeat_penalty=sc.repeat_penalty,
+        no_repeat_penalty=sc.no_repeat_penalty,
+        balance_penalty=sc.balance_penalty,
+        no_repeat_tasks=sc.no_repeat_tasks,
+    )
+
     return Roster(
         people=people,
         tasks=tasks,
@@ -87,6 +108,8 @@ def _build_roster(req: RosterRequest) -> Roster:
         max_task_assignments=max_assignments,
         pre_assignments=req.config.pre_assignments,
         task_blocks=req.config.task_blocks,
+        disabled_task_days=req.config.disabled_task_days,
+        solver_config=solver_config,
     )
 
 
@@ -319,10 +342,13 @@ async def solve_roster(req: RosterRequest):
     """Run the solver on the (possibly edited) roster data."""
     roster = _build_roster(req)
     solver = RosterSolver(roster)
-    solution = solver.solve()
-
-    if solution is None:
-        raise HTTPException(status_code=422, detail="No feasible roster found")
+    try:
+        solution = solver.solve()
+    except SolverError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail="Geen rooster gevonden:\n" + "\n".join(f"• {h}" for h in exc.hints),
+        )
 
     return RosterResponse(schedule=solution)
 
@@ -332,10 +358,13 @@ async def download_roster(req: RosterRequest):
     """Solve and return the result as a downloadable XLSX file."""
     roster = _build_roster(req)
     solver = RosterSolver(roster)
-    solution = solver.solve()
-
-    if solution is None:
-        raise HTTPException(status_code=422, detail="No feasible roster found")
+    try:
+        solution = solver.solve()
+    except SolverError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail="Geen rooster gevonden:\n" + "\n".join(f"• {h}" for h in exc.hints),
+        )
 
     df = generate_roster_table(solution, roster)
 

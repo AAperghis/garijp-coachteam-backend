@@ -1,5 +1,32 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Set, Tuple
+import json
+from pathlib import Path
+
+_CONFIG_PATH = Path(__file__).parent / "config.json"
+
+
+@dataclass
+class SolverConfig:
+    """Tunable weights for the roster objective function."""
+    preference_scale: int = 100       # multiplier for user preference weights
+    multi_task_day_penalty: int = 10   # penalty per extra task on the same day
+    repeat_penalty: int = 20          # penalty per repeated occurrence of the same task
+    no_repeat_penalty: int = 60       # extra penalty for tasks in no_repeat_tasks
+    balance_penalty: int = 5          # penalty for load imbalance (max − min)
+    no_repeat_tasks: List[str] = field(default_factory=list)  # task ids that are extra penalised when repeated
+
+    @classmethod
+    def from_dict(cls, d: Dict) -> "SolverConfig":
+        return cls(**{k: v for k, v in d.items() if k in cls.__dataclass_fields__})
+
+    @classmethod
+    def load_defaults(cls) -> "SolverConfig":
+        if _CONFIG_PATH.exists():
+            with open(_CONFIG_PATH) as f:
+                return cls.from_dict(json.load(f))
+        return cls()
+
 
 @dataclass
 class Person:
@@ -25,3 +52,5 @@ class Roster:
     max_task_assignments: Dict[Tuple[str, str], int] = field(default_factory=dict)  # {(person_id, task_id): max_times_per_week}
     pre_assignments: List[Tuple[str, str, str]] = field(default_factory=list)  # [(person_id, task_id, day)]
     task_blocks: List[Tuple[str, str, str]] = field(default_factory=list)  # [(person_id, task_id, day)] day="" means all days
+    disabled_task_days: Dict[str, List[str]] = field(default_factory=dict)  # {task_id: [days]}
+    solver_config: SolverConfig = field(default_factory=SolverConfig.load_defaults)

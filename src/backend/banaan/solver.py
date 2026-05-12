@@ -8,6 +8,8 @@ supply kids to the same banana ride; one instructor can span multiple rides).
 from __future__ import annotations
 
 import math
+import os
+import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -28,6 +30,160 @@ from  backend.banaan.models import (
 )
 
 
+class SolveError(Exception):
+    """Raised when the solver cannot find a feasible schedule."""
+    pass
+
+
+def check_feasibility(
+    students: list[Student],
+    instructors: list[Instructor],
+    config: BanaanConfig,
+) -> None:
+    """Pre-solve feasibility checks with human-readable error messages.
+
+    Raises SolveError if the problem is definitely infeasible.
+    """
+    banana = [s for s in students if s.wants_banana]
+    n_bs = len(banana)
+    if n_bs == 0:
+        return  # no banana students → empty solution, always feasible
+
+    T = config.total_slots
+    transit = config.transit_slots
+    prep = config.prep_slots
+    cap = config.boat_capacity
+
+    # Check 1: Enough time slots for the rides?
+    min_ride_slots = math.ceil(n_bs / cap)
+    if min_ride_slots > T:
+        raise SolveError(
+            f"Too many banana students ({n_bs}) for the available time. "
+            f"Need at least {min_ride_slots} ride slots (capacity {cap}), "
+            f"but only {T} slots available ({config.start_time}–{config.end_time})."
+        )
+
+    # Check 2: Enough time for a trip (transit + prep + ride + transit)?
+    min_trip_slots = 2 * transit + prep + 1
+    if min_trip_slots > T:
+        raise SolveError(
+            f"Not enough time for a banana trip. "
+            f"A trip needs at least {min_trip_slots} slots "
+            f"({transit} transit + {prep} prep + 1 ride + {transit} return), "
+            f"but only {T} slots available ({config.start_time}–{config.end_time})."
+        )
+
+    # Check 3: Total transport capacity sufficient?
+    total_transport = sum(inst.transport_capacity for inst in instructors)
+    if total_transport < n_bs:
+        raise SolveError(
+            f"Not enough transport capacity. "
+            f"{n_bs} banana students need transport, but all instructors "
+            f"combined can only carry {total_transport}."
+        )
+
+    # Check 4: Minimum group size (≥2) with odd total
+    if n_bs == 1:
+        raise SolveError(
+            "Only 1 banana student — need at least 2 for a ride "
+            "(no child alone on the banana boat)."
+        )
+
+    # Check 5: Every banana student must have a reference to a valid instructor
+    inst_names = {inst.name for inst in instructors}
+    for s in banana:
+        if s.instructor not in inst_names:
+            raise SolveError(
+                f"Student '{s.name}' has instructor '{s.instructor}' "
+                f"who is not in the instructor list. "
+                f"Available instructors: {', '.join(sorted(inst_names))}."
+            )
+
+    # Check 6: Friend references must exist
+    banana_names = {s.name for s in banana}
+    for s in banana:
+        if s.friends:
+            for fname in s.friends:
+                if fname not in banana_names:
+                    non_banana_match = next(
+                        (st for st in students if st.name == fname and not st.wants_banana),
+                        None,
+                    )
+                    if non_banana_match:
+                        raise SolveError(
+                            f"Student '{s.name}' wants to ride with friend '{fname}', "
+                            f"but '{fname}' is not going on the banana."
+                        )
+                    else:
+                        raise SolveError(
+                            f"Student '{s.name}' wants to ride with friend '{fname}', "
+                            f"but there is no student named '{fname}'."
+                        )
+
+    # Check 7: Coverage map — each instructor's discipline must be known
+    coverage_map = config.coverage_map
+    for inst in instructors:
+        disc = normalise_discipline(inst.discipline)
+        if disc not in coverage_map:
+            raise SolveError(
+                f"Instructor '{inst.name}' has discipline '{inst.discipline}' "
+                f"which is not in the coverage map. "
+                f"Known disciplines: {', '.join(sorted(coverage_map.keys()))}."
+            )
+
+    # Check 8: Each student's discipline must be coverable
+    for s in students:
+        disc = normalise_discipline(s.discipline)
+        if disc not in coverage_map:
+            raise SolveError(
+                f"Student '{s.name}' has discipline '{s.discipline}' "
+                f"which is not in the coverage map. "
+                f"Known disciplines: {', '.join(sorted(coverage_map.keys()))}."
+            )
+        valid_discs = coverage_map[disc]
+        compatible = [
+            inst for inst in instructors
+            if normalise_discipline(inst.discipline) in valid_discs
+        ]
+        if not compatible:
+            raise SolveError(
+                f"Student '{s.name}' (discipline '{s.discipline}') "
+                f"has no compatible instructor. Needs one of: "
+                f"{', '.join(sorted(valid_discs))}."
+            )
+
+    # Check 9 (v2-specific): instructors that go need a backup
+    # An instructor with banana students needs to go to the island.
+    # Their backup must cover ALL their students' disciplines.
+    inst_idx = {inst.name: i for i, inst in enumerate(instructors)}
+    for inst in instructors:
+        own = [s for s in students if s.instructor == inst.name]
+        if not own:
+            continue
+        own_banana = [s for s in own if s.wants_banana]
+        if not own_banana:
+            continue
+        # This instructor likely needs to go — check backup exists
+        valid_discs: set[str] | None = None
+        for s in own:
+            disc = normalise_discipline(s.discipline)
+            s_valid = coverage_map.get(disc, {disc})
+            valid_discs = set(s_valid) if valid_discs is None else valid_discs & s_valid
+        backups = [
+            other for other in instructors
+            if other.name != inst.name
+            and normalise_discipline(other.discipline) in (valid_discs or set())
+        ]
+        if not backups:
+            disc_list = ', '.join(sorted(valid_discs or set()))
+            raise SolveError(
+                f"Instructor '{inst.name}' has {len(own_banana)} banana student(s) "
+                f"and needs to go to the island, but no other instructor can "
+                f"cover ALL their students. Need backup with discipline in: {disc_list}. "
+                f"Students: {', '.join(s.name for s in own)}."
+            )
+
+
 @dataclass
 class SolveProgress:
     elapsed: float
@@ -38,10 +194,15 @@ class SolveProgress:
 
     @property
     def gap(self) -> float:
-        """Optimality gap: 0.0 = proven optimal, 1.0 = no bound info."""
-        if self.bound == 0:
-            return 1.0
-        return max(0.0, 1.0 - self.objective / self.bound)
+        """Optimality gap: 0.0 = proven optimal, approaches inf when far.
+
+        Uses the standard MIP gap: |bound - objective| / max(|objective|, |bound|, 1).
+        Works correctly when objective and/or bound are negative.
+        """
+        if self.objective == self.bound:
+            return 0.0
+        denom = max(abs(self.objective), abs(self.bound), 1.0)
+        return abs(self.bound - self.objective) / denom
 
     @property
     def time_fraction(self) -> float:
@@ -51,23 +212,63 @@ class SolveProgress:
 class _ProgressCallback(cp_model.CpSolverSolutionCallback):
     """CP-SAT callback that invokes a user function on each new solution."""
 
-    def __init__(self, timeout: float, on_progress: Callable[[SolveProgress], None]):
+    def __init__(
+        self,
+        timeout: float,
+        on_progress: Callable[[SolveProgress], None],
+        early_stop_gap: float = 0.03,
+        stagnation_seconds: float = 30.0,
+    ):
         super().__init__()
         self._timeout = timeout
         self._on_progress = on_progress
+        self._early_stop_gap = early_stop_gap
+        self._stagnation_seconds = stagnation_seconds
         self._solutions = 0
         self._start = time.monotonic()
+        self._best_objective: float | None = None
+        self._last_improvement_time = time.monotonic()
+        self._stop_requested = threading.Event()
+
+    def request_stop(self) -> None:
+        """Thread-safe: ask the solver to stop at the next opportunity."""
+        self._stop_requested.set()
 
     def on_solution_callback(self):
         self._solutions += 1
-        elapsed = time.monotonic() - self._start
-        self._on_progress(SolveProgress(
+        now = time.monotonic()
+        elapsed = now - self._start
+        objective = self.ObjectiveValue()
+
+        # Track stagnation (no meaningful objective improvement)
+        if self._best_objective is None or objective > self._best_objective + 1:
+            self._best_objective = objective
+            self._last_improvement_time = now
+
+        progress = SolveProgress(
             elapsed=elapsed,
             timeout=self._timeout,
-            objective=self.ObjectiveValue(),
+            objective=objective,
             bound=self.BestObjectiveBound(),
             solutions_found=self._solutions,
-        ))
+        )
+        self._on_progress(progress)
+
+        # External stop request (user clicked Stop)
+        if self._stop_requested.is_set():
+            self.StopSearch()
+            return
+
+        # Stop early if gap is small enough (solution is "good enough")
+        if self._solutions >= 2 and progress.gap <= self._early_stop_gap:
+            self.StopSearch()
+
+        # Stop if objective has stagnated (no improvement for N seconds)
+        # Only after enough time has passed and enough solutions found
+        stagnation = now - self._last_improvement_time
+        if (self._solutions >= 5 and elapsed > 15.0
+                and stagnation > self._stagnation_seconds):
+            self.StopSearch()
 
 
 class BanaanSolver:
@@ -101,11 +302,18 @@ class BanaanSolver:
 
     # ── Public API ───────────────────────────────────────────────────────
 
-    def solve(self, timeout: int = 120, on_progress: Callable[[SolveProgress], None] | None = None) -> BananaSolution | None:
+    def solve(
+        self,
+        timeout: int = 120,
+        on_progress: Callable[[SolveProgress], None] | None = None,
+        callback: _ProgressCallback | None = None,
+    ) -> BananaSolution | None:
         if not self.banana_students:
             return self._empty_solution()
         if self.max_rides == 0:
             return None
+
+        check_feasibility(self.students, self.instructors, self.config)
 
         model = cp_model.CpModel()
         T = self.T
@@ -157,20 +365,8 @@ class BanaanSolver:
         for i in range(n_inst):
             return_depart[i] = model.NewIntVar(0, T - 1, f"ret_{i}")
 
-        # transported_by[s, i]: instructor i transports banana-student s
-        transported_by: dict[tuple[int, int], cp_model.IntVar] = {}
-        for s in range(n_bs):
-            for i in range(n_inst):
-                transported_by[s, i] = model.NewBoolVar(f"tb_{s}_{i}")
-
-        # on_island[i, t]: instructor i is on/around the island at slot t
-        # (transit_to, on_island, or transit_from)
-        on_island: dict[tuple[int, int], cp_model.IntVar] = {}
-        for i in range(n_inst):
-            for t in range(T):
-                on_island[i, t] = model.NewBoolVar(f"oi_{i}_{t}")
-
-        # Pre-compute discipline-compatible instructor indices
+        # Pre-compute discipline-compatible instructor indices (needed early
+        # to restrict transported_by variables).
         nbs_compat: dict[int, list[int]] = {}
         for nbs in range(n_nbs):
             disc = normalise_discipline(self.non_banana_students[nbs].discipline)
@@ -196,6 +392,22 @@ class BanaanSolver:
         for s, insts in bs_compat.items():
             for i in insts:
                 inst_compat_bs[i].append(s)
+
+        # transported_by[s, i]: instructor i transports banana-student s
+        # Only create for compatible instructors (any instructor can transport,
+        # not limited to cover-compatible ones, but must be in bs_compat for
+        # the student to benefit from same-disc/own-instructor bonuses).
+        transported_by: dict[tuple[int, int], cp_model.IntVar] = {}
+        for s in range(n_bs):
+            for i in range(n_inst):
+                transported_by[s, i] = model.NewBoolVar(f"tb_{s}_{i}")
+
+        # on_island[i, t]: instructor i is on/around the island at slot t
+        # (transit_to, on_island, or transit_from)
+        on_island: dict[tuple[int, int], cp_model.IntVar] = {}
+        for i in range(n_inst):
+            for t in range(T):
+                on_island[i, t] = model.NewBoolVar(f"oi_{i}_{t}")
 
         # cover[nbs, i, t]: instructor i covers non-banana student nbs at slot t
         cover: dict[tuple[int, int, int], cp_model.IntVar] = {}
@@ -293,21 +505,21 @@ class BanaanSolver:
             # Ordering: depart before return
             model.Add(depart_slot[i] + transit + prep <= return_depart[i]).OnlyEnforceIf(goes[i])
 
-        # C7: Student on-island timing — if transported_by[s,i], student must
-        #     be on island from instructor's depart through instructor's return+transit-1
-        #     Student rides during ride_slot[s].
-        #     student_on_island[s,t] <=> exists i: transported_by[s,i] AND on_island[i,t]
-        #     Only create aux vars for instructors compatible with this student's
-        #     discipline (others can never transport them in a good solution).
+        # C7: Student on-island timing — if transported_by[s,i], student is
+        #     on island exactly when instructor i is on island.
+        #     Since each student is transported by exactly one instructor,
+        #     we use implications instead of MaxEquality (avoids O(n_bs×n_inst×T)
+        #     auxiliary variables).
         for s in range(n_bs):
-            for t in range(T):
-                on_island_via = []
-                for i in range(n_inst):
-                    both = model.NewBoolVar(f"tb_oi_{s}_{i}_{t}")
-                    model.AddBoolAnd([transported_by[s, i], on_island[i, t]]).OnlyEnforceIf(both)
-                    model.AddBoolOr([transported_by[s, i].Not(), on_island[i, t].Not()]).OnlyEnforceIf(both.Not())
-                    on_island_via.append(both)
-                model.AddMaxEquality(student_on_island[s, t], on_island_via + [model.NewConstant(0)])
+            for i in range(n_inst):
+                for t in range(T):
+                    # transported_by[s,i] => student_on_island[s,t] == on_island[i,t]
+                    model.Add(student_on_island[s, t] == 1).OnlyEnforceIf(
+                        [transported_by[s, i], on_island[i, t]]
+                    )
+                    model.Add(student_on_island[s, t] == 0).OnlyEnforceIf(
+                        [transported_by[s, i], on_island[i, t].Not()]
+                    )
 
         # Student can only ride when they're on the island
         for s in range(n_bs):
@@ -572,6 +784,7 @@ class BanaanSolver:
         model.Maximize(sum(obj_terms))
 
         # ── Search hints for faster first solution ───────────────────────
+        # Hint ride slots: pack students by phase, filling boat capacity
         sorted_by_phase = sorted(range(n_bs), key=lambda s: (self.banana_students[s].phase, s))
         for rank, s in enumerate(sorted_by_phase):
             hint_slot = min(rank // max(1, cfg.boat_capacity), T - 1)
@@ -580,19 +793,40 @@ class BanaanSolver:
         # ── Solve ────────────────────────────────────────────────────────
         solver = cp_model.CpSolver()
         solver.parameters.max_time_in_seconds = timeout
-        solver.parameters.num_workers = 8
+
+        # Auto-detect available cores (free Render has ~1-2)
+        available_cores = os.cpu_count() or 2
+        solver.parameters.num_workers = min(available_cores, 8)
+
+        # Better search strategy for faster convergence
+        solver.parameters.linearization_level = 2
         solver.parameters.log_search_progress = True
 
-        callback = _ProgressCallback(timeout, on_progress) if on_progress else None
+        # Use provided callback, or create one for on_progress, or None
+        if callback is None and on_progress is not None:
+            callback = _ProgressCallback(timeout, on_progress)
         status = solver.Solve(model, callback)
 
-        print(f"  Status: {solver.StatusName(status)}, time: {solver.WallTime():.1f}s")
+        status_name = solver.StatusName(status)
+        print(f"  Status: {status_name}, time: {solver.WallTime():.1f}s")
         if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             return self._extract_solution(solver, ride_slot, ride_at, banana_used,
                                           goes, depart_slot, return_depart,
                                           transported_by, on_island,
                                           student_on_island, cover, cover_banana)
-        return None
+        if status == cp_model.INFEASIBLE:
+            raise SolveError(
+                "The solver proved the schedule is infeasible — no valid "
+                "arrangement exists with the current students, instructors, "
+                "and settings. Try relaxing constraints: increase the time "
+                "window, add more instructors, or reduce banana students."
+            )
+        # MODEL_INVALID or UNKNOWN (timeout with no solution)
+        raise SolveError(
+            f"Solver finished with status '{status_name}' after "
+            f"{solver.WallTime():.0f}s without finding a solution. "
+            f"Try increasing the timeout or simplifying the problem."
+        )
 
     # ── Solution extraction ──────────────────────────────────────────────
 
