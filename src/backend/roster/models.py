@@ -52,4 +52,5 @@ class Roster:
     max_task_assignments: Dict[Tuple[str, str], int] = field(default_factory=dict)  # {(person_id, task_id): max_times_per_week}
     pre_assignments: List[Tuple[str, str, str]] = field(default_factory=list)  # [(person_id, task_id, day)]
     task_blocks: List[Tuple[str, str, str]] = field(default_factory=list)  # [(person_id, task_id, day)] day="" means all days
+    disabled_task_days: Dict[str, List[str]] = field(default_factory=dict)  # {task_id: [days]}
     solver_config: SolverConfig = field(default_factory=SolverConfig.load_defaults)

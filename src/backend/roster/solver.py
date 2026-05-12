@@ -2,6 +2,17 @@ from ortools.sat.python import cp_model
 from backend.roster.models import Roster
 from typing import Dict, List, Tuple, Optional
 
+
+def _status_name(status: int) -> str:
+    return {0: "UNKNOWN", 1: "MODEL_INVALID", 2: "FEASIBLE", 3: "INFEASIBLE", 4: "OPTIMAL"}.get(status, str(status))
+
+
+class SolverError(Exception):
+    """Raised when the solver cannot find a feasible solution."""
+    def __init__(self, message: str, hints: List[str]):
+        self.hints = hints
+        super().__init__(message)
+
 class RosterSolver:
     def __init__(self, roster: Roster):
         self.roster = roster
@@ -24,6 +35,7 @@ class RosterSolver:
         self._add_max_assignments_constraints()
         self._add_pre_assignment_constraints()
         self._add_task_block_constraints()
+        self._add_disabled_task_day_constraints()
         
         # Set objective function
         self._set_objective()
@@ -37,12 +49,19 @@ class RosterSolver:
         if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
             return self._extract_solution(solver)
         else:
-            return None
+            hints = self._diagnose()
+            raise SolverError(
+                f"Solver status: {_status_name(status)}",
+                hints=hints,
+            )
     
     def _add_min_people_constraints(self):
-        """Ensure each task has at least min_people assigned each day"""
+        """Ensure each task has at least min_people assigned each day (skip disabled)"""
+        disabled = self.roster.disabled_task_days
         for task in self.roster.tasks:
             for day in self.roster.days:
+                if day in disabled.get(task.id, []):
+                    continue
                 task_assignments = [
                     self.vars[(person.id, task.id, day)]
                     for person in self.roster.people
@@ -50,9 +69,12 @@ class RosterSolver:
                 self.model.Add(sum(task_assignments) >= task.min_people)
 
     def _add_preferred_people_constraints(self):
-        """Ensure each task has at most preferred_people assigned each day"""
+        """Ensure each task has at most preferred_people assigned each day (skip disabled)"""
+        disabled = self.roster.disabled_task_days
         for task in self.roster.tasks:
             for day in self.roster.days:
+                if day in disabled.get(task.id, []):
+                    continue
                 task_assignments = [
                     self.vars[(person.id, task.id, day)]
                     for person in self.roster.people
@@ -61,7 +83,10 @@ class RosterSolver:
     
     def _add_task_conflict_constraints(self):
         """Ensure people can't do conflicting tasks on the same day"""
+        task_ids = {t.id for t in self.roster.tasks}
         for task1_id, task2_id in self.roster.task_conflicts:
+            if task1_id not in task_ids or task2_id not in task_ids:
+                continue
             for person in self.roster.people:
                 for day in self.roster.days:
                     self.model.Add(
@@ -95,6 +120,63 @@ class RosterSolver:
                     key = (person_id, task_id, d)
                     if key in self.vars:
                         self.model.Add(self.vars[key] == 0)
+
+    def _add_disabled_task_day_constraints(self):
+        """Force all assignments to 0 for disabled task-day pairs"""
+        for task_id, days in self.roster.disabled_task_days.items():
+            for day in days:
+                for person in self.roster.people:
+                    key = (person.id, task_id, day)
+                    if key in self.vars:
+                        self.model.Add(self.vars[key] == 0)
+
+    def _diagnose(self) -> List[str]:
+        """Return human-readable hints about why the model is infeasible."""
+        hints: List[str] = []
+        disabled = self.roster.disabled_task_days
+
+        for task in self.roster.tasks:
+            if task.min_people < 1:
+                continue
+            for day in self.roster.days:
+                if day in disabled.get(task.id, []):
+                    continue
+                # Count people who are NOT blocked from this task on this day
+                blocked = set()
+                for pid, tid, d in self.roster.task_blocks:
+                    if tid == task.id and (d == day or d == ""):
+                        blocked.add(pid)
+                available = [p for p in self.roster.people if p.id not in blocked]
+                if len(available) < task.min_people:
+                    hints.append(
+                        f"'{task.name}' op {day}: {task.min_people} personen nodig "
+                        f"maar slechts {len(available)} beschikbaar (rest is geblokkeerd)"
+                    )
+
+        total_slots_needed = 0
+        total_slots_available = 0
+        for day in self.roster.days:
+            for task in self.roster.tasks:
+                if day in disabled.get(task.id, []):
+                    continue
+                total_slots_needed += task.min_people
+            total_slots_available += len(self.roster.people)
+        if total_slots_needed > total_slots_available:
+            hints.append(
+                f"Totaal {total_slots_needed} toewijzingen nodig, "
+                f"maar slechts {total_slots_available} beschikbaar "
+                f"({len(self.roster.people)} personen × {len(self.roster.days)} dagen). "
+                f"Voeg meer instructeurs toe of verlaag het minimale aantal per taak."
+            )
+
+        if not hints:
+            hints.append(
+                "De combinatie van beperkingen (blokkades, conflicten, min/max) "
+                "maakt het onmogelijk een rooster te maken. "
+                "Probeer beperkingen te versoepelen."
+            )
+
+        return hints
 
     def _set_objective(self):
         """Objective with soft constraints:
@@ -151,9 +233,49 @@ class RosterSolver:
                     penalty += cfg.no_repeat_penalty
                 objective_terms.append(-penalty * repeat)
 
-        # ── 4. Balance total load across people ──
-        max_load = self.model.NewIntVar(0, num_days * num_tasks, "max_load")
-        min_load = self.model.NewIntVar(0, num_days * num_tasks, "min_load")
+        # ── 4. Balance total load across people (proportional to available days) ──
+        # A person blocked on all tasks for a day is effectively absent that day.
+        # We balance load / available_days rather than raw totals so that someone
+        # present 4 out of 6 days gets roughly 4/6 the load of a full-week person.
+
+        blocked_all_days: Dict[str, set] = {}  # person_id -> set of fully-blocked days
+        task_ids = {t.id for t in self.roster.tasks}
+        disabled = self.roster.disabled_task_days
+        for person in self.roster.people:
+            absent_days: set = set()
+            for day in self.roster.days:
+                all_blocked = True
+                for task in self.roster.tasks:
+                    if day in disabled.get(task.id, []):
+                        continue  # task not available this day for anyone
+                    # Check if this person is blocked from this task on this day
+                    person_blocked = False
+                    for pid, tid, d in self.roster.task_blocks:
+                        if pid == person.id and tid == task.id and (d == day or d == ""):
+                            person_blocked = True
+                            break
+                    if not person_blocked:
+                        all_blocked = False
+                        break
+                if all_blocked:
+                    absent_days.add(day)
+            blocked_all_days[person.id] = absent_days
+
+        available_counts = {
+            p.id: max(1, len(self.roster.days) - len(blocked_all_days[p.id]))
+            for p in self.roster.people
+        }
+
+        # Scale each person's load to a common denominator so the solver can
+        # compare them as integers.  scaled_load = total * lcm / available_days
+        from math import gcd
+        from functools import reduce
+        def lcm(a: int, b: int) -> int:
+            return a * b // gcd(a, b)
+        common = reduce(lcm, available_counts.values(), 1)
+
+        max_scaled = self.model.NewIntVar(0, num_days * num_tasks * common, "max_scaled")
+        min_scaled = self.model.NewIntVar(0, num_days * num_tasks * common, "min_scaled")
 
         for person in self.roster.people:
             total = sum(
@@ -161,10 +283,13 @@ class RosterSolver:
                 for task in self.roster.tasks
                 for day in self.roster.days
             )
-            self.model.Add(max_load >= total)
-            self.model.Add(min_load <= total)
+            scale = common // available_counts[person.id]
+            scaled = self.model.NewIntVar(0, num_days * num_tasks * common, f"scaled_{person.id}")
+            self.model.Add(scaled == total * scale)
+            self.model.Add(max_scaled >= scaled)
+            self.model.Add(min_scaled <= scaled)
 
-        objective_terms.append(-cfg.balance_penalty * (max_load - min_load))
+        objective_terms.append(-cfg.balance_penalty * (max_scaled - min_scaled))
 
         self.model.Maximize(sum(objective_terms))
     

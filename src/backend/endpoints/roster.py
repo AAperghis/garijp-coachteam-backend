@@ -8,7 +8,7 @@ import pandas as pd
 import openpyxl  # noqa: F401 — ensures openpyxl engine is available for pd.read_excel
 
 from backend.roster.models import Person, Task, Roster, SolverConfig
-from backend.roster.solver import RosterSolver
+from backend.roster.solver import RosterSolver, SolverError
 from backend.roster.output import generate_roster_table
 
 router = APIRouter(prefix="/roster")
@@ -45,6 +45,7 @@ class RosterConfig(BaseModel):
     max_task_assignments: dict[str, int] = {}
     pre_assignments: list[tuple[str, str, str]] = []
     task_blocks: list[tuple[str, str, str]] = []  # (person_id, task_id, day) day="" for all days
+    disabled_task_days: dict[str, list[str]] = {}  # {task_id: [days]}
     solver_config: SolverConfigInput = SolverConfigInput()
 
 
@@ -107,6 +108,7 @@ def _build_roster(req: RosterRequest) -> Roster:
         max_task_assignments=max_assignments,
         pre_assignments=req.config.pre_assignments,
         task_blocks=req.config.task_blocks,
+        disabled_task_days=req.config.disabled_task_days,
         solver_config=solver_config,
     )
 
@@ -340,10 +342,13 @@ async def solve_roster(req: RosterRequest):
     """Run the solver on the (possibly edited) roster data."""
     roster = _build_roster(req)
     solver = RosterSolver(roster)
-    solution = solver.solve()
-
-    if solution is None:
-        raise HTTPException(status_code=422, detail="No feasible roster found")
+    try:
+        solution = solver.solve()
+    except SolverError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail="Geen rooster gevonden:\n" + "\n".join(f"• {h}" for h in exc.hints),
+        )
 
     return RosterResponse(schedule=solution)
 
@@ -353,10 +358,13 @@ async def download_roster(req: RosterRequest):
     """Solve and return the result as a downloadable XLSX file."""
     roster = _build_roster(req)
     solver = RosterSolver(roster)
-    solution = solver.solve()
-
-    if solution is None:
-        raise HTTPException(status_code=422, detail="No feasible roster found")
+    try:
+        solution = solver.solve()
+    except SolverError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail="Geen rooster gevonden:\n" + "\n".join(f"• {h}" for h in exc.hints),
+        )
 
     df = generate_roster_table(solution, roster)
 
