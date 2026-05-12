@@ -1,5 +1,5 @@
 import pandas as pd
-from .models import Roster
+from backend.roster.models import Roster
 from typing import Dict
 
 def generate_roster_table(solution: Dict, roster: Roster) -> pd.DataFrame:

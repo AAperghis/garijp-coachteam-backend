@@ -16,6 +16,7 @@ dependencies = [
     "ortools>=9.14.6206,<10",
     "pandas>=2.2,<3",
     "openpyxl>=3.1,<4",
+    "uvicorn>=0.35.0",
 ]
 
 [dependency-groups]
@@ -24,7 +25,7 @@ dev = [
 ]
 
 [tool.uv]
-package = false
+package = true
 default-groups = "all"
 
 [build-system]

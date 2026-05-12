@@ -13,9 +13,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from .models import Student, Instructor, BanaanConfig, normalise_discipline
-from .solver import BanaanSolver
-from .output import generate_output, export_to_xlsx, export_to_csv
+from backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
+from backend.banaan.solver import BanaanSolver
+from backend.banaan.output import generate_output, export_to_xlsx, export_to_csv
 
 
 def load_students(path: str) -> list[Student]:

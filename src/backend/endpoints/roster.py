@@ -7,9 +7,9 @@ from pydantic import BaseModel
 import pandas as pd
 import openpyxl  # noqa: F401 — ensures openpyxl engine is available for pd.read_excel
 
-from src.backend.roster.models import Person, Task, Roster
-from src.backend.roster.solver import RosterSolver
-from src.backend.roster.output import generate_roster_table
+from backend.roster.models import Person, Task, Roster
+from backend.roster.solver import RosterSolver
+from backend.roster.output import generate_roster_table
 
 router = APIRouter(prefix="/roster")
 
@@ -35,6 +35,7 @@ class RosterConfig(BaseModel):
     task_conflicts: list[tuple[str, str]] = []
     max_task_assignments: dict[str, int] = {}
     pre_assignments: list[tuple[str, str, str]] = []
+    task_blocks: list[tuple[str, str, str]] = []  # (person_id, task_id, day) day="" for all days
 
 
 class UploadResponse(BaseModel):
@@ -85,6 +86,7 @@ def _build_roster(req: RosterRequest) -> Roster:
         task_conflicts=req.config.task_conflicts,
         max_task_assignments=max_assignments,
         pre_assignments=req.config.pre_assignments,
+        task_blocks=req.config.task_blocks,
     )
 
 
@@ -130,6 +132,7 @@ def _upload_from_json(contents: bytes) -> UploadResponse:
         task_conflicts=data.get("task_conflicts", []),
         max_task_assignments=max_assignments,
         pre_assignments=data.get("pre_assignments", []),
+        task_blocks=data.get("task_blocks", []),
     )
 
     return UploadResponse(people=people, tasks=tasks, config=config)

@@ -6,7 +6,7 @@ from collections import defaultdict
 
 import pandas as pd
 
-from .models import BananaSolution, StudentState, InstructorState
+from backend.banaan.models import BananaSolution, StudentState, InstructorState
 
 
 def generate_output(solution: BananaSolution) -> dict[str, pd.DataFrame]:

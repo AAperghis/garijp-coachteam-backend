@@ -1,8 +1,8 @@
 import argparse
 import json
-from .models import Person, Task, Roster
-from .solver import RosterSolver
-from .output import generate_roster_table, export_roster
+from backend.roster.models import Person, Task, Roster
+from backend.roster.solver import RosterSolver
+from backend.roster.output import generate_roster_table, export_roster
 
 def load_data(config_file):
     """Load roster configuration from JSON file"""

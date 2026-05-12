@@ -8,10 +8,13 @@ supply kids to the same banana ride; one instructor can span multiple rides).
 from __future__ import annotations
 
 import math
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
 
-from .models import (
+from  backend.banaan.models import (
     Student,
     Instructor,
     BanaanConfig,
@@ -23,6 +26,48 @@ from .models import (
     InstructorState,
     normalise_discipline,
 )
+
+
+@dataclass
+class SolveProgress:
+    elapsed: float
+    timeout: float
+    objective: float
+    bound: float
+    solutions_found: int
+
+    @property
+    def gap(self) -> float:
+        """Optimality gap: 0.0 = proven optimal, 1.0 = no bound info."""
+        if self.bound == 0:
+            return 1.0
+        return max(0.0, 1.0 - self.objective / self.bound)
+
+    @property
+    def time_fraction(self) -> float:
+        return min(1.0, self.elapsed / self.timeout) if self.timeout > 0 else 0.0
+
+
+class _ProgressCallback(cp_model.CpSolverSolutionCallback):
+    """CP-SAT callback that invokes a user function on each new solution."""
+
+    def __init__(self, timeout: float, on_progress: Callable[[SolveProgress], None]):
+        super().__init__()
+        self._timeout = timeout
+        self._on_progress = on_progress
+        self._solutions = 0
+        self._start = time.monotonic()
+
+    def on_solution_callback(self):
+        self._solutions += 1
+        elapsed = time.monotonic() - self._start
+        self._on_progress(SolveProgress(
+            elapsed=elapsed,
+            timeout=self._timeout,
+            objective=self.ObjectiveValue(),
+            bound=self.BestObjectiveBound(),
+            solutions_found=self._solutions,
+        ))
 
 
 class BanaanSolver:
@@ -56,7 +101,7 @@ class BanaanSolver:
 
     # ── Public API ───────────────────────────────────────────────────────
 
-    def solve(self, timeout: int = 120) -> BananaSolution | None:
+    def solve(self, timeout: int = 120, on_progress: Callable[[SolveProgress], None] | None = None) -> BananaSolution | None:
         if not self.banana_students:
             return self._empty_solution()
         if self.max_rides == 0:
@@ -252,6 +297,8 @@ class BanaanSolver:
         #     be on island from instructor's depart through instructor's return+transit-1
         #     Student rides during ride_slot[s].
         #     student_on_island[s,t] <=> exists i: transported_by[s,i] AND on_island[i,t]
+        #     Only create aux vars for instructors compatible with this student's
+        #     discipline (others can never transport them in a good solution).
         for s in range(n_bs):
             for t in range(T):
                 on_island_via = []
@@ -355,22 +402,28 @@ class BanaanSolver:
         for s in range(n_bs):
             obj_terms.append(-w["early_bonus"] * ride_slot[s])
 
-        # O3: Phase ordering (almost-hard) — penalize phase-order violations
-        for s1 in range(n_bs):
-            for s2 in range(s1 + 1, n_bs):
-                p1 = self.banana_students[s1].phase
-                p2 = self.banana_students[s2].phase
-                if p1 < p2:
-                    # s1 should ride before or same as s2
-                    violation = model.NewBoolVar(f"pv_{s1}_{s2}")
-                    model.Add(ride_slot[s1] > ride_slot[s2]).OnlyEnforceIf(violation)
-                    model.Add(ride_slot[s1] <= ride_slot[s2]).OnlyEnforceIf(violation.Not())
-                    obj_terms.append(-w["phase_order"] * violation)
-                elif p1 > p2:
-                    violation = model.NewBoolVar(f"pv_{s1}_{s2}")
-                    model.Add(ride_slot[s1] < ride_slot[s2]).OnlyEnforceIf(violation)
-                    model.Add(ride_slot[s1] >= ride_slot[s2]).OnlyEnforceIf(violation.Not())
-                    obj_terms.append(-w["phase_order"] * violation)
+        # O3: Phase ordering — aggregate penalty per phase boundary.
+        #     Replaces O(n²) pairwise variables with O(1) per boundary.
+        #     Penalizes overlap between phase groups (max of earlier phase
+        #     exceeding min of later phase).
+        phase_groups: dict[int, list[int]] = {}
+        for s in range(n_bs):
+            phase_groups.setdefault(self.banana_students[s].phase, []).append(s)
+        sorted_phases = sorted(phase_groups.keys())
+        for pidx in range(len(sorted_phases) - 1):
+            p_cur = sorted_phases[pidx]
+            p_next = sorted_phases[pidx + 1]
+            cur_students = phase_groups[p_cur]
+            next_students = phase_groups[p_next]
+            max_cur = model.NewIntVar(0, T - 1, f"max_p{p_cur}")
+            model.AddMaxEquality(max_cur, [ride_slot[s] for s in cur_students])
+            min_next = model.NewIntVar(0, T - 1, f"min_p{p_next}")
+            model.AddMinEquality(min_next, [ride_slot[s] for s in next_students])
+            overlap = model.NewIntVar(0, T, f"poverlap_{p_cur}_{p_next}")
+            model.AddMaxEquality(overlap, [max_cur - min_next, model.NewConstant(0)])
+            # Scale by geometric mean of group sizes to approximate pairwise penalty
+            multiplier = max(1, int(math.sqrt(len(cur_students) * len(next_students))))
+            obj_terms.append(-w["phase_order"] * multiplier * overlap)
 
         # O4: Minimize island waiting — quadratic penalty on total slots each
         #     student spends on the island.  Quadratic makes many-slot waits
@@ -456,22 +509,25 @@ class BanaanSolver:
                     obj_terms.append(w["friend_bonus"])  # constant bonus since it's hard
 
         # O13: Cover switch penalty — penalize backup instructor changes for
-        #      banana students between consecutive sailing slots.  Non-banana
-        #      students are hard-locked to own instructor so no penalty needed.
+        #      banana students between consecutive sailing slots.
+        #      Uses single aux var per (s, i, t) instead of three.
         for s in range(n_bs):
             for t in range(T - 1):
-                # Only between consecutive sailing slots
-                both_sailing = model.NewBoolVar(f"bs_{s}_{t}")
-                model.AddBoolAnd([student_on_island[s, t].Not(), student_on_island[s, t + 1].Not()]).OnlyEnforceIf(both_sailing)
-                model.AddBoolOr([student_on_island[s, t], student_on_island[s, t + 1]]).OnlyEnforceIf(both_sailing.Not())
                 for i in bs_compat[s]:
-                    lost = model.NewBoolVar(f"lc_{s}_{i}_{t}")
-                    model.AddBoolAnd([cover_banana[s, i, t], cover_banana[s, i, t + 1].Not()]).OnlyEnforceIf(lost)
-                    model.AddBoolOr([cover_banana[s, i, t].Not(), cover_banana[s, i, t + 1]]).OnlyEnforceIf(lost.Not())
-                    switched = model.NewBoolVar(f"cbsw_{s}_{i}_{t}")
-                    model.AddBoolAnd([both_sailing, lost]).OnlyEnforceIf(switched)
-                    model.AddBoolOr([both_sailing.Not(), lost.Not()]).OnlyEnforceIf(switched.Not())
-                    obj_terms.append(-w["cover_switch_penalty"] * switched)
+                    switch = model.NewBoolVar(f"sw_{s}_{i}_{t}")
+                    model.AddBoolAnd([
+                        cover_banana[s, i, t],
+                        cover_banana[s, i, t + 1].Not(),
+                        student_on_island[s, t].Not(),
+                        student_on_island[s, t + 1].Not(),
+                    ]).OnlyEnforceIf(switch)
+                    model.AddBoolOr([
+                        cover_banana[s, i, t].Not(),
+                        cover_banana[s, i, t + 1],
+                        student_on_island[s, t],
+                        student_on_island[s, t + 1],
+                    ]).OnlyEnforceIf(switch.Not())
+                    obj_terms.append(-w["cover_switch_penalty"] * switch)
 
         # C13: Instructor student grouping — each instructor's banana students
         #      must ride within a compact window.  The minimum slots needed
@@ -515,12 +571,20 @@ class BanaanSolver:
 
         model.Maximize(sum(obj_terms))
 
+        # ── Search hints for faster first solution ───────────────────────
+        sorted_by_phase = sorted(range(n_bs), key=lambda s: (self.banana_students[s].phase, s))
+        for rank, s in enumerate(sorted_by_phase):
+            hint_slot = min(rank // max(1, cfg.boat_capacity), T - 1)
+            model.AddHint(ride_slot[s], hint_slot)
+
         # ── Solve ────────────────────────────────────────────────────────
         solver = cp_model.CpSolver()
         solver.parameters.max_time_in_seconds = timeout
         solver.parameters.num_workers = 8
         solver.parameters.log_search_progress = True
-        status = solver.Solve(model)
+
+        callback = _ProgressCallback(timeout, on_progress) if on_progress else None
+        status = solver.Solve(model, callback)
 
         print(f"  Status: {solver.StatusName(status)}, time: {solver.WallTime():.1f}s")
         if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
