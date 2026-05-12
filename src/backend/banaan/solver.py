@@ -38,10 +38,15 @@ class SolveProgress:
 
     @property
     def gap(self) -> float:
-        """Optimality gap: 0.0 = proven optimal, 1.0 = no bound info."""
-        if self.bound == 0:
-            return 1.0
-        return max(0.0, 1.0 - self.objective / self.bound)
+        """Optimality gap: 0.0 = proven optimal, approaches inf when far.
+
+        Uses the standard MIP gap: |bound - objective| / max(|objective|, |bound|, 1).
+        Works correctly when objective and/or bound are negative.
+        """
+        if self.objective == self.bound:
+            return 0.0
+        denom = max(abs(self.objective), abs(self.bound), 1.0)
+        return abs(self.bound - self.objective) / denom
 
     @property
     def time_fraction(self) -> float:
