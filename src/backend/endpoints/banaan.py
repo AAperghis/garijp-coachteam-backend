@@ -1,7 +1,9 @@
 import io
 import json
+import os
 import queue
 import threading
+import uuid
 
 from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
@@ -9,10 +11,22 @@ from pydantic import BaseModel
 import pandas as pd
 
 from backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
-from backend.banaan.solver import BanaanSolver, SolveProgress
+from backend.banaan.solver import BanaanSolver, SolveProgress, SolveError, _ProgressCallback
+from backend.banaan.solver_v2 import BanaanSolverV2
 from backend.banaan.output import generate_output
 
 router = APIRouter(prefix="/banaan")
+
+# Active solves: solve_id -> callback (for stop requests)
+_active_solves: dict[str, _ProgressCallback] = {}
+
+# Select solver via env var: "v2" for simplified model, anything else for original
+_SOLVER_VERSION = os.environ.get("SOLVER_VERSION", "v2").strip().lower()
+
+def _make_solver(students, instructors, config):
+    if _SOLVER_VERSION == "v2":
+        return BanaanSolverV2(students, instructors, config)
+    return BanaanSolver(students, instructors, config)
 
 
 # ── Pydantic models ─────────────────────────────────────────────────────
@@ -291,8 +305,11 @@ async def upload_banaan(
 async def solve_banaan(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
 
-    solver = BanaanSolver(students, instructors, config)
-    solution = solver.solve(timeout=req.timeout)
+    solver = _make_solver(students, instructors, config)
+    try:
+        solution = solver.solve(timeout=req.timeout)
+    except SolveError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     if solution is None:
         raise HTTPException(status_code=422, detail="No feasible schedule found")
@@ -304,8 +321,11 @@ async def solve_banaan(req: BanaanRequest):
 async def download_banaan(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
 
-    solver = BanaanSolver(students, instructors, config)
-    solution = solver.solve(timeout=req.timeout)
+    solver = _make_solver(students, instructors, config)
+    try:
+        solution = solver.solve(timeout=req.timeout)
+    except SolveError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     if solution is None:
         raise HTTPException(status_code=422, detail="No feasible schedule found")
@@ -387,14 +407,16 @@ def _build_response(solution) -> BanaanResponse:
 @router.post("/solve-stream")
 async def solve_stream(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
-    solver = BanaanSolver(students, instructors, config)
+    solver = _make_solver(students, instructors, config)
     timeout = req.timeout
+    solve_id = uuid.uuid4().hex
 
     progress_queue: queue.Queue[str] = queue.Queue()
 
     def on_progress(p: SolveProgress):
         event = json.dumps({
             "type": "progress",
+            "solve_id": solve_id,
             "elapsed": round(p.elapsed, 1),
             "timeout": p.timeout,
             "time_fraction": round(p.time_fraction, 3),
@@ -405,12 +427,21 @@ async def solve_stream(req: BanaanRequest):
         })
         progress_queue.put(f"data: {event}\n\n")
 
+    callback = _ProgressCallback(timeout, on_progress)
+    _active_solves[solve_id] = callback
     result_holder: list = []
 
+    error_holder: list[str] = []
+
     def run_solver():
-        solution = solver.solve(timeout=timeout, on_progress=on_progress)
-        result_holder.append(solution)
-        progress_queue.put(None)  # sentinel
+        try:
+            solution = solver.solve(timeout=timeout, on_progress=on_progress, callback=callback)
+            result_holder.append(solution)
+        except SolveError as e:
+            error_holder.append(str(e))
+        finally:
+            _active_solves.pop(solve_id, None)
+            progress_queue.put(None)  # sentinel
 
     thread = threading.Thread(target=run_solver, daemon=True)
     thread.start()
@@ -423,7 +454,10 @@ async def solve_stream(req: BanaanRequest):
             yield msg
 
         solution = result_holder[0] if result_holder else None
-        if solution is None:
+        if error_holder:
+            event = json.dumps({"type": "error", "detail": error_holder[0]})
+            yield f"data: {event}\n\n"
+        elif solution is None:
             event = json.dumps({"type": "error", "detail": "No feasible schedule found"})
             yield f"data: {event}\n\n"
         else:
@@ -436,3 +470,16 @@ async def solve_stream(req: BanaanRequest):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+class StopRequest(BaseModel):
+    solve_id: str
+
+
+@router.post("/stop")
+async def stop_solve(req: StopRequest):
+    callback = _active_solves.get(req.solve_id)
+    if callback is None:
+        raise HTTPException(status_code=404, detail="Solve not found or already finished")
+    callback.request_stop()
+    return {"status": "stopping"}
