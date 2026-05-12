@@ -4,18 +4,13 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-# Copy dependency file and install
+# Copy project files and install in package mode
 COPY pyproject.toml ./
-ENV UV_SYSTEM_PYTHON=1
-RUN uv pip install -r pyproject.toml
-
-# Copy source code
 COPY src/ ./src/
 
-# Set PYTHONPATH to include the src directory
-ENV PYTHONPATH=/app/src
+RUN uv pip install --system --no-cache .
 
 # Default command
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
