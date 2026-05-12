@@ -399,6 +399,8 @@ async def solve_stream(req: BanaanRequest):
             "timeout": p.timeout,
             "time_fraction": round(p.time_fraction, 3),
             "gap": round(p.gap, 4),
+            "objective": round(p.objective, 2),
+            "bound": round(p.bound, 2),
             "solutions_found": p.solutions_found,
         })
         progress_queue.put(f"data: {event}\n\n")
