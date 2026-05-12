@@ -7,7 +7,7 @@ from pydantic import BaseModel
 import pandas as pd
 import openpyxl  # noqa: F401 — ensures openpyxl engine is available for pd.read_excel
 
-from backend.roster.models import Person, Task, Roster
+from backend.roster.models import Person, Task, Roster, SolverConfig
 from backend.roster.solver import RosterSolver
 from backend.roster.output import generate_roster_table
 
@@ -30,12 +30,22 @@ class TaskInput(BaseModel):
     min_people: int
 
 
+class SolverConfigInput(BaseModel):
+    preference_scale: int = 100
+    multi_task_day_penalty: int = 10
+    repeat_penalty: int = 20
+    no_repeat_penalty: int = 60
+    balance_penalty: int = 5
+    no_repeat_tasks: list[str] = []
+
+
 class RosterConfig(BaseModel):
     days: list[str]
     task_conflicts: list[tuple[str, str]] = []
     max_task_assignments: dict[str, int] = {}
     pre_assignments: list[tuple[str, str, str]] = []
     task_blocks: list[tuple[str, str, str]] = []  # (person_id, task_id, day) day="" for all days
+    solver_config: SolverConfigInput = SolverConfigInput()
 
 
 class UploadResponse(BaseModel):
@@ -79,6 +89,16 @@ def _build_roster(req: RosterRequest) -> Roster:
         if len(parts) == 2:
             max_assignments[(parts[0], parts[1])] = val
 
+    sc = req.config.solver_config
+    solver_config = SolverConfig(
+        preference_scale=sc.preference_scale,
+        multi_task_day_penalty=sc.multi_task_day_penalty,
+        repeat_penalty=sc.repeat_penalty,
+        no_repeat_penalty=sc.no_repeat_penalty,
+        balance_penalty=sc.balance_penalty,
+        no_repeat_tasks=sc.no_repeat_tasks,
+    )
+
     return Roster(
         people=people,
         tasks=tasks,
@@ -87,6 +107,7 @@ def _build_roster(req: RosterRequest) -> Roster:
         max_task_assignments=max_assignments,
         pre_assignments=req.config.pre_assignments,
         task_blocks=req.config.task_blocks,
+        solver_config=solver_config,
     )
 
 

@@ -102,13 +102,17 @@ class RosterSolver:
         2. Penalise multiple tasks on the same day (soft, not hard)
         3. Penalise repeating the same task across the week
         4. Balance total load across people
+
+        All penalty/bonus magnitudes are driven by solver_config.
         """
+        cfg = self.roster.solver_config
         num_days = len(self.roster.days)
         num_tasks = len(self.roster.tasks)
+        no_repeat_ids = set(cfg.no_repeat_tasks)
         objective_terms = []
 
         # ── 1. Preference weights (highest priority) ──
-        weight_scale = num_days * num_tasks * 100
+        weight_scale = num_days * num_tasks * cfg.preference_scale
 
         for person in self.roster.people:
             for task in self.roster.tasks:
@@ -120,7 +124,6 @@ class RosterSolver:
                         )
 
         # ── 2. Soft: penalise >1 task per person per day ──
-        # extra_tasks_d = max(0, tasks_that_day - 1)
         for person in self.roster.people:
             for day in self.roster.days:
                 day_total = sum(
@@ -130,22 +133,23 @@ class RosterSolver:
                 extra = self.model.NewIntVar(0, num_tasks, f"extra_{person.id}_{day}")
                 self.model.Add(extra >= day_total - 1)
                 self.model.Add(extra >= 0)
-                # Moderate penalty – worse than repeating a task but not a deal-breaker
-                objective_terms.append(-10 * extra)
+                objective_terms.append(-cfg.multi_task_day_penalty * extra)
 
-        # ── 3. Penalise repeating the same task (any two days, not just consecutive) ──
+        # ── 3. Penalise repeating the same task (any two days) ──
         for person in self.roster.people:
             for task in self.roster.tasks:
                 week_count = sum(
                     self.vars[(person.id, task.id, day)]
                     for day in self.roster.days
                 )
-                # repeat = max(0, week_count - 1)
                 repeat = self.model.NewIntVar(0, num_days, f"rep_{person.id}_{task.id}")
                 self.model.Add(repeat >= week_count - 1)
                 self.model.Add(repeat >= 0)
-                # Strong penalty per extra occurrence
-                objective_terms.append(-20 * repeat)
+
+                penalty = cfg.repeat_penalty
+                if task.id in no_repeat_ids:
+                    penalty += cfg.no_repeat_penalty
+                objective_terms.append(-penalty * repeat)
 
         # ── 4. Balance total load across people ──
         max_load = self.model.NewIntVar(0, num_days * num_tasks, "max_load")
@@ -160,7 +164,7 @@ class RosterSolver:
             self.model.Add(max_load >= total)
             self.model.Add(min_load <= total)
 
-        objective_terms.append(-5 * (max_load - min_load))
+        objective_terms.append(-cfg.balance_penalty * (max_load - min_load))
 
         self.model.Maximize(sum(objective_terms))
     

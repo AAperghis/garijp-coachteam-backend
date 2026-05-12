@@ -1,6 +1,6 @@
 import argparse
 import json
-from backend.roster.models import Person, Task, Roster
+from backend.roster.models import Person, Task, Roster, SolverConfig
 from backend.roster.solver import RosterSolver
 from backend.roster.output import generate_roster_table, export_roster
 
@@ -31,13 +31,16 @@ def load_data(config_file):
     ]
     
     # Create roster with constraints
+    solver_config = SolverConfig.from_dict(data.get("solver_config", {}))
+
     roster = Roster(
         people=people,
         tasks=tasks,
         days=data["days"],
         task_conflicts=data.get("task_conflicts", []),
         max_task_assignments=data.get("max_task_assignments", {}),
-        pre_assignments=data.get("pre_assignments", [])
+        pre_assignments=data.get("pre_assignments", []),
+        solver_config=solver_config,
     )
     
     return roster

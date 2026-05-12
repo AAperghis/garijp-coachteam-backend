@@ -1,0 +1,8 @@
+{
+    "preference_scale": 100,
+    "multi_task_day_penalty": 10,
+    "repeat_penalty": 20,
+    "no_repeat_penalty": 60,
+    "balance_penalty": 5,
+    "no_repeat_tasks": ["nachtwacht", "corvee"]
+}
