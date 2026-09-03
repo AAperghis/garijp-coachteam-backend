@@ -441,7 +441,13 @@ async def solve_stream(req: BanaanRequest):
 
     def event_stream():
         while True:
-            msg = progress_queue.get()
+            try:
+                # Heartbeat keeps proxies from killing the idle connection
+                # (progress events only fire when a new solution is found).
+                msg = progress_queue.get(timeout=10.0)
+            except queue.Empty:
+                yield 'data: {"type": "ping"}\n\n'
+                continue
             if msg is None:
                 break
             yield msg
