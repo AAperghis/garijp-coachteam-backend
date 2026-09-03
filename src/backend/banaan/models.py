@@ -108,10 +108,10 @@ class BanaanConfig:
     slot_duration_min: int = 15
     transit_slots: int = 1
     prep_slots: int = 1
-    start_time: str = "10:00"
+    start_time: str = "10:30"
     end_time: str = "16:00"
     weights: dict[str, int] = field(default_factory=lambda: {
-        "group_penalty": 1000,
+        "group_penalty": 500,
         "early_bonus": 5,
         "phase_order": 500,
         "island_wait_penalty": 2,
@@ -119,12 +119,11 @@ class BanaanConfig:
         "own_instructor_bonus": 150,
         "same_disc_bonus": 100,
         "friend_bonus": 10,
-        "cover_over_penalty": 10,
+        "cover_over_penalty": 100,
         "cover_own_bonus": 30,
         "cover_disc_bonus": 60,
         "multi_trip_penalty": 200,
         "cover_switch_penalty": 200,
-        "instructor_group_penalty": 100,
     })
     coverage_map: dict[str, set[str]] = field(default_factory=lambda: dict(DEFAULT_COVERAGE_MAP))
 

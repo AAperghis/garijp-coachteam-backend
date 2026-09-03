@@ -3,7 +3,7 @@
     "slot_duration_min": 15,
     "transit_slots": 1,
     "prep_slots": 1,
-    "start_time": "10:00",
+    "start_time": "10:30",
     "end_time": "16:00",
     "weights": {
         "group_penalty": 500,
@@ -18,7 +18,6 @@
         "cover_own_bonus": 30,
         "cover_disc_bonus": 60,
         "multi_trip_penalty": 200,
-        "cover_switch_penalty": 200,
-        "instructor_group_penalty": 100
+        "cover_switch_penalty": 200
     }
 }

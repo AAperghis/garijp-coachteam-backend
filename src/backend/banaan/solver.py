@@ -535,6 +535,10 @@ class BanaanSolver:
         #     cover variables so O7 (capacity) can reference them.
         for nbs in range(n_nbs):
             own_i = self.instructor_idx.get(self.non_banana_students[nbs].instructor)
+            # Own instructor may be cover-incompatible (cross-discipline data);
+            # only hard-lock when they can actually cover this student.
+            if own_i is not None and own_i not in nbs_compat[nbs]:
+                own_i = None
             for t in range(T):
                 model.Add(sum(cover[nbs, i, t] for i in nbs_compat[nbs]) == 1)
                 for i in nbs_compat[nbs]:
@@ -548,6 +552,8 @@ class BanaanSolver:
         # to keep the backup stable.
         for s in range(n_bs):
             own_i = self.instructor_idx.get(self.banana_students[s].instructor)
+            if own_i is not None and own_i not in bs_compat[s]:
+                own_i = None
             for t in range(T):
                 model.Add(
                     sum(cover_banana[s, i, t] for i in bs_compat[s]) == 1
@@ -690,7 +696,7 @@ class BanaanSolver:
         # O8: Cover own instructor bonus (non-banana students)
         for nbs in range(n_nbs):
             own_i = self.instructor_idx.get(self.non_banana_students[nbs].instructor)
-            if own_i is not None:
+            if own_i is not None and own_i in nbs_compat[nbs]:
                 for t in range(T):
                     obj_terms.append(w["cover_own_bonus"] * cover[nbs, own_i, t])
 
@@ -705,7 +711,7 @@ class BanaanSolver:
         # O10: Cover own instructor bonus (banana students while sailing)
         for s in range(n_bs):
             own_i = self.instructor_idx.get(self.banana_students[s].instructor)
-            if own_i is not None:
+            if own_i is not None and own_i in bs_compat[s]:
                 for t in range(T):
                     obj_terms.append(w["cover_own_bonus"] * cover_banana[s, own_i, t])
 
@@ -766,16 +772,18 @@ class BanaanSolver:
         #      min trip = ~3 slots; allow up to 8 (= 2 hours).
         max_island_slots = 2 * transit + prep + 2 + 3  # e.g. 2+1+2+3=8
 
-        # C15: Mandatory prep — each banana student must be on the island
-        #      for at least prep_slots before their ride.  Enforced by
-        #      requiring ride_slot >= depart_slot + transit + prep for the
-        #      transporting instructor.
-        if prep > 0:
-            for s in range(n_bs):
-                for i in range(n_inst):
-                    model.Add(
-                        ride_slot[s] >= depart_slot[i] + transit + prep
-                    ).OnlyEnforceIf(transported_by[s, i])
+        # C15: Ride timing within the trip — each banana student must be on
+        #      the island for at least prep_slots before their ride (after
+        #      transit), and the ride must finish before the return transit
+        #      starts (no riding while the instructor sails home).
+        for s in range(n_bs):
+            for i in range(n_inst):
+                model.Add(
+                    ride_slot[s] >= depart_slot[i] + transit + prep
+                ).OnlyEnforceIf(transported_by[s, i])
+                model.Add(
+                    ride_slot[s] < return_depart[i]
+                ).OnlyEnforceIf(transported_by[s, i])
         for s in range(n_bs):
             model.Add(
                 sum(student_on_island[s, t] for t in range(T)) <= max_island_slots
@@ -786,8 +794,9 @@ class BanaanSolver:
         # ── Search hints for faster first solution ───────────────────────
         # Hint ride slots: pack students by phase, filling boat capacity
         sorted_by_phase = sorted(range(n_bs), key=lambda s: (self.banana_students[s].phase, s))
+        # Earliest feasible ride slot is transit + prep (after depart at slot 0)
         for rank, s in enumerate(sorted_by_phase):
-            hint_slot = min(rank // max(1, cfg.boat_capacity), T - 1)
+            hint_slot = min(transit + prep + rank // max(1, cfg.boat_capacity), T - 1)
             model.AddHint(ride_slot[s], hint_slot)
 
         # ── Solve ────────────────────────────────────────────────────────
