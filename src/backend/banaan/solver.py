@@ -234,6 +234,17 @@ class _ProgressCallback(cp_model.CpSolverSolutionCallback):
         """Thread-safe: ask the solver to stop at the next opportunity."""
         self._stop_requested.set()
 
+    def should_stop(self) -> bool:
+        """Thread-safe check used by the watchdog: external stop request or
+        objective stagnation.  Needed because on_solution_callback only runs
+        when a NEW solution is found — a stalled search never re-enters it."""
+        if self._stop_requested.is_set():
+            return True
+        now = time.monotonic()
+        return (self._solutions >= 1
+                and now - self._start > 15.0
+                and now - self._last_improvement_time > self._stagnation_seconds)
+
     def on_solution_callback(self):
         self._solutions += 1
         now = time.monotonic()
@@ -266,7 +277,7 @@ class _ProgressCallback(cp_model.CpSolverSolutionCallback):
         # Stop if objective has stagnated (no improvement for N seconds)
         # Only after enough time has passed and enough solutions found
         stagnation = now - self._last_improvement_time
-        if (self._solutions >= 5 and elapsed > 15.0
+        if (self._solutions >= 2 and elapsed > 15.0
                 and stagnation > self._stagnation_seconds):
             self.StopSearch()
 
@@ -326,10 +337,16 @@ class BanaanSolver:
 
         # ── Decision variables ───────────────────────────────────────────
 
+        # Tight domains implied by C15/C10: a ride needs transit+prep before
+        # it and a return transit after it.  Pure inference — removes no
+        # feasible solution, but greatly helps propagation.
+        ride_lb = transit + prep
+        ride_ub = T - 1 - transit
+
         # ride_slot[s]: which time slot banana-student s rides the banana
         ride_slot: dict[int, cp_model.IntVar] = {}
         for s in range(n_bs):
-            ride_slot[s] = model.NewIntVar(0, T - 1, f"ride_{s}")
+            ride_slot[s] = model.NewIntVar(ride_lb, ride_ub, f"ride_{s}")
 
         # banana_used[t]: whether any student rides at slot t
         banana_used: dict[int, cp_model.IntVar] = {}
@@ -356,14 +373,17 @@ class BanaanSolver:
             goes[i] = model.NewBoolVar(f"goes_{i}")
 
         # depart_slot[i]: slot when instructor i starts transit TO island
+        # (values only meaningful when goes[i]; tight bounds from C6/C10)
         depart_slot: dict[int, cp_model.IntVar] = {}
         for i in range(n_inst):
-            depart_slot[i] = model.NewIntVar(0, T - 1, f"dep_{i}")
+            depart_slot[i] = model.NewIntVar(0, T - 2 * transit - prep, f"dep_{i}")
 
         # return_depart[i]: slot when instructor i starts transit back FROM island
         return_depart: dict[int, cp_model.IntVar] = {}
         for i in range(n_inst):
-            return_depart[i] = model.NewIntVar(0, T - 1, f"ret_{i}")
+            return_depart[i] = model.NewIntVar(
+                transit + prep, min(T - transit, T - 1), f"ret_{i}"
+            )
 
         # Pre-compute discipline-compatible instructor indices (needed early
         # to restrict transported_by variables).
@@ -796,7 +816,7 @@ class BanaanSolver:
         sorted_by_phase = sorted(range(n_bs), key=lambda s: (self.banana_students[s].phase, s))
         # Earliest feasible ride slot is transit + prep (after depart at slot 0)
         for rank, s in enumerate(sorted_by_phase):
-            hint_slot = min(transit + prep + rank // max(1, cfg.boat_capacity), T - 1)
+            hint_slot = min(ride_lb + rank // max(1, cfg.boat_capacity), ride_ub)
             model.AddHint(ride_slot[s], hint_slot)
 
         # ── Solve ────────────────────────────────────────────────────────
@@ -807,14 +827,29 @@ class BanaanSolver:
         available_cores = os.cpu_count() or 2
         solver.parameters.num_workers = min(available_cores, 8)
 
-        # Better search strategy for faster convergence
-        solver.parameters.linearization_level = 2
         solver.parameters.log_search_progress = True
 
-        # Use provided callback, or create one for on_progress, or None
-        if callback is None and on_progress is not None:
-            callback = _ProgressCallback(timeout, on_progress)
-        status = solver.Solve(model, callback)
+        # Use provided callback, or create one for on_progress, or a silent
+        # one so the stagnation watchdog always works.
+        if callback is None:
+            callback = _ProgressCallback(timeout, on_progress or (lambda p: None))
+
+        # Watchdog: the solution callback only fires on NEW solutions, so a
+        # stalled search would otherwise run until the full timeout even
+        # though the answer stopped improving long ago.
+        done = threading.Event()
+
+        def _watchdog() -> None:
+            while not done.wait(1.0):
+                if callback.should_stop():
+                    solver.StopSearch()
+                    return
+
+        threading.Thread(target=_watchdog, daemon=True).start()
+        try:
+            status = solver.Solve(model, callback)
+        finally:
+            done.set()
 
         status_name = solver.StatusName(status)
         print(f"  Status: {status_name}, time: {solver.WallTime():.1f}s")
