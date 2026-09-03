@@ -12,7 +12,6 @@ import pandas as pd
 
 from backend.banaan.models import Student, Instructor, BanaanConfig, normalise_discipline
 from backend.banaan.solver import BanaanSolver, SolveProgress, SolveError, _ProgressCallback
-from backend.banaan.solver_v2 import BanaanSolverV2
 from backend.banaan.output import generate_output
 
 router = APIRouter(prefix="/banaan")
@@ -22,12 +21,6 @@ _active_solves: dict[str, _ProgressCallback] = {}
 
 # Select solver via env var: "v2" for simplified model, anything else for original
 _SOLVER_VERSION = os.environ.get("SOLVER_VERSION", "v2").strip().lower()
-
-def _make_solver(students, instructors, config):
-    if _SOLVER_VERSION == "v2":
-        return BanaanSolverV2(students, instructors, config)
-    return BanaanSolver(students, instructors, config)
-
 
 # ── Pydantic models ─────────────────────────────────────────────────────
 
@@ -305,7 +298,7 @@ async def upload_banaan(
 async def solve_banaan(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
 
-    solver = _make_solver(students, instructors, config)
+    solver = BanaanSolver(students, instructors, config)
     try:
         solution = solver.solve(timeout=req.timeout)
     except SolveError as e:
@@ -321,7 +314,7 @@ async def solve_banaan(req: BanaanRequest):
 async def download_banaan(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
 
-    solver = _make_solver(students, instructors, config)
+    solver = BanaanSolver(students, instructors, config)
     try:
         solution = solver.solve(timeout=req.timeout)
     except SolveError as e:
@@ -407,7 +400,7 @@ def _build_response(solution) -> BanaanResponse:
 @router.post("/solve-stream")
 async def solve_stream(req: BanaanRequest):
     students, instructors, config = _to_domain(req)
-    solver = _make_solver(students, instructors, config)
+    solver = BanaanSolver(students, instructors, config)
     timeout = req.timeout
     solve_id = uuid.uuid4().hex
 
