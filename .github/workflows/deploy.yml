@@ -1,0 +1,54 @@
+name: Deploy backend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    env:
+      IMAGE: coach-tools:latest
+      CONTAINER: coach-tools
+      # Host port bound to localhost only; cloudflared connects here.
+      HOST_PORT: "8000"
+      # Comma-separated allowed frontend origins for CORS.
+      CORS_ORIGINS: ${{ vars.CORS_ORIGINS || '*' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t "$IMAGE" .
+
+      - name: Restart container
+        run: |
+          docker rm -f "$CONTAINER" 2>/dev/null || true
+          docker run -d \
+            --name "$CONTAINER" \
+            --restart unless-stopped \
+            -p 127.0.0.1:${HOST_PORT}:8000 \
+            -e CORS_ORIGINS="$CORS_ORIGINS" \
+            "$IMAGE"
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:${HOST_PORT}/health" >/dev/null; then
+              echo "Backend healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend failed health check"
+          docker logs --tail 50 "$CONTAINER" || true
+          exit 1
+
+      - name: Prune old images
+        if: always()
+        run: docker image prune -f
